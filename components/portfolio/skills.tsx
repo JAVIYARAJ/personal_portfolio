@@ -78,7 +78,7 @@ class DataRepository {
               key={group.title}
               onMouseEnter={() => setActiveGroup(gIdx)}
               onMouseLeave={() => setActiveGroup(null)}
-              className="p-12 rounded-[3.5rem] bg-white/5 border border-white/10 hover:border-accent-cyan/30 transition-all duration-500 group relative overflow-hidden shadow-2xl flex flex-col gap-10"
+              className="p-8 rounded-[2.5rem] bg-white/5 border border-white/10 hover:border-accent-cyan/30 transition-all duration-500 group relative overflow-hidden shadow-2xl flex flex-col gap-8"
               style={{
                 animation: `fadeInUp 0.6s ease-out ${gIdx * 0.1}s forwards`,
                 opacity: 0,
@@ -88,13 +88,13 @@ class DataRepository {
               <div className="absolute inset-0 bg-gradient-to-br from-accent-cyan/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
               
               <div className="flex justify-between items-start relative z-10">
-                 <div className="space-y-3">
-                    <div className="w-14 h-14 rounded-2xl bg-white/5 flex items-center justify-center group-hover:scale-110 group-hover:bg-accent-cyan/10 transition-all duration-500 shadow-inner">
+                 <div className="space-y-2">
+                    <div className="w-12 h-12 rounded-xl bg-white/5 flex items-center justify-center group-hover:scale-110 group-hover:bg-accent-cyan/10 transition-all duration-500 shadow-inner">
                        {group.icon}
                     </div>
                     <div className="space-y-1">
-                       <h3 className="text-2xl font-black text-white group-hover:text-accent-cyan transition-colors">{group.title}</h3>
-                       <p className="text-[10px] text-white/30 uppercase font-black tracking-widest">{group.detail}</p>
+                       <h3 className="text-xl font-black text-white group-hover:text-accent-cyan transition-colors">{group.title}</h3>
+                       <p className="text-[9px] text-white/30 uppercase font-black tracking-widest">{group.detail}</p>
                     </div>
                  </div>
                  <div className="text-[8px] font-mono text-white/10 group-hover:text-accent-cyan/40 transition-colors uppercase vertical-text tracking-widest pt-4">

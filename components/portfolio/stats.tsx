@@ -41,9 +41,9 @@ function AnimatedCounter({ target, suffix = '', isActive }: AnimatedCounterProps
   }, [target, isActive])
 
   return (
-    <div className="text-5xl md:text-6xl font-black text-white tracking-tighter tabular-nums">
+    <div className="text-3xl md:text-5xl font-black text-white tracking-tighter tabular-nums">
       {count}
-      <span className="text-3xl md:text-4xl text-accent-cyan ml-1">{suffix}</span>
+      <span className="text-2xl md:text-3xl text-accent-cyan ml-1">{suffix}</span>
     </div>
   )
 }
@@ -82,7 +82,7 @@ function StatCard({ stat, index }: { stat: typeof stats[0], index: number }) {
       onMouseMove={handleMouseMove}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
-      className="relative p-10 rounded-[3rem] bg-white/5 border border-white/10 backdrop-blur-xl overflow-hidden group transition-all duration-500 hover:translate-y-[-10px] hover:bg-white/[0.08]"
+      className="relative p-8 rounded-[2rem] bg-white/5 border border-white/10 backdrop-blur-xl overflow-hidden group transition-all duration-500 hover:translate-y-[-10px] hover:bg-white/[0.08]"
       style={{
         animation: `fadeInUp 0.6s ease-out ${index * 0.1}s forwards`,
         opacity: 0,
@@ -96,8 +96,8 @@ function StatCard({ stat, index }: { stat: typeof stats[0], index: number }) {
         }}
       />
 
-      <div className="relative z-10 space-y-6">
-        <div className="w-14 h-14 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center group-hover:scale-110 group-hover:bg-accent-cyan/10 transition-all duration-500">
+      <div className="relative z-10 space-y-5">
+        <div className="w-12 h-12 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center group-hover:scale-110 group-hover:bg-accent-cyan/10 transition-all duration-500">
            {stat.icon}
         </div>
         
@@ -153,29 +153,29 @@ export default function Stats() {
         </div>
 
         {/* Global Insight Bar */}
-        <div className="mt-20 p-10 rounded-[3rem] bg-white/5 border border-white/10 backdrop-blur-xl relative overflow-hidden group hover:bg-white/[0.08] transition-all duration-500">
-           <div className="absolute inset-y-0 left-0 w-2 bg-accent-cyan group-hover:w-4 transition-all" />
+        <div className="mt-16 p-8 rounded-[2rem] bg-white/5 border border-white/10 backdrop-blur-xl relative overflow-hidden group hover:bg-white/[0.08] transition-all duration-500">
+           <div className="absolute inset-y-0 left-0 w-1 bg-accent-cyan group-hover:w-2 transition-all" />
            <div className="flex flex-col md:flex-row items-center justify-between gap-10">
               <div className="flex items-center gap-6">
-                 <div className="p-4 rounded-2xl bg-accent-blue/20 text-accent-cyan">
-                    <Star size={32} fill="currentColor" />
+                 <div className="p-3 rounded-xl bg-accent-blue/20 text-accent-cyan">
+                    <Star size={24} fill="currentColor" />
                  </div>
-                 <div className="space-y-1">
-                    <h4 className="text-2xl font-black text-white">Top Developer Velocity</h4>
-                    <p className="text-white/40 text-sm">Recognized for world-class architectural standards</p>
+                 <div className="space-y-0.5">
+                    <h4 className="text-xl font-black text-white">Top Developer Velocity</h4>
+                    <p className="text-white/40 text-xs text-nowrap">Recognized for world-class technical standards</p>
                  </div>
               </div>
-              <div className="flex items-center gap-12 font-black uppercase text-[10px] tracking-widest text-accent-cyan">
-                 <div className="flex flex-col items-center gap-2">
-                    <span className="text-xl text-white">10+</span>
+              <div className="flex items-center gap-10 font-black uppercase text-[9px] tracking-widest text-accent-cyan">
+                 <div className="flex flex-col items-center gap-1">
+                    <span className="text-lg text-white">10+</span>
                     <span>Featured Apps</span>
                  </div>
-                 <div className="flex flex-col items-center gap-2">
-                    <span className="text-xl text-white">4.9/5</span>
+                 <div className="flex flex-col items-center gap-1">
+                    <span className="text-lg text-white">4.9/5</span>
                     <span>Avg. Rating</span>
                  </div>
-                 <div className="flex flex-col items-center gap-2">
-                    <span className="text-xl text-white">99%</span>
+                 <div className="flex flex-col items-center gap-1">
+                    <span className="text-lg text-white">99%</span>
                     <span>Retention</span>
                  </div>
               </div>
