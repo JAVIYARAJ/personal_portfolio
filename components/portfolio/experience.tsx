@@ -5,39 +5,39 @@ import { Briefcase, Calendar, CheckCircle2, Cpu, Globe, Rocket, Zap } from 'luci
 
 const experiences = [
   {
-    company: 'TechStartup Inc',
-    role: 'Senior Flutter Developer',
-    duration: '2022 - Present',
-    logo: '🚀',
-    tech: ['Riverpod', 'CI/CD', 'Web3'],
-    bullets: [
-      'Led development of flagship mobile app serving 500K+ daily users',
-      'Mentored junior developers and established coding standards',
-      'Reduced app load time by 40% through optimization',
-    ],
-  },
-  {
-    company: 'Digital Solutions Ltd',
+    company: 'Esparkbiz',
     role: 'Flutter Developer',
-    duration: '2020 - 2022',
-    logo: '🌐',
-    tech: ['Firebase', 'GraphQL', 'Swift'],
+    duration: 'Sep 2023 - Present',
+    logo: '🚀',
+    tech: ['Dart', 'Flutter', 'Clean Architecture'],
     bullets: [
-      'Developed and shipped 15+ production apps across iOS and Android',
-      'Implemented real-time features using Firebase and WebSockets',
-      'Collaborated with designers to ensure pixel-perfect UI implementation',
+      'Leading scalable cross-platform architecture for 15+ production applications with a focus on long-term maintainability',
+      'Optimized feature delivery pipelines contributing to a 95% on-time release rate across multiple enterprise projects',
+      'Implemented refined modular design patterns reducing development time for new features by 20%',
     ],
   },
   {
-    company: 'Mobile Ventures',
-    role: 'Junior Developer',
-    duration: '2019 - 2020',
-    logo: '💻',
-    tech: ['REST', 'UX', 'Native'],
+    company: 'Esparkbiz',
+    role: 'Software Developer Intern',
+    duration: 'Jan 2023 - Sep 2023',
+    logo: '🌐',
+    tech: ['Agile', 'Git', 'UI Optimization'],
     bullets: [
-      'Built responsive mobile applications using Flutter framework',
-      'Integrated third-party APIs and payment gateways',
-      'Participated in code reviews and continuous improvement',
+      'Contributed to core feature refactoring that improved codebase maintainability by 30% during high-growth phase',
+      'Followed strict Agile methodologies and Git-based workflows, participating in 20+ successful sprint releases',
+      'Boosted user engagement by 25% through performance profiling and UI-pixel-perfect optimizations',
+    ],
+  },
+  {
+    company: 'Native Systems',
+    role: 'Independent Developer',
+    duration: 'Jun 2021 - Dec 2022',
+    logo: '🤖',
+    tech: ['Kotlin', 'Java', 'Jetpack Compose'],
+    bullets: [
+      'Developed native Android modules and components using Kotlin/Java, establishing a strong platform-level foundation',
+      'Built multi-platform MVP modules for freelance clients, mastering the bridge between Flutter and Native environments',
+      'Researched and implemented modern UI patterns in Jetpack Compose to streamline cross-platform design consistency',
     ],
   },
 ]
@@ -120,7 +120,7 @@ export default function Experience() {
               const isActive = scrollProgress > (index / experiences.length)
               return (
                 <div
-                  key={exp.company}
+                  key={`${exp.company}-${index}`}
                   className={`relative flex flex-col md:flex-row items-center justify-between gap-12 group`}
                   data-timeline-item
                 >

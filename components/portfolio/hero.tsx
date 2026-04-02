@@ -1,13 +1,12 @@
-'use client'
-
+import { motion } from 'framer-motion'
 import { useEffect, useState, useMemo } from 'react'
 import { Download, ArrowDown, Terminal, Cpu, Layers, Globe } from 'lucide-react'
 
 const titles = [
-  'Senior Flutter Engineer',
+  'Senior Flutter Developer',
   'Software Architect',
-  'Full-Stack Developer',
-  'UI/UX Designer',
+  'Cross-Platform Expert',
+  'Clean Architecture Specialist',
 ]
 
 const systemMessages = [
@@ -26,6 +25,8 @@ export default function Hero() {
   const [showSplash, setShowSplash] = useState(true)
   const [splashProgress, setSplashProgress] = useState(0)
   const [currentSystemMessage, setCurrentSystemMessage] = useState(systemMessages[0])
+
+  const nameLetters = "JAVIYA RAJ".split("")
 
   // Advanced splash screen animation
   useEffect(() => {
@@ -145,36 +146,42 @@ export default function Hero() {
       </div>
 
       <div className="max-w-6xl mx-auto w-full grid md:grid-cols-2 gap-16 items-center relative z-10">
-        <div className="text-left space-y-8 animate-fadeInUp">
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-accent-blue/10 border border-accent-blue/20 backdrop-blur-sm">
-            <span className="flex h-2 w-2 rounded-full bg-accent-cyan animate-pulse" />
-            <p className="text-accent-cyan text-xs font-bold uppercase tracking-wider">I am Javiya Raj</p>
-          </div>
-
+        <div className="text-left space-y-8">
           <div className="space-y-4">
-            <h1 className="text-4xl md:text-6xl font-black text-foreground tracking-tighter leading-tight">
-              Engineering{' '}
-              <span className="bg-gradient-to-r from-accent-blue via-accent-cyan to-accent-purple bg-clip-text text-transparent italic">
-                Digital
-              </span>
-              <br />
-              Excellence.
-            </h1>
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, delay: 0.5, ease: "easeOut" }}
+              className="flex items-center gap-4 py-4"
+            >
+              <h1 className="text-4xl md:text-6xl tracking-tight text-white flex items-baseline gap-x-3">
+                <span className="font-black uppercase tracking-tighter">JAVIYA</span>
+                <span className="font-light text-accent-cyan italic">RAJ.</span>
+                <span className="h-2 w-2 rounded-full bg-accent-blue animate-pulse ml-2" />
+              </h1>
+            </motion.div>
             
-            <div className="flex items-center gap-4 text-2xl md:text-3xl text-muted-foreground font-medium">
-              <Terminal size={24} className="text-accent-cyan" />
-              <div className="min-h-[40px] flex items-center">
-                <span>I'm a </span>
-                <span className="text-white ml-2 border-r-2 border-accent-cyan pr-2 animate-pulse font-bold">
+            <motion.div 
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, delay: 1.5 }}
+              className="flex items-center gap-4 text-xl md:text-2xl text-muted-foreground font-medium pt-8"
+            >
+              <div className="p-2 rounded-lg bg-accent-cyan/10 text-accent-cyan hidden sm:block">
+                <Terminal size={20} />
+              </div>
+              <div className="flex flex-wrap items-center min-h-[60px] md:min-h-0">
+                <span className="whitespace-nowrap opacity-60">I'M A</span>
+                <span className="text-white ml-3 px-3 py-1 rounded-md bg-white/5 border-l-2 border-accent-cyan font-bold whitespace-nowrap animate-pulse transition-all">
                   {displayedText}
                 </span>
               </div>
-            </div>
+            </motion.div>
           </div>
 
           <p className="text-lg md:text-xl text-muted max-w-lg leading-relaxed font-light">
-            Crafting immersive, high-performance applications that redefine user experience. 
-            Blending cutting-edge Flutter technology with elite UI/UX design since 2019.
+            Building scalable cross-platform mobile applications using Dart and Flutter. 
+            Skilled in Clean Architecture and performance optimization since 2021.
           </p>
 
           <div className="flex flex-col sm:flex-row gap-5 pt-4">
@@ -196,16 +203,16 @@ export default function Hero() {
 
           <div className="flex items-center gap-10 pt-10 border-t border-glass-border">
             <div className="flex flex-col">
-              <span className="text-4xl font-bold text-accent-cyan">50+</span>
-              <span className="text-xs text-muted uppercase tracking-widest">Projects</span>
+              <span className="text-4xl font-bold text-accent-cyan">15+</span>
+              <span className="text-xs text-muted uppercase tracking-widest">Prod Apps</span>
             </div>
             <div className="flex flex-col">
-              <span className="text-4xl font-bold text-accent-cyan">5Y</span>
+              <span className="text-4xl font-bold text-accent-cyan">3+Y</span>
               <span className="text-xs text-muted uppercase tracking-widest">Experience</span>
             </div>
             <div className="flex flex-col">
-              <span className="text-4xl font-bold text-accent-cyan">10+</span>
-              <span className="text-xs text-muted uppercase tracking-widest">Awards</span>
+              <span className="text-4xl font-bold text-accent-cyan">95%</span>
+              <span className="text-xs text-muted uppercase tracking-widest">Success Rate</span>
             </div>
           </div>
         </div>
@@ -238,9 +245,28 @@ export default function Hero() {
                 </div>
                 
                 <div className="flex gap-4">
-                  <div className="w-12 h-12 rounded-xl bg-accent-blue/10 border border-accent-blue/20" />
-                  <div className="w-12 h-12 rounded-xl bg-accent-cyan/10 border border-accent-cyan/20" />
-                  <div className="w-12 h-12 rounded-xl bg-accent-purple/10 border border-accent-purple/20" />
+                  {/* Flutter Box - Multi-Tone */}
+                  <div className="w-12 h-12 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center group/icon transition-all duration-300 hover:bg-white/10 shadow-2xl">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                      <path d="M14.31 2.35L2.31 14.34L7.44 19.48L21.39 5.54L14.31 2.35Z" fill="#44D9E8"/>
+                      <path d="M14.19 12.32L7.03 19.48L12.15 24L21.39 14.85L14.19 12.32Z" fill="#027DFD"/>
+                    </svg>
+                  </div>
+                  {/* Kotlin Box - Signature Colors */}
+                  <div className="w-12 h-12 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center group/icon transition-all duration-300 hover:bg-white/10 shadow-2xl">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                      <path d="M1.3 24l11.3-11.5L24 24z" fill="#027DFD"/>
+                      <path d="M0 0h12L0 12.5z" fill="#7C3AED"/>
+                      <path d="M13.4 0L0 14v10l12-12L24 0z" fill="#F97316"/>
+                    </svg>
+                  </div>
+                  {/* Dart Box - Deep Blue */}
+                  <div className="w-12 h-12 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center group/icon transition-all duration-300 hover:bg-white/10 shadow-2xl">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                      <path d="M12 0L1.5 5.25v13.5L12 24l10.5-5.25v-13.5L12 0zm0 18L4.5 14.25v-4.5L12 13.5l7.5-3.75v4.5L12 18z" fill="#027DFD"/>
+                      <path d="M12 13.5l7.5-3.75L12 6L4.5 9.75L12 13.5z" fill="#44D9E8"/>
+                    </svg>
+                  </div>
                 </div>
               </div>
             </div>

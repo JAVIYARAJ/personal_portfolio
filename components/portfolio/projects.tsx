@@ -6,33 +6,33 @@ import { ExternalLink, Github } from 'lucide-react'
 const projects = [
   {
     id: 1,
-    name: 'ShopWave',
-    description: 'Feature-rich e-commerce app with real-time inventory sync, secure payments, and AI-powered recommendations. 2M+ users, 4.8★ rating.',
-    tags: ['Flutter', 'Firebase', 'Riverpod', 'Stripe'],
-    accentColor: 'from-blue-500 to-blue-600',
-    emoji: '🛍️',
-    stats: { downloads: '2M+', rating: '4.8' },
-    impact: 'Increased client sales by 300%',
+    name: 'Dyshez',
+    description: 'Developed a scalable food delivery app with an intuitive UX and Supabase-powered backend. Features include real-time order handling, dynamic admin menu management, and a custom Rewards & Loyalty system.',
+    tags: ['Flutter', 'Supabase', 'Loyalty System', 'Real-time'],
+    accentColor: 'from-orange-500 to-red-600',
+    emoji: '🍕',
+    stats: { downloads: '10K+', rating: '4.8' },
+    impact: 'Improved repeat purchases and user retention.',
   },
   {
     id: 2,
-    name: 'MindMap AI',
-    description: 'AI-powered journaling app that understands emotions and provides personalized insights. Uses OpenAI for emotion detection and pattern discovery.',
-    tags: ['Flutter', 'OpenAI', 'Hive', 'Animations'],
-    accentColor: 'from-purple-500 to-purple-600',
-    emoji: '🧠',
-    stats: { downloads: '500K+', rating: '4.9' },
-    impact: 'Helped 100K+ users improve mental wellness',
+    name: 'Smackdab',
+    description: 'A sales productivity tool that boosted team efficiency by 40%. Engineered with reusable UI components and a custom calendar module, optimized for seamless mobile and tablet workflow.',
+    tags: ['Flutter', 'Sales Pro', 'Custom Calendar', 'Modular Layout'],
+    accentColor: 'from-blue-500 to-indigo-600',
+    emoji: '📊',
+    stats: { efficiency: '40%+', engagement: '30%+' },
+    impact: 'Increased overall sales by 25%.',
   },
   {
     id: 3,
-    name: 'GeoTrack',
-    description: 'Real-time location tracking with geofencing, live notifications, and beautiful map visualization. Built for delivery and logistics companies.',
-    tags: ['Flutter', 'Google Maps', 'WebSocket', 'BLoC'],
-    accentColor: 'from-green-500 to-green-600',
-    emoji: '🗺️',
-    stats: { downloads: '1M+', rating: '4.7' },
-    impact: 'Reduced delivery times by 25%',
+    name: 'Goals.com',
+    description: 'CRM application for goal tracking and incentive management. Optimized network and async operations, resulting in a 25% reduction in processing time and a 30% increase in sales performance.',
+    tags: ['Flutter', 'Firebase', 'CRM', 'FCM Integration'],
+    accentColor: 'from-green-500 to-emerald-600',
+    emoji: '🎯',
+    stats: { responsiveness: '25%+', engagement: '15%+' },
+    impact: 'Driven a 30% increase in sales performance.',
   },
 ]
 
@@ -91,14 +91,12 @@ function ProjectCard({ project, index }: ProjectCardProps) {
         
         {/* Stats row */}
         <div className="flex gap-6 mb-4 text-sm">
-          <div>
-            <p className="text-muted text-xs">Downloads</p>
-            <p className="text-accent-cyan font-semibold">{project.stats?.downloads}</p>
-          </div>
-          <div>
-            <p className="text-muted text-xs">Rating</p>
-            <p className="text-accent-cyan font-semibold">⭐ {project.stats?.rating}</p>
-          </div>
+          {Object.entries(project.stats).map(([label, value]) => (
+            <div key={label}>
+              <p className="text-muted text-[10px] uppercase font-black tracking-widest">{label}</p>
+              <p className="text-accent-cyan font-semibold">{value}</p>
+            </div>
+          ))}
         </div>
 
         <p className="text-muted mb-6 leading-relaxed text-sm">{project.description}</p>

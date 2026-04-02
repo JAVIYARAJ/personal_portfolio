@@ -4,10 +4,10 @@ import { useEffect, useRef, useState } from 'react'
 import { Briefcase, Globe, Heart, Rocket, Smartphone, Star, Users, Zap } from 'lucide-react'
 
 const stats = [
-  { target: 50, suffix: '+', description: 'Apps Delivered', icon: <Smartphone size={32} className="text-accent-blue" /> },
-  { target: 3, suffix: 'M+', description: 'Global Reach', icon: <Users size={32} className="text-accent-cyan" /> },
-  { target: 99, suffix: '%', description: 'Customer Success', icon: <Heart size={32} className="text-accent-purple" /> },
-  { target: 5, suffix: '+', description: 'Years Experience', icon: <Rocket size={32} className="text-accent-cyan" /> },
+  { target: 15, suffix: '+', description: 'Production Apps', icon: <Smartphone size={32} className="text-accent-blue" /> },
+  { target: 40, suffix: '%', description: 'Dev Efficiency', icon: <Zap size={32} className="text-accent-cyan" /> },
+  { target: 95, suffix: '%', description: 'On-time Release', icon: <Heart size={32} className="text-accent-purple" /> },
+  { target: 3, suffix: '+', description: 'Years Experience', icon: <Rocket size={32} className="text-accent-cyan" /> },
 ]
 
 interface AnimatedCounterProps {
@@ -142,7 +142,7 @@ export default function Stats() {
             Impact by <span className="bg-gradient-to-r from-accent-blue via-accent-cyan to-white bg-clip-text text-transparent italic">Numbers.</span>
           </h2>
           <p className="text-white/40 text-lg max-w-xl mx-auto font-light leading-relaxed">
-            Proven metrics derived from 5+ years of delivering high-stakes mobile and web architecture.
+            Proven metrics derived from 3+ years of building modular mobile architecture and high-performance cross-platform systems.
           </p>
         </div>
 
