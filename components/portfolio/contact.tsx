@@ -1,7 +1,8 @@
 'use client'
 
-import { useState, useRef, useEffect } from 'react'
+import { useState } from 'react'
 import { Mail, Linkedin, Github, Twitter, Copy, Check, Send } from 'lucide-react'
+import FadeIn from './fade-in'
 
 export default function Contact() {
   const [formData, setFormData] = useState({
@@ -11,26 +12,6 @@ export default function Contact() {
   })
   const [submitted, setSubmitted] = useState(false)
   const [copiedEmail, setCopiedEmail] = useState(false)
-  const [isVisible, setIsVisible] = useState(false)
-  const sectionRef = useRef<HTMLDivElement>(null)
-
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          setIsVisible(true)
-          observer.unobserve(entry.target)
-        }
-      },
-      { threshold: 0.3 }
-    )
-
-    if (sectionRef.current) {
-      observer.observe(sectionRef.current)
-    }
-
-    return () => observer.disconnect()
-  }, [])
 
   const handleInputChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -92,93 +73,96 @@ export default function Contact() {
   }
 
   return (
-    <section id="contact" className="py-20 px-6 bg-gradient-to-b from-background via-card/10 to-background relative overflow-hidden" ref={sectionRef}>
+    <section id="contact" className="py-20 px-6 bg-gradient-to-b from-background via-card/10 to-background relative overflow-hidden">
       {/* Background elements */}
       <div className="absolute top-0 left-1/2 w-96 h-96 bg-accent-cyan/5 rounded-full blur-3xl -translate-x-1/2 -translate-y-1/2" />
 
-      <div className="max-w-5xl mx-auto relative z-10">        <div className={`flex flex-col items-center text-center mb-16 ${isVisible ? 'animate-fadeInUp' : ''}`}>
-        <div className="inline-flex items-center gap-3 px-4 py-1.5 rounded-full bg-white/5 border border-white/10 text-accent-cyan text-[10px] font-black uppercase tracking-[0.3em] backdrop-blur-md mb-8">
-          Transmission Link
-        </div>
-        <h2 className="text-3xl md:text-6xl font-black mb-6 text-white text-balance tracking-tighter leading-tight">
-          Let&apos;s Build Something{' '}
-          <span className="bg-gradient-to-r from-accent-blue via-accent-cyan to-white bg-clip-text text-transparent italic">
-            Extraordinary.
-          </span>
-        </h2>
-        <p className="text-base sm:text-xl text-white/40 max-w-2xl mx-auto font-light leading-relaxed">
-          Whether you have an app idea, need technical consulting, or want to collaborate on open-source, I&apos;m all ears.
-        </p>
-      </div>
+      <div className="max-w-5xl mx-auto relative z-10">
+        <FadeIn className="flex flex-col items-center text-center mb-16" direction="up">
+          <div className="inline-flex items-center gap-3 px-4 py-1.5 rounded-full bg-white/5 border border-white/10 text-accent-cyan text-[10px] font-black uppercase tracking-[0.3em] backdrop-blur-md mb-8">
+            Transmission Link
+          </div>
+          <h2 className="text-3xl md:text-6xl font-black mb-6 text-white text-balance tracking-tighter leading-tight">
+            Let&apos;s Build Something{' '}
+            <span className="bg-gradient-to-r from-accent-blue via-accent-cyan to-white bg-clip-text text-transparent italic">
+              Extraordinary.
+            </span>
+          </h2>
+          <p className="text-base sm:text-xl text-white/40 max-w-2xl mx-auto font-light leading-relaxed">
+            Whether you have an app idea, need technical consulting, or want to collaborate on open-source, I&apos;m all ears.
+          </p>
+        </FadeIn>
 
         <div className="grid lg:grid-cols-2 gap-12 lg:gap-24">
           {/* Contact Form */}
-          <form onSubmit={handleSubmit} className={`space-y-6 ${isVisible ? 'animate-fadeInUp' : ''}`} style={{ animationDelay: '0.1s' }}>
-            <div className="p-6 sm:p-10 rounded-[2rem] sm:rounded-[3rem] border border-white/10 bg-white/5 backdrop-blur-xl transition-all duration-500 hover:bg-white/[0.08]">
-              <div className="space-y-6">
-                <div>
-                  <label htmlFor="name" className="block text-white/60 text-[10px] font-black uppercase tracking-widest mb-3">
-                    Full Name
-                  </label>
-                  <input
-                    type="text"
-                    id="name"
-                    name="name"
-                    value={formData.name}
-                    onChange={handleInputChange}
-                    required
-                    className="w-full px-5 py-4 rounded-xl bg-white/5 border border-white/10 text-white placeholder-white/20 focus:outline-none focus:border-accent-cyan focus:ring-1 focus:ring-accent-cyan/20 transition-all font-medium"
-                    placeholder="Javiya Raj"
-                  />
+          <FadeIn direction="right" delay={0.2}>
+            <form onSubmit={handleSubmit} className="space-y-6">
+              <div className="p-6 sm:p-10 rounded-[2rem] sm:rounded-[3rem] border border-white/10 bg-white/5 backdrop-blur-xl transition-all duration-500 hover:bg-white/[0.08]">
+                <div className="space-y-6">
+                  <div>
+                    <label htmlFor="name" className="block text-white/60 text-[10px] font-black uppercase tracking-widest mb-3">
+                      Full Name
+                    </label>
+                    <input
+                      type="text"
+                      id="name"
+                      name="name"
+                      value={formData.name}
+                      onChange={handleInputChange}
+                      required
+                      className="w-full px-5 py-4 rounded-xl bg-white/5 border border-white/10 text-white placeholder-white/20 focus:outline-none focus:border-accent-cyan focus:ring-1 focus:ring-accent-cyan/20 transition-all font-medium"
+                      placeholder="Javiya Raj"
+                    />
+                  </div>
+
+                  <div>
+                    <label htmlFor="email" className="block text-white/60 text-[10px] font-black uppercase tracking-widest mb-3">
+                      Email Address
+                    </label>
+                    <input
+                      type="email"
+                      id="email"
+                      name="email"
+                      value={formData.email}
+                      onChange={handleInputChange}
+                      required
+                      className="w-full px-5 py-4 rounded-xl bg-white/5 border border-white/10 text-white placeholder-white/20 focus:outline-none focus:border-accent-cyan focus:ring-1 focus:ring-accent-cyan/20 transition-all font-medium"
+                      placeholder="your@email.com"
+                    />
+                  </div>
+
+                  <div>
+                    <label htmlFor="message" className="block text-white/60 text-[10px] font-black uppercase tracking-widest mb-3">
+                      Project Details
+                    </label>
+                    <textarea
+                      id="message"
+                      name="message"
+                      value={formData.message}
+                      onChange={handleInputChange}
+                      required
+                      rows={4}
+                      className="w-full px-5 py-4 rounded-xl bg-white/5 border border-white/10 text-white placeholder-white/20 focus:outline-none focus:border-accent-cyan focus:ring-1 focus:ring-accent-cyan/20 transition-all resize-none font-medium"
+                      placeholder="Tell me about your vision..."
+                    />
+                  </div>
                 </div>
 
-                <div>
-                  <label htmlFor="email" className="block text-white/60 text-[10px] font-black uppercase tracking-widest mb-3">
-                    Email Address
-                  </label>
-                  <input
-                    type="email"
-                    id="email"
-                    name="email"
-                    value={formData.email}
-                    onChange={handleInputChange}
-                    required
-                    className="w-full px-5 py-4 rounded-xl bg-white/5 border border-white/10 text-white placeholder-white/20 focus:outline-none focus:border-accent-cyan focus:ring-1 focus:ring-accent-cyan/20 transition-all font-medium"
-                    placeholder="your@email.com"
-                  />
-                </div>
-
-                <div>
-                  <label htmlFor="message" className="block text-white/60 text-[10px] font-black uppercase tracking-widest mb-3">
-                    Project Details
-                  </label>
-                  <textarea
-                    id="message"
-                    name="message"
-                    value={formData.message}
-                    onChange={handleInputChange}
-                    required
-                    rows={4}
-                    className="w-full px-5 py-4 rounded-xl bg-white/5 border border-white/10 text-white placeholder-white/20 focus:outline-none focus:border-accent-cyan focus:ring-1 focus:ring-accent-cyan/20 transition-all resize-none font-medium"
-                    placeholder="Tell me about your vision..."
-                  />
-                </div>
+                <button
+                  type="submit"
+                  disabled={submitted}
+                  className="w-full mt-10 px-8 py-5 rounded-2xl bg-gradient-to-r from-accent-blue via-accent-cyan to-white bg-[length:200%_auto] hover:bg-right text-[#0A0A0F] font-black uppercase tracking-widest transition-all duration-700 hover:scale-[1.02] active:scale-95 flex items-center justify-center gap-3 group relative overflow-hidden shadow-2xl"
+                >
+                  <div className="absolute inset-0 bg-white/20 translate-x-full group-hover:translate-x-0 transition-transform duration-500" />
+                  <Send size={18} className="group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform relative z-10" />
+                  <span className="relative z-10">{submitted ? 'Transmission Received!' : 'Submit'}</span>
+                </button>
               </div>
-
-              <button
-                type="submit"
-                disabled={submitted}
-                className="w-full mt-10 px-8 py-5 rounded-2xl bg-gradient-to-r from-accent-blue via-accent-cyan to-white bg-[length:200%_auto] hover:bg-right text-[#0A0A0F] font-black uppercase tracking-widest transition-all duration-700 hover:scale-[1.02] active:scale-95 flex items-center justify-center gap-3 group relative overflow-hidden shadow-2xl"
-              >
-                <div className="absolute inset-0 bg-white/20 translate-x-full group-hover:translate-x-0 transition-transform duration-500" />
-                <Send size={18} className="group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform relative z-10" />
-                <span className="relative z-10">{submitted ? 'Transmission Received!' : 'Submit Response'}</span>
-              </button>
-            </div>
-          </form>
+            </form>
+          </FadeIn>
 
           {/* Contact Info */}
-          <div className={`flex flex-col gap-10 sm:gap-12 ${isVisible ? 'animate-fadeInUp' : ''}`} style={{ animationDelay: '0.2s' }}>
+          <FadeIn direction="left" delay={0.3} className="flex flex-col gap-10 sm:gap-12">
             <div className="space-y-6 text-center lg:text-left flex flex-col items-center lg:items-start">
               <h3 className="text-3xl md:text-5xl font-black text-white tracking-tighter leading-tight">Get in <span className="text-accent-blue italic">Touch.</span></h3>
               <p className="text-white/40 text-base sm:text-lg leading-relaxed font-light max-w-md lg:border-l border-white/10 lg:pl-6">
@@ -213,13 +197,15 @@ export default function Contact() {
               <p className="text-[10px] font-black text-white/20 uppercase tracking-[0.3em]">Network Protocols</p>
               <div className="flex flex-wrap justify-center lg:justify-start gap-4">
                 {[
-                  { icon: Github, label: 'GitHub' },
-                  { icon: Linkedin, label: 'LinkedIn' },
-                  { icon: Twitter, label: 'Twitter' },
-                ].map(({ icon: Icon, label }) => (
+                  { icon: Github, label: 'GitHub', url: 'https://github.com/Javiyaraj-Esparkbiz' },
+                  { icon: Linkedin, label: 'LinkedIn', url: '#' },
+                  { icon: Twitter, label: 'Twitter', url: '#' },
+                ].map(({ icon: Icon, label, url }) => (
                   <a
                     key={label}
-                    href="#"
+                    href={url}
+                    target="_blank"
+                    rel="noopener noreferrer"
                     className="w-14 h-14 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center text-white/40 hover:text-accent-cyan hover:border-accent-cyan/40 hover:bg-accent-cyan/5 transition-all hover:scale-110 group"
                   >
                     <Icon size={22} className="group-hover:rotate-12 transition-transform" />
@@ -241,22 +227,9 @@ export default function Contact() {
                 </div>
               </div>
             </div>
-          </div>
+          </FadeIn>
         </div>
       </div>
-
-      <style>{`
-        @keyframes fadeInUp {
-          from {
-            opacity: 0;
-            transform: translateY(20px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
-        }
-      `}</style>
     </section>
   )
 }

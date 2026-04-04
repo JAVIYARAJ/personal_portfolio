@@ -42,6 +42,8 @@ const experiences = [
   },
 ]
 
+import FadeIn from './fade-in'
+
 export default function Experience() {
   const [scrollProgress, setScrollProgress] = useState(0)
   const containerRef = useRef<HTMLDivElement>(null)
@@ -90,13 +92,10 @@ export default function Experience() {
           backgroundSize: '100px 100px'
       }} />
       
-      <div className="absolute inset-0 -z-20">
-        <div className="absolute top-0 left-1/4 w-[600px] h-[600px] bg-accent-blue/10 rounded-full blur-[150px]" />
-        <div className="absolute bottom-0 right-1/4 w-[600px] h-[600px] bg-accent-purple/10 rounded-full blur-[150px]" />
-      </div>
+      <div className="absolute inset-x-0 top-0 h-40 bg-gradient-to-b from-background to-transparent pointer-events-none" />
 
       <div className="max-w-7xl mx-auto relative z-10">
-        <div className="mb-32 flex flex-col items-center text-center md:items-start md:text-left space-y-8">
+        <FadeIn className="mb-32 flex flex-col items-center text-center md:items-start md:text-left space-y-8" direction="up">
           <div className="inline-flex items-center gap-3 px-5 py-2 rounded-2xl bg-white/5 border border-white/10 text-accent-cyan text-[10px] font-black uppercase tracking-[0.3em] backdrop-blur-md">
             <Zap size={14} className="animate-pulse" />
             Engineering Lifecycle
@@ -104,7 +103,7 @@ export default function Experience() {
           <h2 className="text-3xl md:text-6xl font-black text-white tracking-tighter leading-tight">
             Professional <span className="bg-gradient-to-r from-accent-blue via-accent-cyan to-white bg-clip-text text-transparent italic">Path.</span>
           </h2>
-        </div>
+        </FadeIn>
 
         <div ref={containerRef} className="relative">
           {/* Main Vertical Trunk */}
@@ -119,9 +118,12 @@ export default function Experience() {
             {experiences.map((exp, index) => {
               const isActive = scrollProgress > (index / experiences.length)
               return (
-                <div
+                <FadeIn
                   key={`${exp.company}-${index}`}
+                  direction={index % 2 === 0 ? 'right' : 'left'}
+                  delay={index * 0.1}
                   className={`relative flex flex-col md:flex-row items-center justify-between gap-8 md:gap-12 group`}
+                  // @ts-ignore
                   data-timeline-item
                 >
                   {/* CENTRAL POWER HUB */}
@@ -202,7 +204,7 @@ export default function Experience() {
                        </div>
                     </div>
                   </div>
-                </div>
+                </FadeIn>
               )
             })}
           </div>

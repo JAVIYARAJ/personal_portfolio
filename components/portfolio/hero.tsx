@@ -425,9 +425,9 @@ export default function Hero() {
                     {currentExhibit.satellites.map((sat, i) => (
                       <motion.div
                         key={i}
-                        animate={{ 
-                          x: i % 2 === 0 ? [0, 10, 0] : [0, -10, 0], 
-                          y: i % 2 === 0 ? [0, -5, 0] : [0, 5, 0] 
+                        animate={{
+                          x: i % 2 === 0 ? [0, 10, 0] : [0, -10, 0],
+                          y: i % 2 === 0 ? [0, -5, 0] : [0, 5, 0]
                         }}
                         transition={{ duration: 8 + i, repeat: Infinity, ease: 'easeInOut' }}
                         className={`absolute ${sat.pos} p-4 rounded-[2rem] bg-[#0D0D15] border border-white/10 backdrop-blur-3xl shadow-2xl flex flex-col items-center gap-3 group/sat`}
@@ -455,11 +455,10 @@ export default function Hero() {
                 <button
                   key={tab.id}
                   onClick={() => setActiveExhibit(tab.id)}
-                  className={`group relative flex items-center justify-center w-12 h-12 rounded-xl border transition-all duration-300 ${
-                    activeExhibit === tab.id 
-                    ? 'bg-accent-cyan/10 border-accent-cyan shadow-[0_0_20px_rgba(68,217,232,0.3)] text-accent-cyan' 
-                    : 'bg-white/5 border-white/10 text-white/40 hover:bg-white/10 hover:border-white/20'
-                  }`}
+                  className={`group relative flex items-center justify-center w-12 h-12 rounded-xl border transition-all duration-300 ${activeExhibit === tab.id
+                      ? 'bg-accent-cyan/10 border-accent-cyan shadow-[0_0_20px_rgba(68,217,232,0.3)] text-accent-cyan'
+                      : 'bg-white/5 border-white/10 text-white/40 hover:bg-white/10 hover:border-white/20'
+                    }`}
                 >
                   {tab.icon}
                   <span className="absolute right-full mr-4 px-2 py-1 rounded bg-[#0A0A0F] border border-white/10 text-[8px] font-black uppercase tracking-widest text-white opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap">

@@ -116,6 +116,8 @@ function StatCard({ stat, index }: { stat: typeof stats[0], index: number }) {
   )
 }
 
+import FadeIn from './fade-in'
+
 export default function Stats() {
   return (
     <section id="stats" className="py-40 px-6 bg-[#0B0B13] relative overflow-hidden">
@@ -123,15 +125,12 @@ export default function Stats() {
       <div className="absolute inset-0 -z-10 bg-[radial-gradient(circle_at_50%_120%,rgba(68,217,232,0.05),transparent)]" />
 
       <div className="max-w-7xl mx-auto relative z-10">
-        <div className="text-center mb-32 space-y-8">
-          <motion.div
-            initial={{ opacity: 0, scale: 0.8 }}
-            whileInView={{ opacity: 1, scale: 1 }}
-            className="inline-flex items-center gap-3 px-6 py-2 rounded-full bg-white/5 border border-white/10 text-accent-cyan text-[10px] font-black uppercase tracking-[0.4em] backdrop-blur-md"
+        <FadeIn className="text-center mb-32 space-y-8" direction="up">
+          <div className="inline-flex items-center gap-3 px-6 py-2 rounded-full bg-white/5 border border-white/10 text-accent-cyan text-[10px] font-black uppercase tracking-[0.4em] backdrop-blur-md"
           >
             <ShieldCheck size={14} className="animate-pulse" />
             Verified Metrics
-          </motion.div>
+          </div>
 
           <h2 className="text-3xl sm:text-5xl md:text-8xl font-black text-white tracking-tighter leading-none">
             Impact by <span className="bg-gradient-to-r from-accent-blue via-accent-cyan to-white bg-clip-text text-transparent italic">Numbers.</span>
@@ -140,7 +139,7 @@ export default function Stats() {
           <p className="text-white/40 text-base sm:text-xl max-w-2xl mx-auto font-light leading-relaxed">
             Tangible results from architecting high-scale cross-platform systems and modular engineering environments.
           </p>
-        </div>
+        </FadeIn>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
           {stats.map((stat, index) => (
@@ -149,37 +148,39 @@ export default function Stats() {
         </div>
 
         {/* Cinematic Achievement Rail */}
-        <div className="mt-20 p-6 sm:p-10 rounded-[2.5rem] md:rounded-[4rem] bg-[#0A0A0F] border border-white/10 backdrop-blur-3xl relative overflow-hidden group hover:bg-white/[0.03] transition-all duration-700 shadow-[0_40px_100px_rgba(0,0,0,0.5)]">
-          <div className="absolute inset-y-0 left-0 w-2 bg-gradient-to-b from-accent-blue via-accent-cyan to-accent-purple group-hover:w-3 transition-all" />
-          <div className="flex flex-col lg:flex-row items-center justify-between gap-12 lg:gap-16">
-            <div className="flex flex-col sm:flex-row items-center gap-8 sm:gap-10 text-center sm:text-left group/tier">
-              <div className="w-20 h-20 rounded-[1.5rem] bg-accent-cyan/5 border border-accent-cyan/10 flex items-center justify-center text-accent-cyan relative flex-shrink-0 group-hover/tier:scale-110 transition-all duration-700">
-                <Zap size={36} strokeWidth={1.5} className="relative z-10 transition-all duration-500 drop-shadow-[0_0_15px_rgba(68,217,232,0.5)]" />
-                {/* Concentric Modern Orbits */}
-                <div className="absolute inset-[-12px] border border-accent-cyan/10 rounded-full animate-orbitSlow pointer-events-none" />
-                <div className="absolute inset-[-4px] border border-accent-blue/10 rounded-full animate-orbitMedium pointer-events-none opacity-50" />
-                <div className="absolute inset-0 bg-gradient-to-tr from-accent-cyan/20 to-transparent opacity-0 group-hover/tier:opacity-100 transition-opacity blur-2xl" />
-              </div>
-              <div className="space-y-2">
-                <h4 className="text-2xl md:text-3xl font-black text-white tracking-tight">Engineering <span className="text-accent-cyan italic">Velocity Tier.</span></h4>
-                <p className="text-white/30 text-xs sm:text-sm font-light max-w-sm border-l border-white/10 pl-4">Classified within the top 5% of production-grade architecture systems.</p>
-              </div>
-            </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-8 sm:gap-12 lg:border-l border-white/10 lg:pl-12 w-full lg:w-auto">
-              {[
-                { label: 'RETENTION', val: '99%', color: '#10B981' },
-                { label: 'SATISFACTION', val: '4.9/5', color: '#44D9E8' },
-                { label: 'UPTIME', val: 'INFINITY', color: '#027DFD' }
-              ].map(item => (
-                <div key={item.label} className="text-center group/item cursor-default border-b border-white/5 pb-4 sm:border-0 sm:pb-0 last:border-0">
-                  <p className="text-xl sm:text-2xl font-black text-white group-hover/item:scale-110 transition-transform">{item.val}</p>
-                  <p className="text-[10px] font-black text-white/20 uppercase tracking-widest mt-1" style={{ color: `${item.color}40` }}>{item.label}</p>
+        <FadeIn className="mt-20" delay={0.4} direction="up">
+          <div className="p-6 sm:p-10 rounded-[2.5rem] md:rounded-[4rem] bg-[#0A0A0F] border border-white/10 backdrop-blur-3xl relative overflow-hidden group hover:bg-white/[0.03] transition-all duration-700 shadow-[0_40px_100px_rgba(0,0,0,0.5)]">
+            <div className="absolute inset-y-0 left-0 w-2 bg-gradient-to-b from-accent-blue via-accent-cyan to-accent-purple group-hover:w-3 transition-all" />
+            <div className="flex flex-col lg:flex-row items-center justify-between gap-12 lg:gap-16">
+              <div className="flex flex-col sm:flex-row items-center gap-8 sm:gap-10 text-center sm:text-left group/tier">
+                <div className="w-20 h-20 rounded-[1.5rem] bg-accent-cyan/5 border border-accent-cyan/10 flex items-center justify-center text-accent-cyan relative flex-shrink-0 group-hover/tier:scale-110 transition-all duration-700">
+                  <Zap size={36} strokeWidth={1.5} className="relative z-10 transition-all duration-500 drop-shadow-[0_0_15px_rgba(68,217,232,0.5)]" />
+                  {/* Concentric Modern Orbits */}
+                  <div className="absolute inset-[-12px] border border-accent-cyan/10 rounded-full animate-orbitSlow pointer-events-none" />
+                  <div className="absolute inset-[-4px] border border-accent-blue/10 rounded-full animate-orbitMedium pointer-events-none opacity-50" />
+                  <div className="absolute inset-0 bg-gradient-to-tr from-accent-cyan/20 to-transparent opacity-0 group-hover/tier:opacity-100 transition-opacity blur-2xl" />
                 </div>
-              ))}
+                <div className="space-y-2">
+                  <h4 className="text-2xl md:text-3xl font-black text-white tracking-tight">Engineering <span className="text-accent-cyan italic">Velocity Tier.</span></h4>
+                  <p className="text-white/30 text-xs sm:text-sm font-light max-w-sm border-l border-white/10 pl-4">Classified within the top 5% of production-grade architecture systems.</p>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-8 sm:gap-12 lg:border-l border-white/10 lg:pl-12 w-full lg:w-auto">
+                {[
+                  { label: 'RETENTION', val: '99%', color: '#10B981' },
+                  { label: 'SATISFACTION', val: '4.9/5', color: '#44D9E8' },
+                  { label: 'UPTIME', val: 'INFINITY', color: '#027DFD' }
+                ].map(item => (
+                  <div key={item.label} className="text-center group/item cursor-default border-b border-white/5 pb-4 sm:border-0 sm:pb-0 last:border-0">
+                    <p className="text-xl sm:text-2xl font-black text-white group-hover/item:scale-110 transition-transform">{item.val}</p>
+                    <p className="text-[10px] font-black text-white/20 uppercase tracking-widest mt-1" style={{ color: `${item.color}40` }}>{item.label}</p>
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
-        </div>
+        </FadeIn>
       </div>
     </section>
   )

@@ -224,6 +224,8 @@ function ProjectCard({ project, index }: ProjectCardProps) {
   )
 }
 
+import FadeIn from './fade-in'
+
 export default function Projects() {
   return (
     <section id="projects" className="py-40 px-6 bg-[#0B0B13] relative overflow-hidden">
@@ -234,15 +236,11 @@ export default function Projects() {
       }} />
 
       <div className="max-w-7xl mx-auto">
-        <div className="mb-24 flex flex-col md:flex-row justify-between items-center md:items-end gap-10 text-center md:text-left">
+        <FadeIn className="mb-24 flex flex-col md:flex-row justify-between items-center md:items-end gap-10 text-center md:text-left" direction="up">
           <div className="space-y-6 flex flex-col items-center md:items-start">
-            <motion.div 
-               initial={{ opacity: 0, x: -20 }}
-               whileInView={{ opacity: 1, x: 0 }}
-               className="inline-flex items-center gap-3 px-4 py-1.5 rounded-full bg-white/5 border border-white/10 text-accent-cyan text-[10px] font-black uppercase tracking-[0.3em] backdrop-blur-md"
-            >
+            <div className="inline-flex items-center gap-3 px-4 py-1.5 rounded-full bg-white/5 border border-white/10 text-accent-cyan text-[10px] font-black uppercase tracking-[0.3em] backdrop-blur-md">
                Portfolio Showcase
-            </motion.div>
+            </div>
             <h2 className="text-3xl sm:text-5xl md:text-7xl font-black text-white tracking-tighter leading-tight">
                Featured <span className="bg-gradient-to-r from-accent-blue via-accent-cyan to-white bg-clip-text text-transparent italic">Impact.</span>
             </h2>
@@ -250,7 +248,7 @@ export default function Projects() {
           <p className="text-white/40 text-base sm:text-xl font-light leading-relaxed max-w-sm md:border-l-2 border-accent-cyan/20 md:pl-8">
             Real-world applications engineered for performance, used by thousands of active users.
           </p>
-        </div>
+        </FadeIn>
 
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
           {projects.map((project, index) => (

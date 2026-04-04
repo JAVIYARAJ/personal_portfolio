@@ -16,8 +16,8 @@ const skillGroups = [
       </svg>
     ),
     color: '#44D9E8',
-    skills: ['Flutter SDK', 'Dart', 'Modular Design', 'Clean Architecture','Solid principles'],
-    detail: 'v3.x Ecosystem'
+    skills: ['Flutter', 'Dart', 'Modular Design', 'Clean Architecture','Solid principles','Animation'],
+    detail: 'Ecosystem'
   },
   {
     title: 'Logic Engine',
@@ -28,7 +28,7 @@ const skillGroups = [
       </svg>
     ),
     color: '#027DFD',
-    skills: ['BLoC / Cubit', 'Riverpod', 'State Hooks', 'Reactive Flows'],
+    skills: ['BLoC / Cubit','GetX', 'Riverpod', 'State Hooks', 'Reactive Flows'],
     detail: 'Enterprise Logic'
   },
   {
@@ -83,6 +83,8 @@ const skillGroups = [
   },
 ]
 
+import FadeIn from './fade-in'
+
 export default function Skills() {
   const [hoveredGroup, setHoveredGroup] = useState<number | null>(null)
 
@@ -98,16 +100,12 @@ export default function Skills() {
       <div className="absolute bottom-0 left-[-10%] w-[800px] h-[800px] bg-accent-purple/5 rounded-full blur-[200px]" />
 
       <div className="max-w-7xl mx-auto relative z-10">
-        <div className="flex flex-col md:flex-row justify-between items-center md:items-end mb-24 gap-8 text-center md:text-left">
+        <FadeIn className="flex flex-col md:flex-row justify-between items-center md:items-end mb-24 gap-8 text-center md:text-left" direction="up">
           <div className="space-y-6 max-w-2xl flex flex-col items-center md:items-start">
-            <motion.div 
-              initial={{ opacity: 0, x: -20 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              className="inline-flex items-center gap-3 px-5 py-2 rounded-full bg-white/5 border border-white/10 text-accent-cyan text-[10px] font-black uppercase tracking-[0.3em]"
-            >
+            <div className="inline-flex items-center gap-3 px-5 py-2 rounded-full bg-white/5 border border-white/10 text-accent-cyan text-[10px] font-black uppercase tracking-[0.3em]">
               <CircuitBoard size={14} />
               Technical Ecosystem
-            </motion.div>
+            </div>
             <h2 className="text-3xl sm:text-5xl md:text-7xl font-black text-white tracking-tighter leading-tight">
               Hardware-Level <br/>
               <span className="bg-gradient-to-r from-accent-blue via-accent-cyan to-white bg-clip-text text-transparent italic">Engineering.</span>
@@ -116,18 +114,15 @@ export default function Skills() {
           <p className="text-white/40 text-base sm:text-xl font-light leading-relaxed max-w-sm md:border-l-2 border-accent-cyan/20 md:pl-8 pb-2">
             A battle-tested set of technologies designed for performance, stability, and extreme scale.
           </p>
-        </div>
+        </FadeIn>
 
         {/* BENTO DASHBOARD: COMPACT HIGH-DENSITY GRID */}
         <div className="grid lg:grid-cols-12 gap-5">
           {skillGroups.map((group, idx) => (
-            <motion.div
+            <FadeIn
               key={group.title}
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ delay: idx * 0.05 }}
-              onMouseEnter={() => setHoveredGroup(idx)}
-              onMouseLeave={() => setHoveredGroup(null)}
+              direction="up"
+              delay={idx * 0.05}
               className={`
                 relative p-6 sm:p-7 rounded-[2.5rem] bg-white/5 border border-white/10 overflow-hidden group
                 min-h-[260px] sm:min-h-[280px] h-full flex flex-col justify-between
@@ -140,6 +135,10 @@ export default function Skills() {
                 ${idx === 5 ? 'lg:col-span-6' : ''}
                 transition-all duration-500 hover:bg-white/[0.08]
               `}
+              // @ts-ignore
+              onMouseEnter={() => setHoveredGroup(idx)}
+              // @ts-ignore
+              onMouseLeave={() => setHoveredGroup(null)}
             >
               {/* Active Background FX */}
               <AnimatePresence>
@@ -187,7 +186,7 @@ export default function Skills() {
               <div className="absolute -bottom-6 -right-6 opacity-[0.01] group-hover:opacity-[0.05] transition-opacity duration-700 pointer-events-none scale-[2]">
                 {group.icon}
               </div>
-            </motion.div>
+            </FadeIn>
           ))}
         </div>
       </div>
