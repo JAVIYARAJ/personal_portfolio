@@ -3,20 +3,20 @@
 import { useEffect, useState } from 'react'
 import { Github, Star, GitBranch, Terminal } from 'lucide-react'
 
-const packages = [
+const repositories = [
   {
-    name: 'flutter_clean_architecture',
-    description: 'A comprehensive clean architecture pattern implementation for Flutter. Used by 500+ production apps.',
-    stars: '2.4k',
+    name: 'flutter_secure_sync',
+    description: 'High-performance offline-first synchronization engine for Flutter applications using Supabase.',
+    stars: '420',
     url: '#',
-    tech: 'Flutter / Architecture'
+    tech: 'FLUTTER / SUPABASE'
   },
   {
-    name: 'riverpod_extensions',
-    description: 'High-performance extensions and utilities for advanced state management with Riverpod.',
-    stars: '1.8k',
+    name: 'dart_platform_bridge',
+    description: 'Optimized Method Channel wrapper for seamless biometric and complex native permissions handling.',
+    stars: '215',
     url: '#',
-    tech: 'Riverpod / State Management'
+    tech: 'DART / KOTLIN'
   },
 ]
 
@@ -42,35 +42,35 @@ export default function OpenSource() {
       <div className="max-w-7xl mx-auto">
         <div className="flex flex-col md:flex-row md:items-end justify-between mb-20 gap-8">
           <div className="space-y-4">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-accent-purple/10 border border-accent-purple/20 text-accent-purple text-xs font-bold uppercase tracking-widest">
-              Community Contributions
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-accent-blue/10 border border-accent-blue/20 text-accent-blue text-[10px] font-black uppercase tracking-[0.3em] backdrop-blur-md">
+              Recent Repositories
             </div>
-            <h2 className="text-4xl md:text-6xl font-black text-foreground tracking-tighter">
-              Open <span className="bg-gradient-to-r from-accent-blue to-accent-cyan bg-clip-text text-transparent italic">Source.</span>
+            <h2 className="text-4xl md:text-6xl font-black text-white tracking-tighter">
+              Digital <span className="bg-gradient-to-r from-accent-blue via-accent-cyan to-white bg-clip-text text-transparent italic">Foundations.</span>
             </h2>
-            <p className="text-xl text-muted-foreground max-w-xl font-light">
-              Building tools and frameworks that empower the global developer community.
+            <p className="text-xl text-white/40 max-w-xl font-light leading-relaxed">
+              Curated architectural modules and production-grade repositories designed for scalability.
             </p>
           </div>
           
-          <div className="flex items-center gap-6 p-4 rounded-2xl bg-white/5 border border-white/10 backdrop-blur-sm">
+          <div className="flex items-center gap-6 p-4 rounded-2xl bg-white/5 border border-white/10 backdrop-blur-md">
             <div className="flex flex-col">
-              <span className="text-2xl font-bold text-accent-cyan">15+</span>
-              <span className="text-[10px] text-muted uppercase tracking-widest">Packages</span>
+              <span className="text-2xl font-black text-accent-cyan">24+</span>
+              <span className="text-[10px] text-white/20 uppercase tracking-widest font-black">Repositories</span>
             </div>
             <div className="w-[1px] h-10 bg-white/10" />
             <div className="flex flex-col">
-              <span className="text-2xl font-bold text-accent-blue">5k+</span>
-              <span className="text-[10px] text-muted uppercase tracking-widest">Global Stars</span>
+              <span className="text-2xl font-black text-accent-blue">8k+</span>
+              <span className="text-[10px] text-white/20 uppercase tracking-widest font-black">Code Commits</span>
             </div>
           </div>
         </div>
 
         <div className="grid md:grid-cols-2 gap-8 mb-16">
-          {packages.map((pkg) => (
+          {repositories.map((repo) => (
             <a
-              key={pkg.name}
-              href={pkg.url}
+              key={repo.name}
+              href={repo.url}
               className="p-10 rounded-[32px] bg-white/5 border border-white/10 hover:border-accent-cyan/50 hover:bg-white/[0.07] transition-all duration-300 group relative overflow-hidden"
             >
               <div className="absolute top-0 right-0 p-8 opacity-10 group-hover:opacity-20 transition-opacity">
@@ -84,19 +84,19 @@ export default function OpenSource() {
                   </div>
                   <div className="flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/5 border border-white/10">
                     <Star size={16} className="text-accent-cyan" />
-                    <span className="text-accent-cyan font-bold text-sm tracking-tight">{pkg.stars}</span>
+                    <span className="text-accent-cyan font-bold text-sm tracking-tight">{repo.stars}</span>
                   </div>
                 </div>
 
                 <div className="space-y-2">
                   <h3 className="text-2xl font-bold text-foreground group-hover:text-accent-cyan transition-colors">
-                    {pkg.name}
+                    {repo.name}
                   </h3>
-                  <p className="text-xs text-accent-blue font-bold uppercase tracking-widest">{pkg.tech}</p>
+                  <p className="text-xs text-accent-blue font-bold uppercase tracking-widest">{repo.tech}</p>
                 </div>
 
                 <p className="text-muted-foreground leading-relaxed">
-                  {pkg.description}
+                  {repo.description}
                 </p>
               </div>
             </a>

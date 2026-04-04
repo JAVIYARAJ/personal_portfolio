@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useRef, useState } from 'react'
-import { Trophy, Code, Target, Zap, Cpu, Sparkles } from 'lucide-react'
+import { Trophy, Code, Target, Zap, Cpu, Sparkles, Layers, Globe } from 'lucide-react'
 
 const techStack = [
   { name: 'Flutter', icon: '🦋', desc: 'Framework Expert' },
@@ -64,55 +64,61 @@ export default function About() {
 
       <div className="max-w-7xl mx-auto space-y-40">
         {/* REFINED HEADER & IMPACT SECTION */}
-        <div className="grid lg:grid-cols-12 gap-24 items-start">
-          <div className="lg:col-span-12 xl:col-span-5 space-y-12">
-            <div className="space-y-6">
-              <div className="inline-flex items-center gap-3 px-4 py-2 rounded-full bg-white/5 border border-white/10 text-accent-cyan text-[10px] font-black uppercase tracking-[0.3em] backdrop-blur-md">
-                Professional Vision
-              </div>
-              <h2 className="text-4xl md:text-6xl font-black text-white tracking-tighter leading-[1.1] pb-2">
-                Engineering <br/>
-                <span className="bg-gradient-to-r from-accent-blue via-accent-cyan to-white bg-clip-text text-transparent italic inline-block py-2">Scalable Solutions.</span>
-              </h2>
-              <p className="text-xl text-white/50 leading-relaxed font-light max-w-2xl">
-                I transform complex visions into reliable, maintainable applications. 
-                With <span className="text-white font-bold">3+ years</span> of expertise in the Flutter ecosystem, 
-                I bridge the gap between high-scale architecture and user-centric digital interfaces.
-              </p>
-            </div>
-
-            <div className="flex flex-wrap gap-4 pt-4">
-               <div className="px-8 py-3.5 rounded-3xl bg-white/5 border border-white/10 text-xs font-black text-accent-cyan uppercase tracking-widest hover:bg-white/10 transition-colors">
-                  Quality Driven
+        <div className="grid lg:grid-cols-12 gap-12 lg:gap-24 items-start">
+          <div className="lg:col-span-12 xl:col-span-5 flex flex-col items-center text-center xl:items-start xl:text-left space-y-8">
+             <div className="space-y-6 flex flex-col items-center xl:items-start w-full">
+               <div className="inline-flex items-center gap-3 px-4 py-1.5 rounded-2xl bg-white/5 border border-white/10 text-accent-cyan text-[10px] font-black uppercase tracking-[0.3em] backdrop-blur-md">
+                 <Cpu size={14} className="animate-pulse" />
+                 Professional Vision
                </div>
-               <div className="px-8 py-3.5 rounded-3xl bg-white/5 border border-white/10 text-xs font-black text-accent-blue uppercase tracking-widest hover:bg-white/10 transition-colors">
-                  System Architecture
+               <h2 className="text-3xl md:text-5xl font-black text-white tracking-tighter leading-none pb-2">
+                 Modern <br/>
+                 <span className="bg-gradient-to-r from-accent-blue via-accent-cyan to-white bg-clip-text text-transparent italic inline-block py-2">Flutter Architecture.</span>
+               </h2>
+               
+               {/* High-Precision Flutter Strategy */}
+               <div className="grid grid-cols-1 gap-3 w-full pt-4">
+                  {[
+                    { label: 'CROSS-PLATFORM', sub: 'Single Codebase, Native Speed', icon: <Cpu size={14} /> },
+                    { label: 'STATE ORCHESTRATION', sub: 'Riverpod & BLoC Scalability', icon: <Layers size={14} /> },
+                    { label: 'MODULAR SYSTEMS', sub: 'Clean Arch & Component Reuse', icon: <Zap size={14} /> }
+                  ].map((param, i) => (
+                    <div key={i} className="p-4 rounded-2xl bg-white/5 border border-white/5 flex items-center gap-4 group/param hover:bg-white/10 transition-all duration-500 overflow-hidden relative">
+                       <div className="p-2 rounded-lg bg-accent-cyan/10 text-accent-cyan group-hover/param:scale-110 transition-transform">{param.icon}</div>
+                       <div className="text-left">
+                          <p className="text-[10px] font-black text-white uppercase tracking-widest leading-none mb-1">{param.label}</p>
+                          <p className="text-[10px] text-white/30 font-light leading-none">{param.sub}</p>
+                       </div>
+                       <div className="absolute right-0 top-0 bottom-0 w-1 bg-accent-cyan/0 group-hover/param:bg-accent-cyan/50 transition-all" />
+                    </div>
+                  ))}
                </div>
-            </div>
+             </div>
           </div>
 
           <div className="lg:col-span-12 xl:col-span-7">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {achievements.map((item, idx) => (
                 <div 
                   key={item.title}
-                  className="p-10 rounded-[3rem] bg-white/5 border border-white/10 hover:border-accent-cyan/30 transition-all duration-500 group relative overflow-hidden h-full flex flex-col justify-between"
+                  className="p-7 rounded-3xl bg-white/5 border border-white/10 hover:border-accent-cyan/30 transition-all duration-500 group relative overflow-hidden h-full flex flex-col"
                   style={{
                     animation: animateHeader ? `fadeInUp 0.6s ease-out ${idx * 0.1}s forwards` : 'none',
                     opacity: 0
                   }}
                 >
                   <div className="absolute inset-0 bg-gradient-to-br from-accent-cyan/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-                  <div className="relative z-10">
-                    <div className="w-16 h-16 rounded-[1.5rem] bg-white/5 flex items-center justify-center mb-8 group-hover:scale-110 group-hover:bg-accent-cyan/10 transition-all duration-500">
+                  <div className="relative z-10 flex flex-col h-full">
+                    <div className="w-12 h-12 rounded-xl bg-white/5 flex items-center justify-center mb-6 group-hover:scale-110 group-hover:bg-accent-cyan/10 transition-all duration-500">
                       {item.icon}
                     </div>
-                    <h4 className="text-3xl font-black text-white mb-4 leading-tight">{item.title}</h4>
-                    <p className="text-[14px] text-white/40 leading-relaxed font-light">{item.description}</p>
+                    <div>
+                      <h4 className="text-xl font-black text-white mb-2 leading-tight tracking-tight">{item.title}</h4>
+                      <p className="text-[13px] text-white/40 leading-relaxed font-light">{item.description}</p>
+                    </div>
+                    
+                    <div className="mt-6 h-0.5 w-8 bg-white/10 rounded-full group-hover:w-16 group-hover:bg-accent-cyan transition-all duration-500" />
                   </div>
-                  
-                  {/* Subtle technical detail */}
-                  <div className="mt-8 h-1 w-12 bg-white/10 rounded-full group-hover:w-24 group-hover:bg-accent-cyan transition-all duration-500" />
                 </div>
               ))}
             </div>

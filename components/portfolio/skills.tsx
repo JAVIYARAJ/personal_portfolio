@@ -8,9 +8,11 @@ const skillGroups = [
   {
     title: 'Framework Core',
     icon: (
-      <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-        <path d="M14.31 2.35L2.31 14.34L7.44 19.48L21.39 5.54L14.31 2.35Z" fill="#44D9E8"/>
-        <path d="M14.19 12.32L7.03 19.48L12.15 24L21.39 14.85L14.19 12.32Z" fill="#027DFD"/>
+      <svg width="24" height="24" viewBox="0 0 38 44" fill="none">
+        <path d="M37.0631 20.0376H23.7056L12.0195 31.7265L18.6969 38.4038L37.0631 20.0376Z" fill="#54C5F8"/>
+        <path d="M8.68014 28.3864L2 21.7063L23.7063 0H37.0638L8.68014 28.3864Z" fill="#54C5F8"/>
+        <path d="M18.6975 38.4039L23.7062 43.4126H37.0637L25.3749 31.7266L18.6975 38.4039Z" fill="#01579B"/>
+        <path d="M18.6966 25.0456L12.019 31.7231L18.6966 38.4007L25.3741 31.7231L18.6966 25.0456Z" fill="#29B6F6"/>
       </svg>
     ),
     color: '#44D9E8',
@@ -83,79 +85,21 @@ const skillGroups = [
 
 export default function Skills() {
   const [hoveredGroup, setHoveredGroup] = useState<number | null>(null)
-  const [snippetIndex, setSnippetIndex] = useState(0)
-
-  const snippets = [
-    (
-          <div key="s1" className="space-y-4">
-        <div className="space-y-1">
-          <p className="text-white/20 italic">// Clean Architecture: Dependency Layer</p>
-          <p className="text-white/80 font-bold"><span className="text-accent-purple">class</span> <span className="text-accent-cyan">ProjectRepository</span> {'{'}</p>
-        </div>
-        <div className="pl-8 space-y-2 border-l border-white/5">
-          <p className="text-white/40 italic">// Domain-driven decoupled logic</p>
-          <p className="text-white/80"><span className="text-accent-purple font-bold">final</span> <span className="text-accent-blue">RemoteDataSource</span> _source;</p>
-          <p className="text-white/80"><span className="text-accent-cyan">ProjectRepository</span>(<span className="text-accent-purple font-bold">this</span>._source);</p>
-          <p className="text-white/80"><span className="text-accent-blue font-bold">Future</span>&lt;<span className="text-accent-cyan">Data</span>&gt; <span className="text-accent-cyan">fetch</span>() =&gt; _source.<span className="text-accent-cyan">call</span>();</p>
-        </div>
-        <p className="text-white/80">{'}'}</p>
-      </div>
-    ),
-    (
-      <div key="s2" className="space-y-4">
-        <div className="space-y-1">
-          <p className="text-white/20 italic">// State Orchestration: Reactive BLoC</p>
-          <p className="text-white/80 font-bold"><span className="text-accent-purple">class</span> <span className="text-accent-cyan">CoreEngine</span> <span className="text-accent-purple">extends</span> <span className="text-accent-blue">Bloc</span> {'{'}</p>
-        </div>
-        <div className="pl-8 space-y-2 border-l border-white/5">
-          <p className="text-white/80"><span className="text-accent-cyan">CoreEngine</span>() : <span className="text-accent-purple font-bold">super</span>(<span className="text-accent-cyan">Initial</span>()) {'{'}</p>
-          <p className="pl-8 text-white/80">on&lt;<span className="text-accent-cyan">Trigger</span>&gt;((event, emit) {'{'}</p>
-          <p className="pl-16 text-white/80">emit(<span className="text-accent-cyan">Success</span>(data: event.payload));</p>
-          <p className="pl-8 text-white/80">{'}'});</p>
-          <p className="text-white/80">{'}'}</p>
-        </div>
-        <p className="text-white/80">{'}'}</p>
-      </div>
-    ),
-    (
-      <div key="s3" className="space-y-4">
-        <div className="space-y-1">
-          <p className="text-white/20 italic">// Performance: Hardware Acceleration</p>
-          <p className="text-white/80 font-bold"><span className="text-accent-purple">Widget</span> <span className="text-accent-cyan">build</span>(<span className="text-accent-blue">BuildContext</span> context) {'{'}</p>
-        </div>
-        <div className="pl-8 space-y-2 border-l border-white/5">
-          <p className="text-white/80"><span className="text-accent-purple font-bold">return</span> <span className="text-accent-cyan">RepaintBoundary</span>(</p>
-          <p className="pl-8 text-white/80">child: <span className="text-accent-cyan">ExpensiveSurface</span>(</p>
-          <p className="pl-16 text-white/80">isOptimized: <span className="text-accent-purple font-bold">true</span>,</p>
-          <p className="pl-16 text-white/80">targetFps: <span className="text-accent-blue font-bold">120.0</span>,</p>
-          <p className="pl-8 text-white/80">),</p>
-          <p className="text-white/80">);</p>
-        </div>
-        <p className="text-white/80">{'}'}</p>
-      </div>
-    )
-  ]
-
-  // Removed automatic interval per user request
-  useEffect(() => {
-    // Persistent static state, only updates on manual trigger
-  }, [])
 
   return (
     <section id="skills" className="py-32 px-6 bg-[#08080C] relative overflow-hidden">
-      {/* Dynamic Energy Grid */}
+      {/* ... Energy Grid & Glows ... */}
       <div className="absolute inset-x-0 top-0 h-full w-full -z-10 opacity-[0.03]" style={{
           backgroundImage: `linear-gradient(#44D9E8 1px, transparent 1px), linear-gradient(90deg, #44D9E8 1px, transparent 1px)`,
           backgroundSize: '100px 100px'
       }} />
       
-      {/* Cinematic Glows */}
       <div className="absolute top-0 right-[-10%] w-[800px] h-[800px] bg-accent-blue/5 rounded-full blur-[200px]" />
       <div className="absolute bottom-0 left-[-10%] w-[800px] h-[800px] bg-accent-purple/5 rounded-full blur-[200px]" />
 
       <div className="max-w-7xl mx-auto relative z-10">
-        <div className="flex flex-col md:flex-row justify-between items-end mb-24 gap-8">
-          <div className="space-y-6 max-w-2xl">
+        <div className="flex flex-col md:flex-row justify-between items-center md:items-end mb-24 gap-8 text-center md:text-left">
+          <div className="space-y-6 max-w-2xl flex flex-col items-center md:items-start">
             <motion.div 
               initial={{ opacity: 0, x: -20 }}
               whileInView={{ opacity: 1, x: 0 }}
@@ -164,220 +108,89 @@ export default function Skills() {
               <CircuitBoard size={14} />
               Technical Ecosystem
             </motion.div>
-            <h2 className="text-5xl md:text-7xl font-black text-white tracking-tighter leading-tight">
+            <h2 className="text-3xl sm:text-5xl md:text-7xl font-black text-white tracking-tighter leading-tight">
               Hardware-Level <br/>
               <span className="bg-gradient-to-r from-accent-blue via-accent-cyan to-white bg-clip-text text-transparent italic">Engineering.</span>
             </h2>
           </div>
-          <p className="text-white/40 text-xl font-light leading-relaxed max-w-sm border-l-2 border-accent-cyan/20 pl-8 pb-2">
+          <p className="text-white/40 text-base sm:text-xl font-light leading-relaxed max-w-sm md:border-l-2 border-accent-cyan/20 md:pl-8 pb-2">
             A battle-tested set of technologies designed for performance, stability, and extreme scale.
           </p>
         </div>
 
-        {/* BENTO DASHBOARD REDESIGN */}
-        <div className="grid lg:grid-cols-12 gap-6 mb-24">
+        {/* BENTO DASHBOARD: COMPACT HIGH-DENSITY GRID */}
+        <div className="grid lg:grid-cols-12 gap-5">
           {skillGroups.map((group, idx) => (
             <motion.div
               key={group.title}
-              initial={{ opacity: 0, y: 30 }}
+              initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
-              transition={{ delay: idx * 0.1 }}
+              transition={{ delay: idx * 0.05 }}
               onMouseEnter={() => setHoveredGroup(idx)}
               onMouseLeave={() => setHoveredGroup(null)}
               className={`
-                relative p-10 rounded-[3rem] bg-white/5 border border-white/10 overflow-hidden group
-                min-h-[420px] h-full
+                relative p-6 sm:p-7 rounded-[2.5rem] bg-white/5 border border-white/10 overflow-hidden group
+                min-h-[260px] sm:min-h-[280px] h-full flex flex-col justify-between
+                col-span-1 md:col-span-6
                 ${idx === 0 ? 'lg:col-span-8' : ''}
                 ${idx === 1 ? 'lg:col-span-4' : ''}
                 ${idx === 2 ? 'lg:col-span-4' : ''}
                 ${idx === 3 ? 'lg:col-span-8' : ''}
                 ${idx === 4 ? 'lg:col-span-6' : ''}
                 ${idx === 5 ? 'lg:col-span-6' : ''}
-                transition-all duration-700 hover:bg-white/[0.07]
+                transition-all duration-500 hover:bg-white/[0.08]
               `}
             >
               {/* Active Background FX */}
               <AnimatePresence>
                 {hoveredGroup === idx && (
                   <motion.div
-                    initial={{ opacity: 0, scale: 0.8 }}
+                    initial={{ opacity: 0, scale: 0.9 }}
                     animate={{ opacity: 1, scale: 1 }}
-                    exit={{ opacity: 0, scale: 0.8 }}
+                    exit={{ opacity: 0, scale: 0.9 }}
                     className="absolute inset-0 z-0"
                   >
-                    <div className="absolute top-0 right-0 w-64 h-64 blur-[100px] rounded-full" style={{ backgroundColor: `${group.color}20` }} />
-                    <div className="absolute bottom-0 left-0 w-64 h-64 blur-[100px] rounded-full" style={{ backgroundColor: `${group.color}10` }} />
+                    <div className="absolute top-0 right-0 w-48 h-48 blur-[80px] rounded-full" style={{ backgroundColor: `${group.color}15` }} />
+                    <div className="absolute bottom-0 left-0 w-48 h-48 blur-[80px] rounded-full" style={{ backgroundColor: `${group.color}05` }} />
                   </motion.div>
                 )}
               </AnimatePresence>
 
-              <div className="relative z-10 h-full flex flex-col gap-10">
+              <div className="relative z-10 flex flex-col gap-6">
                 <div className="flex justify-between items-start">
-                  <div className="space-y-4">
-                    <div className="w-16 h-16 rounded-3xl bg-white/5 flex items-center justify-center border border-white/10 group-hover:border-accent-cyan/30 group-hover:bg-accent-cyan/10 transition-all duration-500 shadow-2xl">
-                      <div style={{ color: group.color }}>{group.icon}</div>
+                  <div className="space-y-3">
+                    <div className="w-12 h-12 rounded-2xl bg-white/5 flex items-center justify-center border border-white/10 group-hover:border-accent-cyan/30 group-hover:bg-accent-cyan/10 transition-all duration-500">
+                      <div className="scale-75" style={{ color: group.color }}>{group.icon}</div>
                     </div>
                     <div className="space-y-1">
-                      <h3 className="text-3xl font-black text-white group-hover:tracking-wider transition-all duration-500">{group.title}</h3>
-                      <p className="text-[10px] font-black text-accent-cyan uppercase tracking-[0.3em] opacity-60">{group.detail}</p>
+                      <h3 className="text-xl font-black text-white group-hover:text-accent-cyan transition-colors">{group.title}</h3>
+                      <p className="text-[8px] font-black text-accent-cyan uppercase tracking-[0.2em] opacity-40">{group.detail}</p>
                     </div>
                   </div>
-                  <Binary className="text-white/5 group-hover:text-accent-cyan/20 transition-colors" size={60} />
+                  <Binary className="text-white/5 group-hover:text-accent-cyan/10 transition-colors" size={40} />
                 </div>
 
-                <div className="flex flex-wrap gap-4">
+                <div className="flex flex-wrap gap-2.5">
                   {group.skills.map((skill) => (
-                    <motion.div
+                    <div
                       key={skill}
-                      whileHover={{ scale: 1.05 }}
-                      className="px-6 py-3 rounded-2xl bg-white/5 border border-white/10 text-xs font-black text-white/50 hover:text-white hover:border-accent-cyan/50 hover:bg-accent-cyan/5 transition-all cursor-default flex items-center gap-3"
+                      className="px-4 py-2 rounded-xl bg-white/5 border border-white/10 text-[10px] font-black text-white/40 hover:text-white hover:border-accent-cyan/40 hover:bg-accent-cyan/5 transition-all cursor-default flex items-center gap-2"
                     >
-                      <div className="w-1.5 h-1.5 rounded-full bg-accent-cyan shadow-[0_0_8px_rgba(68,217,232,1)]" />
+                      <div className="w-1 h-1 rounded-full bg-accent-cyan" />
                       {skill}
-                    </motion.div>
+                    </div>
                   ))}
                 </div>
               </div>
 
               {/* Hardware Decor */}
-              <div className="absolute -bottom-10 -right-10 opacity-[0.02] group-hover:opacity-[0.08] transition-opacity duration-700 pointer-events-none scale-[2.5]">
+              <div className="absolute -bottom-6 -right-6 opacity-[0.01] group-hover:opacity-[0.05] transition-opacity duration-700 pointer-events-none scale-[2]">
                 {group.icon}
               </div>
             </motion.div>
           ))}
         </div>
-
-        {/* REFINED PHILOSOPHY SECTION REDESIGN */}
-        <div className="grid lg:grid-cols-12 gap-16 items-center">
-          <motion.div 
-            initial={{ opacity: 0, x: -50 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
-            className="lg:col-span-5 flex flex-col"
-          >
-            <div className="bg-white/5 border border-white/10 rounded-[4rem] p-10 flex flex-col space-y-10">
-              <div className="space-y-6">
-                <div className="inline-flex items-center gap-2 text-accent-cyan text-[10px] font-black uppercase tracking-widest">
-                   <div className="w-1.5 h-1.5 rounded-full bg-accent-cyan animate-ping" />
-                   Core Principles
-                </div>
-                <h3 className="text-5xl md:text-6xl font-black text-white leading-[1.1] tracking-tighter">
-                  Engineering <br/>
-                  <span className="bg-gradient-to-r from-accent-blue via-accent-cyan to-white bg-clip-text text-transparent italic">Philosophy.</span>
-                </h3>
-                <p className="text-white/40 text-lg font-light leading-relaxed border-l-2 border-white/5 pl-8 italic">
-                  "I don't just write code; I architect resilient digital ecosystems where performance is a feature, not an afterthought."
-                </p>
-              </div>
-
-              <div className="grid gap-4">
-                {[
-                  { label: 'CLEAN ARCHITECTURE', val: 'MISSION CRITICAL', icon: <CheckCircle2 size={18}/>, color: '#027DFD' },
-                  { label: 'STATE ORCHESTRATION', val: 'FLAWLESS REACTIVITY', icon: <Cpu size={18}/>, color: '#44D9E8' },
-                  { label: 'PERFORMANCE SCORE', val: '99+ OPTIMIZED', icon: <Zap size={18}/>, color: '#10B981' }
-                ].map((m, i) => (
-                  <motion.div 
-                    key={m.label}
-                    initial={{ opacity: 0, x: -20 }}
-                    whileInView={{ opacity: 1, x: 0 }}
-                    transition={{ delay: i * 0.15 }}
-                    onMouseEnter={() => setSnippetIndex(i)}
-                    className={`relative p-5 rounded-[2rem] border transition-all duration-500 group overflow-hidden cursor-pointer ${snippetIndex === i ? 'bg-white/10 border-accent-cyan/50 shadow-[0_0_30px_rgba(68,217,232,0.1)]' : 'bg-white/5 border-white/10'}`}
-                  >
-                    <div className={`absolute inset-y-0 left-0 w-1 transition-all duration-500 ${snippetIndex === i ? 'bg-accent-cyan w-1.5' : 'bg-white/20'}`} />
-                    <div className="flex justify-between items-center relative z-10">
-                      <div className={`flex items-center gap-5 transition-colors ${snippetIndex === i ? 'text-white' : 'text-white/40 group-hover:text-white'}`}>
-                        <div className={`p-2.5 rounded-xl border transition-all duration-500 ${snippetIndex === i ? 'bg-accent-cyan/20 border-accent-cyan/40 scale-110 shadow-lg' : 'bg-white/5 border-white/10'}`} style={{ color: snippetIndex === i ? '#44D9E8' : m.color }}>
-                          {m.icon}
-                        </div>
-                        <span className="text-[10px] font-black uppercase tracking-[0.2em]">{m.label}</span>
-                      </div>
-                      <span className={`text-xs font-black italic transition-opacity ${snippetIndex === i ? 'text-accent-cyan opacity-100' : 'text-white opacity-40 group-hover:opacity-100'}`}>{m.val}</span>
-                    </div>
-                  </motion.div>
-                ))}
-              </div>
-            </div>
-          </motion.div>
-
-          <motion.div 
-            initial={{ opacity: 0, scale: 0.95, rotateY: -10 }}
-            whileInView={{ opacity: 1, scale: 1, rotateY: 0 }}
-            transition={{ duration: 1.2 }}
-            className="lg:col-span-7"
-          >
-            <div className="rounded-[4rem] bg-[#0A0A0F] border border-white/10 shadow-[0_50px_150px_rgba(0,0,0,0.8)] p-1 w-full group relative overflow-hidden">
-               <div className="absolute inset-0 bg-gradient-to-br from-accent-blue/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-1000" />
-               
-               <div className="bg-[#0D0D15] rounded-[3.8rem] p-10 relative z-10 border border-white/5">
-                <div className="flex items-center justify-between mb-8">
-                    <div className="flex gap-2.5 items-center">
-                      <div 
-                        onClick={() => setSnippetIndex((prev) => (prev + 1) % snippets.length)}
-                        className="w-3.5 h-3.5 rounded-full bg-[#FF5F56] shadow-[0_0_10px_rgba(255,95,86,0.3)] cursor-pointer hover:scale-110 transition-all active:scale-95" 
-                      />
-                      <div className="w-3.5 h-3.5 rounded-full bg-[#FFBD2E] shadow-[0_0_10px_rgba(255,189,46,0.3)]" />
-                      <div className="w-3.5 h-3.5 rounded-full bg-[#27C93F] shadow-[0_0_10px_rgba(39,201,63,0.3)] mr-2" />
-                    </div>
-                    <div className="flex items-center gap-4 px-5 py-2 rounded-full bg-white/5 border border-white/10 text-[10px] font-black uppercase text-white/40 tracking-[0.2em]">
-                      <Terminal size={14} className="text-accent-cyan" />
-                      developer_brain_dump.dart
-                      <div className="w-2 h-2 rounded-full bg-accent-cyan animate-pulse" />
-                    </div>
-                 </div>
-
-                 <div className="min-h-[280px] relative">
-                   <AnimatePresence mode="wait">
-                     <motion.div
-                       key={snippetIndex}
-                       initial={{ opacity: 0, y: 15 }}
-                       animate={{ opacity: 1, y: 0 }}
-                       exit={{ opacity: 0, y: -15 }}
-                       transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
-                       className="space-y-6 font-mono text-[14px] md:text-[16px] leading-[1.8] absolute inset-0"
-                     >
-                       {snippets[snippetIndex]}
-                     </motion.div>
-                   </AnimatePresence>
-                 </div>
-
-                <div className="absolute bottom-12 left-12 right-12 pt-6 border-t border-white/5 bg-[#0D0D15]/95 backdrop-blur-md z-30">
-                   <motion.div 
-                     initial={{ opacity: 0, scale: 0.9, y: 10 }}
-                     whileInView={{ opacity: 1, scale: 1, y: 0 }}
-                     className="inline-flex items-center gap-3 px-6 py-3 bg-accent-cyan/10 border border-accent-cyan/40 text-accent-cyan text-[11px] font-black rounded-2xl relative overflow-hidden group/badge shadow-[0_0_20px_rgba(68,217,232,0.1)]"
-                   >
-                     {/* Breathing Glow Overlay */}
-                     <div className="absolute inset-0 bg-accent-cyan/5 animate-pulse" />
-                     
-                     <span className="relative z-10 flex items-center gap-2 tracking-widest">
-                        <Activity size={14} className="animate-pulse text-accent-cyan" />
-                        OPTIMIZATION_SUCCESSFUL (REFRESH)
-                     </span>
-
-                     {/* High-Performance Scan Line */}
-                     <motion.div 
-                        animate={{ x: ['-200%', '200%'] }}
-                        transition={{ duration: 2, repeat: Infinity, ease: 'linear' }}
-                        className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent skew-x-[-25deg] z-20 pointer-events-none"
-                     />
-                   </motion.div>
-                </div>
-               </div>
-            </div>
-          </motion.div>
-        </div>
       </div>
-
-      <style>{`
-        @keyframes shimmer {
-          0% { transform: translateX(-100%); }
-          100% { transform: translateX(100%); }
-        }
-        .animate-shimmer {
-          animation: shimmer 3s infinite linear;
-        }
-      `}</style>
     </section>
   )
 }

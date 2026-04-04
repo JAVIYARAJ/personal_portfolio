@@ -48,10 +48,10 @@ export default function Contact() {
     console.log('Form submitted:', formData)
     setSubmitted(true)
     setFormData({ name: '', email: '', message: '' })
-    
+
     // Trigger confetti-like effect
     triggerSuccessAnimation()
-    
+
     setTimeout(() => setSubmitted(false), 3000)
   }
 
@@ -96,118 +96,122 @@ export default function Contact() {
       {/* Background elements */}
       <div className="absolute top-0 left-1/2 w-96 h-96 bg-accent-cyan/5 rounded-full blur-3xl -translate-x-1/2 -translate-y-1/2" />
 
-      <div className="max-w-5xl mx-auto relative z-10">
-        <div className={`text-center mb-16 ${isVisible ? 'animate-fadeInUp' : ''}`}>
-          <h2 className="text-4xl md:text-6xl font-bold mb-6 text-foreground text-balance">
-            Let&apos;s Build Something{' '}
-            <span className="bg-gradient-to-r from-accent-blue to-accent-cyan bg-clip-text text-transparent">
-              Extraordinary
-            </span>
-          </h2>
-          <p className="text-xl text-muted max-w-2xl mx-auto">
-            Whether you have an app idea, need technical consulting, or want to collaborate on open-source, I&apos;m all ears.
-          </p>
+      <div className="max-w-5xl mx-auto relative z-10">        <div className={`flex flex-col items-center text-center mb-16 ${isVisible ? 'animate-fadeInUp' : ''}`}>
+        <div className="inline-flex items-center gap-3 px-4 py-1.5 rounded-full bg-white/5 border border-white/10 text-accent-cyan text-[10px] font-black uppercase tracking-[0.3em] backdrop-blur-md mb-8">
+          Transmission Link
         </div>
+        <h2 className="text-3xl md:text-6xl font-black mb-6 text-white text-balance tracking-tighter leading-tight">
+          Let&apos;s Build Something{' '}
+          <span className="bg-gradient-to-r from-accent-blue via-accent-cyan to-white bg-clip-text text-transparent italic">
+            Extraordinary.
+          </span>
+        </h2>
+        <p className="text-base sm:text-xl text-white/40 max-w-2xl mx-auto font-light leading-relaxed">
+          Whether you have an app idea, need technical consulting, or want to collaborate on open-source, I&apos;m all ears.
+        </p>
+      </div>
 
-        <div className="grid md:grid-cols-2 gap-16">
+        <div className="grid lg:grid-cols-2 gap-12 lg:gap-24">
           {/* Contact Form */}
           <form onSubmit={handleSubmit} className={`space-y-6 ${isVisible ? 'animate-fadeInUp' : ''}`} style={{ animationDelay: '0.1s' }}>
-            <div className="p-8 rounded-2xl border border-glass-border bg-card/50 backdrop-blur-sm">
-              <div>
-                <label htmlFor="name" className="block text-foreground font-semibold mb-3">
-                  Full Name
-                </label>
-                <input
-                  type="text"
-                  id="name"
-                  name="name"
-                  value={formData.name}
-                  onChange={handleInputChange}
-                  required
-                  className="w-full px-4 py-3 rounded-lg bg-background border border-glass-border text-foreground placeholder-muted focus:outline-none focus:border-accent-cyan focus:ring-2 focus:ring-accent-cyan/20 transition-all"
-                  placeholder="Javiya Raj"
-                />
-              </div>
+            <div className="p-6 sm:p-10 rounded-[2rem] sm:rounded-[3rem] border border-white/10 bg-white/5 backdrop-blur-xl transition-all duration-500 hover:bg-white/[0.08]">
+              <div className="space-y-6">
+                <div>
+                  <label htmlFor="name" className="block text-white/60 text-[10px] font-black uppercase tracking-widest mb-3">
+                    Full Name
+                  </label>
+                  <input
+                    type="text"
+                    id="name"
+                    name="name"
+                    value={formData.name}
+                    onChange={handleInputChange}
+                    required
+                    className="w-full px-5 py-4 rounded-xl bg-white/5 border border-white/10 text-white placeholder-white/20 focus:outline-none focus:border-accent-cyan focus:ring-1 focus:ring-accent-cyan/20 transition-all font-medium"
+                    placeholder="Javiya Raj"
+                  />
+                </div>
 
-              <div className="mt-6">
-                <label htmlFor="email" className="block text-foreground font-semibold mb-3">
-                  Email Address
-                </label>
-                <input
-                  type="email"
-                  id="email"
-                  name="email"
-                  value={formData.email}
-                  onChange={handleInputChange}
-                  required
-                  className="w-full px-4 py-3 rounded-lg bg-background border border-glass-border text-foreground placeholder-muted focus:outline-none focus:border-accent-cyan focus:ring-2 focus:ring-accent-cyan/20 transition-all"
-                  placeholder="your@email.com"
-                />
-              </div>
+                <div>
+                  <label htmlFor="email" className="block text-white/60 text-[10px] font-black uppercase tracking-widest mb-3">
+                    Email Address
+                  </label>
+                  <input
+                    type="email"
+                    id="email"
+                    name="email"
+                    value={formData.email}
+                    onChange={handleInputChange}
+                    required
+                    className="w-full px-5 py-4 rounded-xl bg-white/5 border border-white/10 text-white placeholder-white/20 focus:outline-none focus:border-accent-cyan focus:ring-1 focus:ring-accent-cyan/20 transition-all font-medium"
+                    placeholder="your@email.com"
+                  />
+                </div>
 
-              <div className="mt-6">
-                <label htmlFor="message" className="block text-foreground font-semibold mb-3">
-                  Project Details
-                </label>
-                <textarea
-                  id="message"
-                  name="message"
-                  value={formData.message}
-                  onChange={handleInputChange}
-                  required
-                  rows={5}
-                  className="w-full px-4 py-3 rounded-lg bg-background border border-glass-border text-foreground placeholder-muted focus:outline-none focus:border-accent-cyan focus:ring-2 focus:ring-accent-cyan/20 transition-all resize-none"
-                  placeholder="Tell me about your project, timeline, and vision..."
-                />
+                <div>
+                  <label htmlFor="message" className="block text-white/60 text-[10px] font-black uppercase tracking-widest mb-3">
+                    Project Details
+                  </label>
+                  <textarea
+                    id="message"
+                    name="message"
+                    value={formData.message}
+                    onChange={handleInputChange}
+                    required
+                    rows={4}
+                    className="w-full px-5 py-4 rounded-xl bg-white/5 border border-white/10 text-white placeholder-white/20 focus:outline-none focus:border-accent-cyan focus:ring-1 focus:ring-accent-cyan/20 transition-all resize-none font-medium"
+                    placeholder="Tell me about your vision..."
+                  />
+                </div>
               </div>
 
               <button
                 type="submit"
                 disabled={submitted}
-                className="w-full mt-8 px-6 py-4 rounded-lg bg-gradient-to-r from-accent-blue to-accent-cyan hover:from-accent-blue/80 hover:to-accent-cyan/80 disabled:from-green-600 disabled:to-green-600 text-foreground font-semibold transition-all hover:scale-105 active:scale-95 flex items-center justify-center gap-2 group relative overflow-hidden"
+                className="w-full mt-10 px-8 py-5 rounded-2xl bg-gradient-to-r from-accent-blue via-accent-cyan to-white bg-[length:200%_auto] hover:bg-right text-[#0A0A0F] font-black uppercase tracking-widest transition-all duration-700 hover:scale-[1.02] active:scale-95 flex items-center justify-center gap-3 group relative overflow-hidden shadow-2xl"
               >
-                <Send size={20} className="group-hover:translate-x-1 transition-transform" />
-                {submitted ? 'Message Sent! 🎉' : 'Send Message'}
+                <div className="absolute inset-0 bg-white/20 translate-x-full group-hover:translate-x-0 transition-transform duration-500" />
+                <Send size={18} className="group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform relative z-10" />
+                <span className="relative z-10">{submitted ? 'Transmission Received!' : 'Submit Response'}</span>
               </button>
             </div>
           </form>
 
           {/* Contact Info */}
-          <div className={`space-y-8 ${isVisible ? 'animate-fadeInUp' : ''}`} style={{ animationDelay: '0.2s' }}>
-            <div>
-              <h3 className="text-3xl font-bold text-foreground mb-4">Get in Touch</h3>
-              <p className="text-muted text-lg leading-relaxed">
-                I check messages regularly and typically respond within 24 hours. Let&apos;s talk about building something amazing together.
+          <div className={`flex flex-col gap-10 sm:gap-12 ${isVisible ? 'animate-fadeInUp' : ''}`} style={{ animationDelay: '0.2s' }}>
+            <div className="space-y-6 text-center lg:text-left flex flex-col items-center lg:items-start">
+              <h3 className="text-3xl md:text-5xl font-black text-white tracking-tighter leading-tight">Get in <span className="text-accent-blue italic">Touch.</span></h3>
+              <p className="text-white/40 text-base sm:text-lg leading-relaxed font-light max-w-md lg:border-l border-white/10 lg:pl-6">
+                Ready to architect your next high-performance mobile ecosystem. I typically respond within one business cycle.
               </p>
             </div>
 
             {/* Email - Enhanced */}
             <div
-              className="p-6 rounded-xl border border-glass-border bg-card/50 hover:border-accent-cyan/80 hover:bg-accent-blue/10 transition-all duration-300 group cursor-pointer"
+              className="p-4 sm:p-6 rounded-[2rem] border border-white/10 bg-white/5 hover:border-accent-cyan/40 hover:bg-white/[0.08] transition-all duration-500 group cursor-pointer relative overflow-hidden"
               onClick={copyEmail}
             >
-              <div className="flex items-center gap-4">
-                <div className="p-3 rounded-lg bg-accent-blue/20 group-hover:bg-accent-cyan/20 transition-colors">
-                  <Mail className="text-accent-cyan" size={24} />
+              <div className="absolute inset-0 bg-gradient-to-br from-accent-cyan/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+              <div className="flex flex-col sm:flex-row items-center gap-6 relative z-10">
+                <div className="w-14 h-14 rounded-2xl bg-accent-blue/10 flex items-center justify-center text-accent-blue group-hover:scale-110 group-hover:bg-accent-blue/20 transition-all duration-500 flex-shrink-0">
+                  <Mail size={24} />
                 </div>
-                <div className="flex-1">
-                  <p className="text-xs text-muted uppercase tracking-wider">Email</p>
-                  <p className="text-lg text-foreground font-semibold group-hover:text-accent-cyan transition-colors font-mono">
+                <div className="flex-1 text-center sm:text-left min-w-0">
+                  <p className="text-[10px] font-black text-white/20 uppercase tracking-[0.3em] mb-1">Direct Communication</p>
+                  <p className="text-sm sm:text-lg text-white font-black group-hover:text-accent-cyan transition-colors truncate">
                     hello@javiyaraj.dev
                   </p>
                 </div>
-                {copiedEmail ? (
-                  <Check size={20} className="text-green-400 animate-bounce" />
-                ) : (
-                  <Copy size={20} className="text-muted group-hover:text-accent-cyan transition-colors" />
-                )}
+                <div className="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center text-white/20 group-hover:text-accent-cyan group-hover:bg-accent-cyan/10 transition-all">
+                  {copiedEmail ? <Check size={18} className="text-green-400" /> : <Copy size={18} />}
+                </div>
               </div>
             </div>
 
             {/* Social Links - Enhanced */}
-            <div>
-              <p className="text-xs text-muted uppercase tracking-wider mb-4">Connect Online</p>
-              <div className="flex gap-4">
+            <div className="space-y-6 flex flex-col items-center lg:items-start">
+              <p className="text-[10px] font-black text-white/20 uppercase tracking-[0.3em]">Network Protocols</p>
+              <div className="flex flex-wrap justify-center lg:justify-start gap-4">
                 {[
                   { icon: Github, label: 'GitHub' },
                   { icon: Linkedin, label: 'LinkedIn' },
@@ -216,22 +220,24 @@ export default function Contact() {
                   <a
                     key={label}
                     href="#"
-                    className="p-4 rounded-lg border border-glass-border hover:border-accent-cyan/80 hover:bg-accent-cyan/10 text-accent-cyan transition-all hover:scale-110 duration-300 group"
-                    title={label}
+                    className="w-14 h-14 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center text-white/40 hover:text-accent-cyan hover:border-accent-cyan/40 hover:bg-accent-cyan/5 transition-all hover:scale-110 group"
                   >
-                    <Icon size={24} className="group-hover:rotate-12 transition-transform" />
+                    <Icon size={22} className="group-hover:rotate-12 transition-transform" />
                   </a>
                 ))}
               </div>
             </div>
 
             {/* Availability */}
-            <div className="p-6 rounded-xl bg-gradient-to-br from-accent-blue/20 to-accent-cyan/20 border border-accent-blue/30 hover:border-accent-cyan/50 transition-colors">
-              <div className="flex items-center gap-3">
-                <span className="w-3 h-3 bg-green-400 rounded-full animate-pulse shadow-lg shadow-green-400/50" />
-                <div>
-                  <p className="text-accent-cyan font-semibold">Currently Available</p>
-                  <p className="text-sm text-muted">For new freelance & contract projects</p>
+            <div className="p-4 sm:p-6 rounded-[2rem] bg-accent-cyan/[0.03] border border-accent-cyan/20 group hover:bg-accent-cyan/[0.06] transition-all duration-500">
+              <div className="flex flex-col sm:flex-row items-center gap-6 text-center sm:text-left">
+                <div className="relative">
+                  <div className="w-4 h-4 bg-green-500 rounded-full animate-pulse shadow-[0_0_15px_rgba(34,197,94,0.5)]" />
+                  <div className="absolute inset-0 bg-green-500 rounded-full animate-ping opacity-20" />
+                </div>
+                <div className="space-y-0.5">
+                  <p className="text-accent-cyan text-sm font-black uppercase tracking-widest leading-none">Operational Capacity</p>
+                  <p className="text-xs text-white/30 font-light mt-1">Currently accepting high-scale architecture projects</p>
                 </div>
               </div>
             </div>

@@ -7,9 +7,9 @@ import Stats from '@/components/portfolio/stats'
 import Projects from '@/components/portfolio/projects'
 import Skills from '@/components/portfolio/skills'
 import Experience from '@/components/portfolio/experience'
-import Testimonials from '@/components/portfolio/testimonials'
 import OpenSource from '@/components/portfolio/open-source'
 import Contact from '@/components/portfolio/contact'
+import BackgroundAmbience from '@/components/portfolio/background-ambience'
 import Navigation from '@/components/portfolio/navigation'
 import ProgressBar from '@/components/portfolio/progress-bar'
 import CustomCursor from '@/components/portfolio/custom-cursor'
@@ -29,11 +29,12 @@ export default function Home() {
   }, [])
 
   return (
-    <div className="bg-background text-foreground overflow-x-hidden">
+    <div className="relative text-foreground selection:bg-accent-cyan/30">
+      <BackgroundAmbience />
       <CustomCursor />
       <Navigation />
       <ProgressBar progress={scrollProgress} />
-      
+
       <main>
         <Hero />
         <About />
@@ -41,7 +42,6 @@ export default function Home() {
         <Projects />
         <Skills />
         <Experience />
-        <Testimonials />
         <OpenSource />
         <Contact />
       </main>
