@@ -1,28 +1,5 @@
 import { motion } from 'framer-motion'
-import { Trophy, Code, Target, Zap, Cpu, Layers } from 'lucide-react'
-
-const achievements = [
-  {
-    title: '20% Dev Speed',
-    description: 'Reduced development time through modular architecture and automation.',
-    icon: <Zap className="text-accent-cyan" />,
-  },
-  {
-    title: '15% User Satisfaction.',
-    description: 'Improved application performance and UI features contributing to higher satisfaction.',
-    icon: <Trophy className="text-accent-blue" />,
-  },
-  {
-    title: 'Clean Architecture',
-    description: 'Maintain code quality and maintainability using standard clean architecture rules.',
-    icon: <Code className="text-accent-purple" />,
-  },
-  {
-    title: '30% Stability',
-    description: 'Enhanced codebase maintainability and application stability during large-scale refactors.',
-    icon: <Target className="text-accent-cyan" />,
-  },
-]
+import { Zap, Cpu, Layers, ShieldCheck, Smartphone, Activity, Code } from 'lucide-react'
 
 export default function About() {
   const containerVariants = {
@@ -51,71 +28,56 @@ export default function About() {
       <div className="absolute inset-x-0 top-0 h-[1000px] -z-10 bg-gradient-to-b from-accent-blue/5 to-transparent pointer-events-none" />
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[1200px] h-[1200px] bg-accent-purple/5 rounded-full blur-[180px]" />
 
-      <div className="max-w-7xl mx-auto space-y-40">
+      <div className="max-w-7xl mx-auto space-y-32">
+        {/* Header Section: Professional Vision */}
         <motion.div
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true, margin: "-20px" }}
-          variants={containerVariants}
-          className="grid lg:grid-cols-12 gap-12 lg:gap-24 items-start"
+           initial="hidden"
+           whileInView="visible"
+           viewport={{ once: true, margin: "-20px" }}
+           variants={containerVariants}
+           className="flex flex-col md:flex-row justify-between items-center md:items-end gap-10 text-center md:text-left"
         >
-          <motion.div
-            variants={itemVariants}
-            className="lg:col-span-12 xl:col-span-5 flex flex-col items-center text-center xl:items-start xl:text-left space-y-8"
-          >
-            <div className="space-y-6 flex flex-col items-center xl:items-start w-full">
-              <div className="inline-flex items-center gap-3 px-4 py-1.5 rounded-2xl bg-white/5 border border-white/10 text-accent-cyan text-[10px] font-black uppercase tracking-[0.3em] backdrop-blur-md">
-                <Cpu size={14} className="animate-pulse" />
-                Professional Vision
-              </div>
-              <h2 className="text-2xl sm:text-3xl md:text-5xl font-black text-white tracking-tighter leading-none pb-2 break-words">
-                Modern <br />
-                <span className="bg-gradient-to-r from-accent-blue via-accent-cyan to-white bg-clip-text text-transparent italic inline-block py-2">Flutter Architecture.</span>
-              </h2>
-                <div className="grid grid-cols-1 gap-3 w-full pt-4">
-                  {[
-                    { label: '3+ YEARS EXPERIENCE', sub: 'Production Flutter Ecosystems', icon: <Zap size={14} /> },
-                    { label: 'STATE ORCHESTRATION', sub: 'BLoC, GetX & Riverpod Scalability', icon: <Layers size={14} /> },
-                    { label: 'MODULAR SYSTEMS', sub: 'Clean Arch & Component Reuse', icon: <Zap size={14} /> }
-                  ].map((param, i) => (
-                    <div key={i} className="p-4 rounded-2xl bg-white/5 border border-white/5 flex items-center gap-4 group/param hover:bg-white/10 transition-all duration-500 overflow-hidden relative">
-                       <div className="p-2 rounded-lg bg-accent-cyan/10 text-accent-cyan group-hover/param:scale-110 transition-transform">{param.icon}</div>
-                       <div className="text-left">
-                          <p className="text-[10px] font-black text-white uppercase tracking-widest leading-none mb-1">{param.label}</p>
-                          <p className="text-[10px] text-white/30 font-light leading-none">{param.sub}</p>
-                       </div>
-                       <div className="absolute right-0 top-0 bottom-0 w-1 bg-accent-cyan/0 group-hover/param:bg-accent-cyan/50 transition-all" />
-                    </div>
-                  ))}
-               </div>
+          <div className="space-y-6 flex flex-col items-center md:items-start">
+            <div className="inline-flex items-center gap-3 px-4 py-1.5 rounded-full bg-white/5 border border-white/10 text-accent-cyan text-[10px] font-black uppercase tracking-[0.3em] backdrop-blur-md">
+              <Cpu size={14} className="animate-pulse" />
+              Professional Vision
             </div>
-          </motion.div>
-
-          <div className="lg:col-span-12 xl:col-span-7">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {achievements.map((item, idx) => (
-                <motion.div
-                  key={item.title}
-                  variants={itemVariants}
-                  className="p-7 rounded-3xl bg-white/5 border border-white/10 hover:border-accent-cyan/30 transition-all duration-500 group relative overflow-hidden h-full flex flex-col"
-                >
-                  <div className="absolute inset-0 bg-gradient-to-br from-accent-cyan/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-                  <div className="relative z-10 flex flex-col h-full">
-                    <div className="w-12 h-12 rounded-xl bg-white/5 flex items-center justify-center mb-6 group-hover:scale-110 group-hover:bg-accent-cyan/10 transition-all duration-500">
-                      {item.icon}
-                    </div>
-                    <div>
-                      <h4 className="text-xl font-black text-white mb-2 leading-tight tracking-tight">{item.title}</h4>
-                      <p className="text-[13px] text-white/40 leading-relaxed font-light">{item.description}</p>
-                    </div>
-
-                    <div className="mt-6 h-0.5 w-8 bg-white/10 rounded-full group-hover:w-16 group-hover:bg-accent-cyan transition-all duration-500" />
-                  </div>
-                </motion.div>
-              ))}
-            </div>
+            <h2 className="text-3xl sm:text-5xl md:text-7xl font-black text-white tracking-tighter leading-tight">
+              Modern <span className="bg-gradient-to-r from-accent-blue via-accent-cyan to-white bg-clip-text text-transparent italic">Architecture.</span>
+            </h2>
           </div>
+          <p className="text-white/40 text-base sm:text-xl font-light leading-relaxed max-w-md md:border-l-2 border-accent-cyan/20 md:pl-8 text-center md:text-left">
+            I believe in building software that is as beautiful under the hood as it is on the surface. My approach centers on modularity, testability, and deterministic state management.
+          </p>
         </motion.div>
+
+        <motion.div
+           initial="hidden"
+           whileInView="visible"
+           viewport={{ once: true, margin: "-20px" }}
+           variants={containerVariants}
+           className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8"
+        >
+          {[
+            { title: 'Performance Optimization', desc: 'Maximizing frame rates and minimizing resource overhead.', icon: <Zap size={32} />, color: 'text-yellow-400' },
+            { title: 'Clean Architecture', desc: 'Separating concerns for maintainable and scalable codebases.', icon: <ShieldCheck size={32} />, color: 'text-blue-400' },
+            { title: 'Cross-Platform Mastery', desc: 'Seamlessly targets iOS, Android, and Web with zero compromise.', icon: <Smartphone size={32} />, color: 'text-accent-cyan' },
+            { title: 'CI/CD Automation', desc: 'Robust deployment pipelines for reliable app deliveries.', icon: <Activity size={32} />, color: 'text-purple-400' }
+          ].map((feature, i) => (
+            <div key={i} className="p-10 rounded-[3rem] bg-white/[0.03] border border-white/5 group hover:bg-white/[0.06] hover:border-white/10 transition-all duration-700 flex flex-col gap-8 relative overflow-hidden h-full shadow-2xl">
+              <div className="absolute inset-0 bg-gradient-to-br from-white/[0.02] to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+              <div className={`w-16 h-16 rounded-[1.5rem] bg-white/5 border border-white/10 flex items-center justify-center ${feature.color} transition-all duration-700 group-hover:scale-110 group-hover:bg-white/10 relative z-10`}>
+                {feature.icon}
+              </div>
+              <div className="space-y-4 relative z-10">
+                <h4 className="text-2xl font-black text-white tracking-tighter leading-tight">{feature.title}</h4>
+                <p className="text-[15px] text-white/40 font-light leading-relaxed group-hover:text-white/60 transition-colors">{feature.desc}</p>
+              </div>
+              <div className={`absolute bottom-0 left-0 h-1 w-0 bg-gradient-to-r from-transparent via-white/10 to-transparent group-hover:w-full transition-all duration-1000`} />
+            </div>
+          ))}
+        </motion.div>
+
       </div>
     </section>
   )
