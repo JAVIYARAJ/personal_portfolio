@@ -72,7 +72,6 @@ export default function About() {
                 Modern <br />
                 <span className="bg-gradient-to-r from-accent-blue via-accent-cyan to-white bg-clip-text text-transparent italic inline-block py-2">Flutter Architecture.</span>
               </h2>
-
                 <div className="grid grid-cols-1 gap-3 w-full pt-4">
                   {[
                     { label: '3+ YEARS EXPERIENCE', sub: 'Production Flutter Ecosystems', icon: <Zap size={14} /> },
