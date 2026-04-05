@@ -67,7 +67,7 @@ export default function Contact() {
   }
 
   const copyEmail = () => {
-    navigator.clipboard.writeText('hello@javiyaraj.dev')
+    navigator.clipboard.writeText('javiyaraj4@gmail.com')
     setCopiedEmail(true)
     setTimeout(() => setCopiedEmail(false), 2000)
   }
@@ -183,7 +183,7 @@ export default function Contact() {
                 <div className="flex-1 text-center sm:text-left min-w-0">
                   <p className="text-[10px] font-black text-white/20 uppercase tracking-[0.3em] mb-1">Direct Communication</p>
                   <p className="text-sm sm:text-lg text-white font-black group-hover:text-accent-cyan transition-colors truncate">
-                    hello@javiyaraj.dev
+                    javiyaraj4@gmail.com
                   </p>
                 </div>
                 <div className="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center text-white/20 group-hover:text-accent-cyan group-hover:bg-accent-cyan/10 transition-all">
@@ -197,8 +197,8 @@ export default function Contact() {
               <p className="text-[10px] font-black text-white/20 uppercase tracking-[0.3em]">Network Protocols</p>
               <div className="flex flex-wrap justify-center lg:justify-start gap-4">
                 {[
-                  { icon: Github, label: 'GitHub', url: 'https://github.com/Javiyaraj-Esparkbiz' },
-                  { icon: Linkedin, label: 'LinkedIn', url: '#' },
+                  { icon: Github, label: 'GitHub', url: 'https://github.com/JAVIYARAJ' },
+                  { icon: Linkedin, label: 'LinkedIn', url: 'https://www.linkedin.com/in/javiyaraj/' },
                   { icon: Twitter, label: 'Twitter', url: '#' },
                 ].map(({ icon: Icon, label, url }) => (
                   <a

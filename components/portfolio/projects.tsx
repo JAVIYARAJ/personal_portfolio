@@ -7,6 +7,20 @@ import { ExternalLink, Github, ArrowRight, Layers, Smartphone, BarChart3, Target
 const projects = [
   {
     id: 1,
+    name: 'SPLITEASE',
+    category: 'FinTech / Social Expense',
+    description: 'A comprehensive expense management engine facilitating group orchestration, peer invitations, and automated split synchronization. Features multi-tier role management (Owner, Admin, Member) with granular permission control.',
+    tags: ['Flutter', 'Supabase', 'Edge Functions', 'Custom Animations', 'Real-time Sync', 'Complex Logic', 'Clean Architecture', 'Depedency Injection(GetIt)'],
+    color: '#6366F1',
+    icon: <Activity className="text-indigo-500" />,
+    stats: [{ label: 'Tracking', val: '+50%' }, { label: 'Scale', val: 'Real-time' }],
+    impact: 'Architected a scalable group-logic system with multi-tier role permissions and instant synchronization.',
+    playstore: '#',
+    appstore: '#',
+    type: 'Personal',
+  },
+  {
+    id: 2,
     name: 'DYSHEZ',
     category: 'Logistics / Consumer',
     description: 'Developed a scalable food delivery app with an intuitive UX and Supabase-powered backend. Features include real-time order handling and a custom Rewards system.',
@@ -14,25 +28,28 @@ const projects = [
     color: '#F97316',
     icon: <Smartphone className="text-orange-500" />,
     image: 'https://is1-ssl.mzstatic.com/image/thumb/PurpleSource211/v4/ef/05/79/ef05799b-bf3d-db54-943b-67951e75d071/Placeholder.mill/400x400bb-75.webp',
-    stats: [ { label: 'Scale', val: '10K+' }, { label: 'Rating', val: '4.8' } ],
+    stats: [{ label: 'Scale', val: '10K+' }, { label: 'Rating', val: '4.8' }],
     impact: 'Engineered a 30% increase in repeat orders via modular loyalty logic.',
     appstore: 'https://apps.apple.com/in/app/dyshez/id6474236767',
     playstore: 'https://play.google.com/store/apps/details?id=com.dyshez.app',
+    type: 'Esparkbiz',
   },
   {
-    id: 2,
+    id: 3,
     name: 'SMACKDAB',
     category: 'Sales / Productivity',
     description: 'A dedicated productivity engine that boosted team efficiency by 40%. Engineered with high-performance custom calendar modules and reactive data flows.',
     tags: ['Flutter', 'Responsive Design', 'Modular UI', 'Complex Logic', 'Reactive Dart', 'Sales Intelligence'],
     color: '#027DFD',
     icon: <BarChart3 className="text-blue-500" />,
-    stats: [ { label: 'Efficiency', val: '+40%' }, { label: 'Lift', val: '25%' } ],
+    stats: [{ label: 'Efficiency', val: '+40%' }, { label: 'Lift', val: '25%' }],
     impact: 'Transformed sales workflow into a mobile-first intelligent engine.',
     playstore: '#',
+    appstore: '#',
+    type: 'Esparkbiz',
   },
   {
-    id: 3,
+    id: 4,
     name: 'GOALS.COM',
     category: 'Native Android / CRM',
     description: 'High-scale CRM for goal tracking and incentive management. Reduced processing time by 25% through advanced async optimization and network caching.',
@@ -40,9 +57,25 @@ const projects = [
     color: '#10B981',
     icon: <Target className="text-emerald-500" />,
     image: 'https://www.goals.com/wp-content/uploads/2022/07/goals-logo.svg',
-    stats: [ { label: 'Speed', val: '+25%' }, { label: 'Growth', val: '30%' } ],
+    stats: [{ label: 'Speed', val: '+25%' }, { label: 'Growth', val: '30%' }],
     impact: 'Optimized network layer resulting in 30% faster data availability.',
     playstore: '#',
+    appstore: '#',
+    type: 'Esparkbiz',
+  },
+  {
+    id: 5,
+    name: 'PADDLE',
+    category: 'Job Portal / HR Tech',
+    description: 'A comprehensive job portal platform for seekers and admins. Optimized recruitment workflows via BLoC state management and robust candidate tracking.',
+    tags: ['Flutter', 'Dart', 'BLoC', 'Clean Architecture', 'Dio', 'Firebase Auth', 'Push Notifications', 'Socket.Io'],
+    color: '#0EA5E9',
+    icon: <Layers className="text-sky-500" />,
+    stats: [{ label: 'Workflows', val: '+30%' }, { label: 'Engagement', val: '25%' }],
+    impact: 'Reduced bug reports by 20% and improved development speed by 15% through Clean Architecture.',
+    playstore: '#',
+    appstore: '#',
+    type: 'Esparkbiz',
   },
 ]
 
@@ -54,14 +87,14 @@ interface ProjectCardProps {
 function ProjectCard({ project, index }: ProjectCardProps) {
   const [isHovered, setIsHovered] = useState(false)
   const cardRef = useRef<HTMLDivElement>(null)
-  
+
   // 3D Parallax Tilt Logic
   const x = useMotionValue(0)
   const y = useMotionValue(0)
-  
+
   const mouseXSpring = useSpring(x)
   const mouseYSpring = useSpring(y)
-  
+
   const rotateX = useTransform(mouseYSpring, [-0.5, 0.5], ['10deg', '-10deg'])
   const rotateY = useTransform(mouseXSpring, [-0.5, 0.5], ['-10deg', '10deg'])
 
@@ -93,7 +126,7 @@ function ProjectCard({ project, index }: ProjectCardProps) {
       onMouseMove={handleMouseMove}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={handleMouseLeave}
-      style={{ 
+      style={{
         perspective: '1000px',
         transformStyle: 'preserve-3d',
       }}
@@ -103,31 +136,32 @@ function ProjectCard({ project, index }: ProjectCardProps) {
         style={{ rotateX, rotateY }}
         className="relative z-10 flex flex-col h-full gap-6"
       >
-        <div className="flex justify-between items-start">
-          <div className="space-y-4">
+        <div className="flex justify-between items-start gap-4">
+          <div className="flex-1 space-y-4 min-w-0">
             <div className="w-14 h-14 rounded-2xl bg-white/10 border border-white/20 flex items-center justify-center group-hover:scale-110 transition-transform duration-500 shadow-xl overflow-hidden p-2" style={{ boxShadow: `0 10px 40px -10px ${project.color}30` }}>
-               {(project as any).image ? (
-                 <img src={(project as any).image} alt={project.name} className="w-full h-full object-contain" />
-               ) : (
-                 project.icon
-               )}
+              {(project as any).image ? (
+                <img src={(project as any).image} alt={project.name} className="w-full h-full object-contain" />
+              ) : (
+                project.icon
+              )}
             </div>
-            <div>
-               <div className="flex items-center gap-2 mb-1">
-                 <div className="w-1 h-1 rounded-full bg-accent-cyan animate-pulse" />
-                 <p className="text-[9px] font-black tracking-[0.2em] uppercase text-accent-cyan opacity-60">{project.category}</p>
-               </div>
-               <h3 className="text-2xl font-black text-white group-hover:tracking-wider transition-all duration-700">{project.name}</h3>
+            <div className="space-y-2">
+              <div className="flex items-center gap-3">
+                <p className="text-[9px] font-black tracking-[0.2em] uppercase text-accent-cyan opacity-40 leading-none">{project.category}</p>
+                <div className="h-2 w-[1px] bg-white/10 hidden sm:block" />
+                <span className="text-[8px] font-black tracking-[0.1em] uppercase text-white/20 leading-none">{(project as any).type}</span>
+              </div>
+              <h3 className="text-2xl font-black text-white group-hover:tracking-wider transition-all duration-700 leading-none">{project.name}</h3>
             </div>
           </div>
-          
-          <div className="flex flex-col items-end gap-3 text-right">
-             {project.stats.map(s => (
-               <div key={s.label} className="p-2 px-3 rounded-xl bg-white/5 border border-white/10 backdrop-blur-sm">
-                  <p className="text-[8px] font-black text-white/30 uppercase tracking-widest leading-none mb-1">{s.label}</p>
-                  <p className="text-base font-bold text-white tracking-tight">{s.val}</p>
-               </div>
-             ))}
+
+          <div className="flex flex-col items-end gap-3 text-right shrink-0">
+            {project.stats.map(s => (
+              <div key={s.label} className="p-2 px-3 rounded-xl bg-white/5 border border-white/10 backdrop-blur-sm">
+                <p className="text-[8px] font-black text-white/30 uppercase tracking-widest leading-none mb-1">{s.label}</p>
+                <p className="text-base font-bold text-white tracking-tight">{s.val}</p>
+              </div>
+            ))}
           </div>
         </div>
 
@@ -155,7 +189,7 @@ function ProjectCard({ project, index }: ProjectCardProps) {
                 <Apple size={18} />
               </a>
             )}
-            {(project as any).playstore && (project as any).playstore !== '#' && (
+            {(project as any).playstore && (
               <a href={(project as any).playstore} target="_blank" rel="noopener noreferrer" className="w-10 h-10 rounded-full bg-white/5 border border-white/10 text-white/40 flex items-center justify-center hover:text-white hover:border-[#10B981] hover:bg-[#10B981]/10 transition-all shadow-lg pointer-events-auto" title="Google Play Store">
                 <Play size={18} fill="currentColor" strokeWidth={1} />
               </a>
@@ -166,7 +200,7 @@ function ProjectCard({ project, index }: ProjectCardProps) {
               </a>
             )}
           </div>
-          
+
           <button className="flex items-center gap-2 group/more pointer-events-auto">
             <span className="text-[9px] font-black text-accent-blue uppercase tracking-widest group-hover/more:text-accent-cyan transition-colors">Engineering Impact</span>
             <div className="p-2 rounded-lg bg-white/5 border border-white/10 text-accent-cyan group-hover/more:translate-x-1 transition-all">
@@ -209,13 +243,13 @@ function ProjectCard({ project, index }: ProjectCardProps) {
             className="absolute inset-x-0 bottom-28 z-20 p-8 py-10 bg-gradient-to-t from-[#0A0A0F]/80 to-transparent pointer-events-none backdrop-blur-sm"
           >
             <div className="space-y-3">
-               <div className="flex items-center gap-2">
-                  <Activity size={12} className="text-accent-cyan animate-pulse" />
-                  <span className="text-[9px] font-black text-white/40 uppercase tracking-[0.2em]">Production Validation</span>
-               </div>
-               <p className="text-sm font-light text-white italic leading-relaxed">
-                 "{project.impact}"
-               </p>
+              <div className="flex items-center gap-2">
+                <Activity size={12} className="text-accent-cyan animate-pulse" />
+                <span className="text-[9px] font-black text-white/40 uppercase tracking-[0.2em]">Production Validation</span>
+              </div>
+              <p className="text-sm font-light text-white italic leading-relaxed">
+                "{project.impact}"
+              </p>
             </div>
           </motion.div>
         )}
@@ -231,18 +265,18 @@ export default function Projects() {
     <section id="projects" className="py-40 px-6 bg-[#0B0B13] relative overflow-hidden">
       {/* Static Background Grid */}
       <div className="absolute inset-0 -z-10 opacity-[0.02]" style={{
-          backgroundImage: `radial-gradient(#ffffff 0.5px, transparent 0.5px)`,
-          backgroundSize: '30px 30px'
+        backgroundImage: `radial-gradient(#ffffff 0.5px, transparent 0.5px)`,
+        backgroundSize: '30px 30px'
       }} />
 
       <div className="max-w-7xl mx-auto">
         <FadeIn className="mb-24 flex flex-col md:flex-row justify-between items-center md:items-end gap-10 text-center md:text-left" direction="up">
           <div className="space-y-6 flex flex-col items-center md:items-start">
             <div className="inline-flex items-center gap-3 px-4 py-1.5 rounded-full bg-white/5 border border-white/10 text-accent-cyan text-[10px] font-black uppercase tracking-[0.3em] backdrop-blur-md">
-               Portfolio Showcase
+              Portfolio Showcase
             </div>
             <h2 className="text-3xl sm:text-5xl md:text-7xl font-black text-white tracking-tighter leading-tight">
-               Featured <span className="bg-gradient-to-r from-accent-blue via-accent-cyan to-white bg-clip-text text-transparent italic">Impact.</span>
+              Featured <span className="bg-gradient-to-r from-accent-blue via-accent-cyan to-white bg-clip-text text-transparent italic">Impact.</span>
             </h2>
           </div>
           <p className="text-white/40 text-base sm:text-xl font-light leading-relaxed max-w-sm md:border-l-2 border-accent-cyan/20 md:pl-8">

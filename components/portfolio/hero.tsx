@@ -273,10 +273,10 @@ export default function Hero() {
               whileInView={{ opacity: 1, y: 0 }}
               className="flex items-center gap-4 py-4 justify-center md:justify-start"
             >
-              <h1 className="text-3xl xs:text-4xl md:text-6xl tracking-tight text-white flex items-baseline gap-x-2 md:gap-x-3 glint-effect p-2">
+              <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-7xl xl:text-8xl tracking-tight text-white flex items-baseline gap-x-2 md:gap-x-3 glint-effect p-2 pr-6 whitespace-nowrap">
                 <span className="font-black uppercase tracking-tighter">JAVIYA</span>
                 <span className="font-light text-accent-cyan italic">RAJ.</span>
-                <span className="h-1.5 w-1.5 md:h-2 md:w-2 rounded-full bg-accent-blue animate-pulse ml-1" />
+                <span className="h-1.5 w-1.5 md:h-2 md:w-2 rounded-full bg-accent-blue animate-pulse ml-1 shrink-0" />
               </h1>
             </motion.div>
 
@@ -456,8 +456,8 @@ export default function Hero() {
                   key={tab.id}
                   onClick={() => setActiveExhibit(tab.id)}
                   className={`group relative flex items-center justify-center w-12 h-12 rounded-xl border transition-all duration-300 ${activeExhibit === tab.id
-                      ? 'bg-accent-cyan/10 border-accent-cyan shadow-[0_0_20px_rgba(68,217,232,0.3)] text-accent-cyan'
-                      : 'bg-white/5 border-white/10 text-white/40 hover:bg-white/10 hover:border-white/20'
+                    ? 'bg-accent-cyan/10 border-accent-cyan shadow-[0_0_20px_rgba(68,217,232,0.3)] text-accent-cyan'
+                    : 'bg-white/5 border-white/10 text-white/40 hover:bg-white/10 hover:border-white/20'
                     }`}
                 >
                   {tab.icon}

@@ -16,7 +16,7 @@ const skillGroups = [
       </svg>
     ),
     color: '#44D9E8',
-    skills: ['Flutter', 'Dart', 'Modular Design', 'Clean Architecture','Solid principles','Animation'],
+    skills: ['Flutter', 'Dart', 'Modular Design','Material UI / Cupertino Widgets','Responsive UI / Adaptive Design','Solid principles','Custom Animation','Unit Testing','Widget Testing','Integration Testing'],
     detail: 'Ecosystem'
   },
   {
@@ -28,7 +28,7 @@ const skillGroups = [
       </svg>
     ),
     color: '#027DFD',
-    skills: ['BLoC / Cubit','GetX', 'Riverpod', 'State Hooks', 'Reactive Flows'],
+    skills: ['BLoC / Cubit','GetX', 'Riverpod', 'State Hooks', 'Reactive Flows','Clean Architecture','Dependency Injection (GetIt)'],
     detail: 'Enterprise Logic'
   },
   {
@@ -41,7 +41,7 @@ const skillGroups = [
       </svg>
     ),
     color: '#F97316',
-    skills: ['Firebase / Supabase', 'Hive / SQLite', 'REST / GraphQL', 'PostgeSQL'],
+    skills: ['Firebase / Supabase', 'Hive / SQLite', 'REST / GraphQL', 'PostgeSQL','GraphQL'],
     detail: 'Real-time Persistence'
   },
   {
@@ -54,7 +54,7 @@ const skillGroups = [
       </svg>
     ),
     color: '#10B981',
-    skills: ['Kotlin Core', 'Jetpack Compose', 'Platform Bridges', 'Java Legacy'],
+    skills: ['Android SDK','Kotlin Core', 'Jetpack Compose', 'Platform Bridges', 'Java Legacy','Background Services / WorkManager'],
     detail: 'Android Framework'
   },
   {
@@ -78,7 +78,7 @@ const skillGroups = [
       </svg>
     ),
     color: '#F87171',
-    skills: ['Shorebird (OTA)', 'Codemagic', 'Fastlane', 'GitHub Actions'],
+    skills: ['Shorebird (OTA)', 'Codemagic', 'Fastlane', 'GitHub Actions','Play Store / App Store Deployment','Build Automation & Versioning'],
     detail: 'Continuous Delivery'
   },
 ]

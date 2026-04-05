@@ -33,9 +33,9 @@ export default function Footer() {
     {
       title: 'Contact',
       links: [
-        { name: 'rajjaviya30@gmail.com', href: 'mailto:rajjaviya30@gmail.com', icon: <Mail size={14} /> },
-        { name: 'GitHub', href: 'https://github.com/Javiyar8', icon: <Github size={14} /> },
-        { name: 'LinkedIn', href: 'https://linkedin.com/in/javiyar8', icon: <Linkedin size={14} /> },
+        { name: 'javiyaraj4@gmail.com', href: 'mailto:javiyaraj@gmail.com', icon: <Mail size={14} /> },
+        { name: 'GitHub', href: 'https://github.com/JAVIYARAJ', icon: <Github size={14} /> },
+        { name: 'LinkedIn', href: 'https://linkedin.com/in/javiyaraj/', icon: <Linkedin size={14} /> },
       ]
     }
   ]
@@ -63,13 +63,14 @@ export default function Footer() {
             
             <p className="text-sm text-white/40 leading-relaxed font-light max-w-xs">
               Specialized in high-performance cross-platform development since 2021. 
+              Specialized in high-performance cross-platform development with 3+ years of experience. 
               Engineering scalable mobile ecosystems with Clean Architecture.
             </p>
 
             <div className="flex items-center gap-4">
               {[
-                { icon: <Github size={18} />, href: 'https://github.com/Javiyar8' },
-                { icon: <Linkedin size={18} />, href: 'https://linkedin.com/in/javiyar8' },
+                { icon: <Github size={18} />, href: 'https://github.com/JAVIYARAJ' },
+                { icon: <Linkedin size={18} />, href: 'https://linkedin.com/in/javiyaraj/' },
                 { icon: <Twitter size={18} />, href: '#' },
                 { icon: <Mail size={18} />, href: 'mailto:rajjaviya30@gmail.com' }
               ].map((social, i) => (
@@ -107,26 +108,15 @@ export default function Footer() {
           </div>
         </div>
 
-        {/* Footer Metrics / System info */}
+        {/* Footer Metrics / System info removed as requested */}
         <div className="border-t border-white/5 pt-12 flex flex-col md:flex-row items-center justify-between gap-8">
            <div className="flex flex-wrap items-center justify-center gap-6 text-[10px] font-black text-white/15 uppercase tracking-widest">
-              <div className="flex items-center gap-2">
-                 <Terminal size={12} />
-                 <span>Build v4.2.1-Stable</span>
-              </div>
-              <div className="flex items-center gap-2">
-                 <ShieldCheck size={12} />
-                 <span>SSO Encryption Active</span>
-              </div>
-              <div className="flex items-center gap-2">
-                 <Globe size={12} />
-                 <span>Node: AP-South-1</span>
-              </div>
+              {/* Technical metrics removed */}
            </div>
 
            <div className="flex items-center gap-8">
               <p className="text-[11px] text-white/20 font-black tracking-tighter uppercase whitespace-nowrap">
-                &copy; {currentYear} Developed by <span className="text-white">Raj Javiya</span>
+                &copy; {currentYear} Developed by Raj Javiya
               </p>
               
               <button 

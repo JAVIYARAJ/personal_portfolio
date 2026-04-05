@@ -4,8 +4,8 @@ import { Github, Star, GitBranch, Terminal } from 'lucide-react'
 
 const repositories = [
   {
-    name: 'flutter_secure_sync',
-    description: 'High-performance offline-first synchronization engine for Flutter applications using Supabase.',
+    name: 'split_ease',
+    description: 'A comprehensive expense management engine facilitating group orchestration, peer invitations, and automated split synchronization. Features multi-tier role management (Owner, Admin, Member) with granular permission control.',
     stars: '420',
     url: '#',
     tech: 'FLUTTER / SUPABASE'
@@ -40,7 +40,7 @@ export default function OpenSource() {
           
           <div className="flex items-center gap-6 p-4 rounded-2xl bg-white/5 border border-white/10 backdrop-blur-md">
             <div className="flex flex-col">
-              <span className="text-2xl font-black text-accent-cyan">24+</span>
+              <span className="text-2xl font-black text-accent-cyan">34+</span>
               <span className="text-[10px] text-white/20 uppercase tracking-widest font-black">Repositories</span>
             </div>
             <div className="w-[1px] h-10 bg-white/10" />
@@ -91,7 +91,7 @@ export default function OpenSource() {
 
         <FadeIn className="text-center mt-12" direction="up">
           <a
-            href="https://github.com/Javiyaraj-Esparkbiz"
+            href="https://github.com/JAVIYARAJ"
             target="_blank"
             rel="noopener noreferrer"
             className="inline-flex items-center gap-3 px-8 py-4 rounded-2xl bg-white/5 border border-white/10 hover:bg-white/10 text-foreground font-bold transition-all hover:scale-[1.02] active:scale-95 group"
