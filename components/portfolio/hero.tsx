@@ -273,7 +273,7 @@ export default function Hero() {
               whileInView={{ opacity: 1, y: 0 }}
               className="flex items-center gap-4 py-4 justify-center md:justify-start"
             >
-              <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-7xl xl:text-8xl tracking-tight text-white flex items-baseline gap-x-2 md:gap-x-3 glint-effect p-2 pr-6 whitespace-nowrap">
+              <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl tracking-tight text-white flex items-baseline gap-x-2 md:gap-x-3 glint-effect p-2 pr-10 whitespace-nowrap">
                 <span className="font-black uppercase tracking-tighter">JAVIYA</span>
                 <span className="font-light text-accent-cyan italic">RAJ.</span>
                 <span className="h-1.5 w-1.5 md:h-2 md:w-2 rounded-full bg-accent-blue animate-pulse ml-1 shrink-0" />
@@ -293,7 +293,7 @@ export default function Hero() {
                 <span className="whitespace-nowrap opacity-60">I'M A</span>
               </div>
               <div className="flex items-center min-h-[40px]">
-                <span className="text-white px-3 py-1 rounded-md bg-white/5 border-l-2 border-accent-cyan font-bold whitespace-normal sm:whitespace-nowrap animate-pulse transition-all min-h-[36px] flex items-center text-center sm:text-left">
+                <span className="text-white px-3 py-1 rounded-md bg-white/5 border-l-2 border-accent-cyan font-bold whitespace-nowrap animate-pulse transition-all min-h-[36px] flex items-center text-center sm:text-left">
                   {displayedText || '\u00A0'}
                 </span>
               </div>
