@@ -43,6 +43,9 @@ const experiences = [
 ]
 
 import FadeIn from './fade-in'
+import TextReveal from './text-reveal'
+import Magnetic from './magnetic'
+
 
 export default function Experience() {
   const [scrollProgress, setScrollProgress] = useState(0)
@@ -95,15 +98,22 @@ export default function Experience() {
       <div className="absolute inset-x-0 top-0 h-40 bg-gradient-to-b from-background to-transparent pointer-events-none" />
 
       <div className="max-w-7xl mx-auto relative z-10">
-        <FadeIn className="mb-32 flex flex-col items-center text-center md:items-start md:text-left space-y-8" direction="up">
-          <div className="inline-flex items-center gap-3 px-5 py-2 rounded-2xl bg-white/5 border border-white/10 text-accent-cyan text-[10px] font-black uppercase tracking-[0.3em] backdrop-blur-md">
-            <Zap size={14} className="animate-pulse" />
-            Engineering Lifecycle
-          </div>
-          <h2 className="text-3xl md:text-6xl font-black text-white tracking-tighter leading-tight">
-            Professional <span className="bg-gradient-to-r from-accent-blue via-accent-cyan to-white bg-clip-text text-transparent italic">Path.</span>
-          </h2>
+        <FadeIn className="mb-32 flex flex-col items-center text-center lg:items-start lg:text-left space-y-8" direction="none" blur scale={0.98}>
+
+          <Magnetic>
+            <div className="inline-flex items-center gap-3 px-5 py-2 rounded-2xl bg-white/5 border border-white/10 text-accent-cyan text-[10px] font-black uppercase tracking-[0.3em] backdrop-blur-md">
+              <Zap size={14} className="animate-pulse" />
+              Engineering Lifecycle
+            </div>
+          </Magnetic>
+          <TextReveal
+            text="Professional Path."
+            className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black text-white tracking-tighter"
+          />
+
         </FadeIn>
+
+
 
         <div ref={containerRef} className="relative">
           {/* Main Vertical Trunk */}

@@ -84,13 +84,16 @@ const skillGroups = [
 ]
 
 import FadeIn from './fade-in'
+import TextReveal from './text-reveal'
+import Magnetic from './magnetic'
+
 
 export default function Skills() {
   const [hoveredGroup, setHoveredGroup] = useState<number | null>(null)
 
   return (
     <section id="skills" className="py-32 px-6 bg-[#08080C] relative overflow-hidden">
-      {/* ... Energy Grid & Glows ... */}
+      {/* Energy Grid & Glows */}
       <div className="absolute inset-x-0 top-0 h-full w-full -z-10 opacity-[0.03]" style={{
           backgroundImage: `linear-gradient(#44D9E8 1px, transparent 1px), linear-gradient(90deg, #44D9E8 1px, transparent 1px)`,
           backgroundSize: '100px 100px'
@@ -100,29 +103,44 @@ export default function Skills() {
       <div className="absolute bottom-0 left-[-10%] w-[800px] h-[800px] bg-accent-purple/5 rounded-full blur-[200px]" />
 
       <div className="max-w-7xl mx-auto relative z-10">
-        <FadeIn className="flex flex-col md:flex-row justify-between items-center md:items-end mb-24 gap-8 text-center md:text-left" direction="up">
-          <div className="space-y-6 max-w-2xl flex flex-col items-center md:items-start">
-            <div className="inline-flex items-center gap-3 px-5 py-2 rounded-full bg-white/5 border border-white/10 text-accent-cyan text-[10px] font-black uppercase tracking-[0.3em]">
-              <CircuitBoard size={14} />
-              Technical Ecosystem
-            </div>
-            <h2 className="text-3xl sm:text-5xl md:text-7xl font-black text-white tracking-tighter leading-tight">
-              Hardware-Level <br/>
-              <span className="bg-gradient-to-r from-accent-blue via-accent-cyan to-white bg-clip-text text-transparent italic">Engineering.</span>
-            </h2>
+        <FadeIn className="flex flex-col lg:flex-row justify-between items-center lg:items-end mb-24 gap-8 text-center lg:text-left" direction="none" blur scale={0.98}>
+          <div className="space-y-6 max-w-2xl flex flex-col items-center lg:items-start">
+
+            <Magnetic>
+              <div className="inline-flex items-center gap-3 px-5 py-2 rounded-full bg-white/5 border border-white/10 text-accent-cyan text-[10px] font-black uppercase tracking-[0.3em]">
+                <CircuitBoard size={14} />
+                Technical Ecosystem
+              </div>
+            </Magnetic>
+            <TextReveal
+              text="Hardware-Level Engineering."
+              className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black text-white tracking-tighter"
+            />
+
           </div>
+
           <p className="text-white/40 text-base sm:text-xl font-light leading-relaxed max-w-sm md:border-l-2 border-accent-cyan/20 md:pl-8 pb-2">
             A battle-tested set of technologies designed for performance, stability, and extreme scale.
           </p>
         </FadeIn>
 
         {/* BENTO DASHBOARD: COMPACT HIGH-DENSITY GRID */}
-        <div className="grid lg:grid-cols-12 gap-5">
+        <FadeIn staggerChildren={0.1} direction="up" className="grid lg:grid-cols-12 gap-5">
           {skillGroups.map((group, idx) => (
-            <FadeIn
+            <motion.div
               key={group.title}
-              direction="up"
-              delay={idx * 0.05}
+              variants={{
+                hidden: { opacity: 0, y: 30, scale: 0.95, filter: 'blur(8px)' },
+                visible: { 
+                  opacity: 1, 
+                  y: 0, 
+                  scale: 1, 
+                  filter: 'blur(0px)',
+                  transition: { duration: 0.8, ease: [0.21, 0.47, 0.32, 0.98] } 
+                }
+              }}
+              onMouseEnter={() => setHoveredGroup(idx)}
+              onMouseLeave={() => setHoveredGroup(null)}
               className={`
                 relative p-6 sm:p-7 rounded-[2.5rem] bg-white/5 border border-white/10 overflow-hidden group
                 min-h-[260px] sm:min-h-[280px] h-full flex flex-col justify-between
@@ -135,10 +153,6 @@ export default function Skills() {
                 ${idx === 5 ? 'lg:col-span-6' : ''}
                 transition-all duration-500 hover:bg-white/[0.08]
               `}
-              // @ts-ignore
-              onMouseEnter={() => setHoveredGroup(idx)}
-              // @ts-ignore
-              onMouseLeave={() => setHoveredGroup(null)}
             >
               {/* Active Background FX */}
               <AnimatePresence>
@@ -186,10 +200,11 @@ export default function Skills() {
               <div className="absolute -bottom-6 -right-6 opacity-[0.01] group-hover:opacity-[0.05] transition-opacity duration-700 pointer-events-none scale-[2]">
                 {group.icon}
               </div>
-            </FadeIn>
+            </motion.div>
           ))}
-        </div>
+        </FadeIn>
       </div>
     </section>
   )
 }
+

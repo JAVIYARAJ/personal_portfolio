@@ -20,23 +20,32 @@ const repositories = [
 ]
 
 import FadeIn from './fade-in'
+import TextReveal from './text-reveal'
+import Magnetic from './magnetic'
+
 
 export default function OpenSource() {
   return (
     <section className="py-32 px-6 bg-[#0A0A0F]">
       <div className="max-w-7xl mx-auto">
-        <FadeIn className="flex flex-col md:flex-row md:items-end justify-between mb-20 gap-8" direction="up">
-          <div className="space-y-4">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-accent-blue/10 border border-accent-blue/20 text-accent-blue text-[10px] font-black uppercase tracking-[0.3em] backdrop-blur-md">
-              Recent Repositories
-            </div>
-            <h2 className="text-4xl md:text-6xl font-black text-white tracking-tighter">
-              Digital <span className="bg-gradient-to-r from-accent-blue via-accent-cyan to-white bg-clip-text text-transparent italic">Foundations.</span>
-            </h2>
+        <FadeIn className="flex flex-col lg:flex-row lg:items-end justify-between mb-20 gap-8 items-center text-center lg:items-start lg:text-left" direction="none" blur scale={0.98}>
+          <div className="space-y-4 flex flex-col items-center lg:items-start">
+
+            <Magnetic>
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-accent-blue/10 border border-accent-blue/20 text-accent-blue text-[10px] font-black uppercase tracking-[0.3em] backdrop-blur-md">
+                Recent Repositories
+              </div>
+            </Magnetic>
+            <TextReveal
+              text="Digital Foundations."
+              className="text-3xl sm:text-5xl md:text-6xl font-black text-white tracking-tighter"
+            />
+
             <p className="text-xl text-white/40 max-w-xl font-light leading-relaxed">
               Curated architectural modules and production-grade repositories designed for scalability.
             </p>
           </div>
+
           
           <div className="flex items-center gap-6 p-4 rounded-2xl bg-white/5 border border-white/10 backdrop-blur-md">
             <div className="flex flex-col">
@@ -51,9 +60,9 @@ export default function OpenSource() {
           </div>
         </FadeIn>
 
-        <div className="grid md:grid-cols-2 gap-8 mb-16">
+        <FadeIn staggerChildren={0.15} direction="up" className="grid md:grid-cols-2 gap-8 mb-16">
           {repositories.map((repo, idx) => (
-            <FadeIn key={repo.name} direction={idx % 2 === 0 ? 'right' : 'left'} delay={idx * 0.1}>
+            <div key={repo.name}>
               <a
                 href={repo.url}
                 className="p-10 rounded-[32px] bg-white/5 border border-white/10 hover:border-accent-cyan/50 hover:bg-white/[0.07] transition-all duration-300 group relative overflow-hidden h-full block"
@@ -85,11 +94,12 @@ export default function OpenSource() {
                   </p>
                 </div>
               </a>
-            </FadeIn>
+            </div>
           ))}
-        </div>
+        </FadeIn>
 
-        <FadeIn className="text-center mt-12" direction="up">
+        <FadeIn className="text-center mt-12" direction="up" blur scale={0.98}>
+
           <a
             href="https://github.com/JAVIYARAJ"
             target="_blank"
