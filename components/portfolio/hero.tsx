@@ -301,8 +301,7 @@ export default function Hero() {
           </div>
 
           <p className="text-base md:text-xl text-muted max-w-lg leading-relaxed font-light text-center md:text-left">
-            Building scalable cross-platform mobile applications using Dart and Flutter.
-            Skilled in Clean Architecture and performance optimization since 2021.
+            Developing high-performance, scalable mobile applications using Flutter and Dart, leveraging Clean Architecture to ensure maintainability and efficiency since 2021.
           </p>
 
           <div className="flex flex-col sm:flex-row gap-5 pt-4">
@@ -314,37 +313,15 @@ export default function Hero() {
               <ArrowDown size={20} className="group-hover:translate-y-1 transition-transform" />
             </button>
             <a
-              href="#"
+              href="/resume.pdf"
+              target="_blank"
+              rel="noopener noreferrer"
               className="px-10 py-5 rounded-2xl border border-glass-border bg-white/5 hover:bg-white/10 text-foreground font-bold transition-all hover:scale-[1.02] active:scale-95 backdrop-blur-sm flex items-center justify-center gap-3 glint-effect"
             >
               <Download size={20} className="text-accent-cyan" />
               <span>Resume.pdf</span>
             </a>
           </div>
-
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 1.6 }}
-            className="grid grid-cols-1 sm:grid-cols-3 gap-6 sm:gap-8 px-6 py-5 sm:px-8 sm:py-6 rounded-[1.5rem] bg-white/[0.03] border border-white/10 backdrop-blur-xl mt-12 shadow-2xl w-full sm:w-fit mx-auto md:mx-0"
-          >
-            {[
-              { label: 'PROD APPS', val: '15+', icon: <Layers size={16} />, color: '#027DFD' },
-              { label: 'EXPERIENCE', val: '3+Y', icon: <Terminal size={16} />, color: '#44D9E8' },
-              { label: 'SUCCESS RATE', val: '95%', icon: <Cpu size={16} />, color: '#A855F7' }
-            ].map((s, i) => (
-              <div key={s.label} className="flex items-center gap-4 whitespace-nowrap justify-center sm:justify-start">
-                <div className="p-2.5 rounded-xl bg-white/5 border border-white/10 shrink-0" style={{ color: s.color }}>
-                  {s.icon}
-                </div>
-                <div className="flex flex-col">
-                  <span className="text-xl sm:text-2xl font-black text-white leading-none tracking-tighter">{s.val}</span>
-                  <span className="text-[8px] font-black text-white/20 tracking-[0.3em] uppercase mt-1">{s.label}</span>
-                </div>
-                {i < 2 && <div className="hidden sm:block h-8 w-[1px] bg-white/10 ml-4 shrink-0" />}
-              </div>
-            ))}
-          </motion.div>
         </div>
 
         {/* Visual Content (Right Side): Sophisticated Minimalist Exhibit */}

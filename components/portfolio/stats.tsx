@@ -7,7 +7,7 @@ import { Smartphone, Zap, Heart, Rocket, Star, BarChart3, Activity, ShieldCheck 
 const stats = [
   { target: 15, suffix: '+', label: 'DEPLOYED APPS', sub: 'Production Grade', icon: <Smartphone />, color: '#027DFD' },
   { target: 40, suffix: '%', label: 'DEV VELOCITY', sub: 'Efficiency Lift', icon: <Zap />, color: '#44D9E8' },
-  { target: 95, suffix: '%', label: 'USER RETENTION', sub: 'Engagement Rate', icon: <Heart />, color: '#F87171' },
+  { target: 99, suffix: '.9%', label: 'CRASH-FREE', sub: 'Stability Index', icon: <ShieldCheck />, color: '#F87171' },
   { target: 3, suffix: '+', label: 'YEARS EXP', sub: 'Industrial Tenure', icon: <Rocket />, color: '#10B981' },
 ]
 

@@ -222,8 +222,8 @@ export default function Contact() {
                   <div className="absolute inset-0 bg-green-500 rounded-full animate-ping opacity-20" />
                 </div>
                 <div className="space-y-0.5">
-                  <p className="text-accent-cyan text-sm font-black uppercase tracking-widest leading-none">Operational Capacity</p>
-                  <p className="text-xs text-white/30 font-light mt-1">Currently accepting high-scale architecture projects</p>
+                  <p className="text-accent-cyan text-sm font-black uppercase tracking-widest leading-none">Operational Status</p>
+                  <p className="text-xs text-white/30 font-light mt-1">Currently work on personal projects</p>
                 </div>
               </div>
             </div>
