@@ -120,9 +120,16 @@ function ProjectCard({ project, index }: ProjectCardProps) {
   return (
     <motion.div
       ref={cardRef}
-      initial={{ opacity: 0, y: 50 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.8, delay: index * 0.1, ease: [0.16, 1, 0.3, 1] }}
+      variants={{
+        hidden: { opacity: 0, y: 50, scale: 0.9, filter: 'blur(10px)' },
+        visible: { 
+          opacity: 1, 
+          y: 0, 
+          scale: 1, 
+          filter: 'blur(0px)',
+          transition: { duration: 0.8, ease: [0.21, 0.47, 0.32, 0.98] } 
+        }
+      }}
       onMouseMove={handleMouseMove}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={handleMouseLeave}
@@ -130,7 +137,9 @@ function ProjectCard({ project, index }: ProjectCardProps) {
         perspective: '1000px',
         transformStyle: 'preserve-3d',
       }}
-      className="group relative p-8 rounded-[2.5rem] bg-white/[0.03] border border-white/10 overflow-hidden transition-all duration-700"
+
+      className="group relative p-8 rounded-[2.5rem] bg-white/[0.03] border border-white/10 overflow-hidden transition-all duration-700 h-full"
+
     >
       <motion.div
         style={{ rotateX, rotateY }}
@@ -259,6 +268,9 @@ function ProjectCard({ project, index }: ProjectCardProps) {
 }
 
 import FadeIn from './fade-in'
+import TextReveal from './text-reveal'
+import Magnetic from './magnetic'
+
 
 export default function Projects() {
   return (
@@ -270,26 +282,39 @@ export default function Projects() {
       }} />
 
       <div className="max-w-7xl mx-auto">
-        <FadeIn className="mb-24 flex flex-col md:flex-row justify-between items-center md:items-end gap-10 text-center md:text-left" direction="up">
-          <div className="space-y-6 flex flex-col items-center md:items-start">
-            <div className="inline-flex items-center gap-3 px-4 py-1.5 rounded-full bg-white/5 border border-white/10 text-accent-cyan text-[10px] font-black uppercase tracking-[0.3em] backdrop-blur-md">
-              Portfolio Showcase
-            </div>
-            <h2 className="text-3xl sm:text-5xl md:text-7xl font-black text-white tracking-tighter leading-tight">
-              Featured <span className="bg-gradient-to-r from-accent-blue via-accent-cyan to-white bg-clip-text text-transparent italic">Impact.</span>
-            </h2>
+        <FadeIn className="mb-24 flex flex-col lg:flex-row justify-between items-center lg:items-end gap-10 text-center lg:text-left" direction="none" blur scale={0.98}>
+
+
+          <div className="space-y-6 flex flex-col items-center lg:items-start">
+
+            <Magnetic>
+              <div className="inline-flex items-center gap-3 px-4 py-1.5 rounded-full bg-white/5 border border-white/10 text-accent-cyan text-[10px] font-black uppercase tracking-[0.3em] backdrop-blur-md">
+                Portfolio Showcase
+              </div>
+            </Magnetic>
+            <TextReveal
+              text="Featured Impact."
+              className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black text-white tracking-tighter"
+            />
+
           </div>
-          <p className="text-white/40 text-base sm:text-xl font-light leading-relaxed max-w-sm md:border-l-2 border-accent-cyan/20 md:pl-8">
+
+          <p className="text-white/40 text-base sm:text-xl font-light leading-relaxed max-w-sm lg:border-l-2 border-accent-cyan/20 lg:pl-8">
+
             Real-world applications engineered for performance, used by thousands of active users.
           </p>
         </FadeIn>
 
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <FadeIn staggerChildren={0.15} direction="up" className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
           {projects.map((project, index) => (
-            <ProjectCard key={project.id} project={project} index={index} />
+            <div key={project.id} className="h-full">
+              <ProjectCard project={project} index={index} />
+            </div>
           ))}
-        </div>
+
+        </FadeIn>
       </div>
     </section>
   )
 }
+

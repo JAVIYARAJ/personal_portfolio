@@ -3,6 +3,8 @@
 import { motion } from 'framer-motion'
 import { Github, Linkedin, Twitter, Mail, Cpu, ArrowUp, Globe, Terminal, ShieldCheck } from 'lucide-react'
 import Link from 'next/link'
+import Magnetic from './magnetic'
+
 
 export default function Footer() {
   const currentYear = new Date().getFullYear()
@@ -71,18 +73,21 @@ export default function Footer() {
               {[
                 { icon: <Github size={18} />, href: 'https://github.com/JAVIYARAJ' },
                 { icon: <Linkedin size={18} />, href: 'https://linkedin.com/in/javiyaraj/' },
-                { icon: <Twitter size={18} />, href: '#' },
+                { icon: <Twitter size={18} />, href: 'https://x.com/Rjcoding' },
+
                 { icon: <Mail size={18} />, href: 'mailto:javiyaraj4@gmail.com?subject=Portfolio Inquiry' }
               ].map((social, i) => (
-                <a
-                  key={i}
-                  href={social.href}
-                  className="w-10 h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-white/40 hover:text-accent-cyan hover:border-accent-cyan/50 hover:bg-accent-cyan/10 transition-all duration-300"
-                >
-                  {social.icon}
-                </a>
+                <Magnetic key={i}>
+                  <a
+                    href={social.href}
+                    className="w-10 h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-white/40 hover:text-accent-cyan hover:border-accent-cyan/50 hover:bg-accent-cyan/10 transition-all duration-300"
+                  >
+                    {social.icon}
+                  </a>
+                </Magnetic>
               ))}
             </div>
+
           </div>
 
           {/* Dynamic Links */}
@@ -119,13 +124,16 @@ export default function Footer() {
               &copy; {currentYear} Developed by Raj Javiya
             </p>
 
-            <button
-              onClick={scrollToTop}
-              className="group flex items-center gap-3 px-5 py-2.5 rounded-full bg-white/5 border border-white/10 hover:border-accent-cyan/50 hover:bg-accent-cyan/5 transition-all"
-            >
-              <span className="text-[10px] font-black uppercase text-white/30 group-hover:text-white transition-colors">Uplink</span>
-              <ArrowUp size={14} className="text-accent-cyan group-hover:-translate-y-1 transition-transform" />
-            </button>
+            <Magnetic>
+              <button
+                onClick={scrollToTop}
+                className="group flex items-center gap-3 px-5 py-2.5 rounded-full bg-white/5 border border-white/10 hover:border-accent-cyan/50 hover:bg-accent-cyan/5 transition-all"
+              >
+                <span className="text-[10px] font-black uppercase text-white/30 group-hover:text-white transition-colors">Uplink</span>
+                <ArrowUp size={14} className="text-accent-cyan group-hover:-translate-y-1 transition-transform" />
+              </button>
+            </Magnetic>
+
           </div>
         </div>
       </div>

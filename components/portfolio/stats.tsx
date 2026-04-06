@@ -41,19 +41,26 @@ function AnimatedCounter({ target, suffix = '', isActive }: { target: number, su
 }
 
 function StatCard({ stat, index }: { stat: typeof stats[0], index: number }) {
-  const ref = useRef(null)
-  const isInView = useInView(ref, { once: true })
   const [isHovered, setIsHovered] = useState(false)
-
+  const [isActive, setIsActive] = useState(false)
+  
   return (
     <motion.div
-      ref={ref}
-      initial={{ opacity: 0, scale: 0.9, y: 30 }}
-      animate={isInView ? { opacity: 1, scale: 1, y: 0 } : {}}
-      transition={{ delay: index * 0.1, duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+      variants={{
+        hidden: { opacity: 0, scale: 0.9, y: 30, filter: 'blur(10px)' },
+        visible: { 
+          opacity: 1, 
+          scale: 1, 
+          y: 0, 
+          filter: 'blur(0px)',
+          transition: { duration: 0.8, ease: [0.21, 0.47, 0.32, 0.98] } 
+        }
+      }}
+      onViewportEnter={() => setIsActive(true)}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
-      className="relative p-6 sm:p-10 rounded-[2.5rem] md:rounded-[3rem] bg-white/5 border border-white/10 backdrop-blur-3xl overflow-hidden group hover:bg-white/[0.08] transition-all duration-700"
+      className="relative p-6 sm:p-10 rounded-[2.5rem] md:rounded-[3rem] bg-white/5 border border-white/10 backdrop-blur-3xl overflow-hidden group hover:bg-white/[0.08] transition-all duration-700 h-full"
+
     >
       {/* HUD Scanner FX */}
       <AnimatePresence>
@@ -86,7 +93,7 @@ function StatCard({ stat, index }: { stat: typeof stats[0], index: number }) {
         </div>
 
         <div className="space-y-1">
-          <AnimatedCounter target={stat.target} suffix={stat.suffix} isActive={isInView} />
+          <AnimatedCounter target={stat.target} suffix={stat.suffix} isActive={isActive} />
           <div className="space-y-0.5">
             <p className="text-white/40 font-black uppercase tracking-[0.3em] text-[10px] group-hover:text-white transition-colors">
               {stat.label}
@@ -99,14 +106,14 @@ function StatCard({ stat, index }: { stat: typeof stats[0], index: number }) {
         <div className="h-1.5 w-full bg-white/5 rounded-full overflow-hidden relative">
           <motion.div
             initial={{ width: 0 }}
-            animate={isInView ? { width: '100%' } : {}}
-            transition={{ duration: 1.5, delay: 0.5 + (index * 0.1) }}
+            animate={isActive ? { width: '100%' } : {}}
+            transition={{ duration: 1.5, delay: 0.5 }}
             className="h-full bg-white/20"
           />
           <motion.div
             initial={{ width: 0 }}
-            animate={isInView ? { width: '40%' } : {}}
-            transition={{ duration: 1, delay: 1 + (index * 0.1) }}
+            animate={isActive ? { width: '40%' } : {}}
+            transition={{ duration: 1, delay: 1 }}
             className="absolute top-0 left-0 h-full"
             style={{ backgroundColor: stat.color }}
           />
@@ -117,6 +124,9 @@ function StatCard({ stat, index }: { stat: typeof stats[0], index: number }) {
 }
 
 import FadeIn from './fade-in'
+import TextReveal from './text-reveal'
+import Magnetic from './magnetic'
+
 
 export default function Stats() {
   return (
@@ -125,30 +135,39 @@ export default function Stats() {
       <div className="absolute inset-0 -z-10 bg-[radial-gradient(circle_at_50%_120%,rgba(68,217,232,0.05),transparent)]" />
 
       <div className="max-w-7xl mx-auto relative z-10">
-        <FadeIn className="text-center mb-32 space-y-8" direction="up">
-          <div className="inline-flex items-center gap-3 px-6 py-2 rounded-full bg-white/5 border border-white/10 text-accent-cyan text-[10px] font-black uppercase tracking-[0.4em] backdrop-blur-md"
-          >
-            <ShieldCheck size={14} className="animate-pulse" />
-            Verified Metrics
-          </div>
+        <FadeIn className="text-center lg:text-left mb-32 space-y-8 flex flex-col items-center lg:items-start" direction="none" blur scale={0.98}>
 
-          <h2 className="text-3xl sm:text-5xl md:text-8xl font-black text-white tracking-tighter leading-none">
-            Impact by <span className="bg-gradient-to-r from-accent-blue via-accent-cyan to-white bg-clip-text text-transparent italic">Numbers.</span>
-          </h2>
 
-          <p className="text-white/40 text-base sm:text-xl max-w-2xl mx-auto font-light leading-relaxed">
+
+          <Magnetic>
+            <div className="inline-flex items-center gap-3 px-6 py-2 rounded-full bg-white/5 border border-white/10 text-accent-cyan text-[10px] font-black uppercase tracking-[0.4em] backdrop-blur-md"
+            >
+              <ShieldCheck size={14} className="animate-pulse" />
+              Verified Metrics
+            </div>
+          </Magnetic>
+
+          <TextReveal
+            text="Impact by Numbers."
+            className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black text-white tracking-tighter"
+          />
+
+
+
+          <p className="text-white/40 text-base sm:text-xl max-w-2xl font-light leading-relaxed">
+
             Tangible results from architecting high-scale cross-platform systems and modular engineering environments.
           </p>
         </FadeIn>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+        <FadeIn staggerChildren={0.1} direction="up" className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
           {stats.map((stat, index) => (
             <StatCard key={index} stat={stat} index={index} />
           ))}
-        </div>
+        </FadeIn>
 
         {/* Cinematic Achievement Rail */}
-        <FadeIn className="mt-20" delay={0.4} direction="up">
+        <FadeIn className="mt-20" delay={0.4} direction="up" blur scale={0.98}>
           <div className="p-6 sm:p-10 rounded-[2.5rem] md:rounded-[4rem] bg-[#0A0A0F] border border-white/10 backdrop-blur-3xl relative overflow-hidden group hover:bg-white/[0.03] transition-all duration-700 shadow-[0_40px_100px_rgba(0,0,0,0.5)]">
             <div className="absolute inset-y-0 left-0 w-2 bg-gradient-to-b from-accent-blue via-accent-cyan to-accent-purple group-hover:w-3 transition-all" />
             <div className="flex flex-col lg:flex-row items-center justify-between gap-12 lg:gap-16">
@@ -185,3 +204,4 @@ export default function Stats() {
     </section>
   )
 }
+

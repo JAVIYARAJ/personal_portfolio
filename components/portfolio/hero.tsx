@@ -11,8 +11,15 @@ import {
   Smartphone,
   Zap,
   ShieldCheck,
-  Activity
+  Activity,
+  CircuitBoard
 } from 'lucide-react'
+
+import FadeIn from './fade-in'
+import TextReveal from './text-reveal'
+import Magnetic from './magnetic'
+
+
 
 const titles = [
   'Senior Flutter Developer',
@@ -254,8 +261,9 @@ export default function Hero() {
   return (
     <section
       onMouseMove={handleMouseMove}
-      className="min-h-screen flex items-center justify-center pt-20 px-6 relative overflow-hidden bg-[#0A0A0F]"
+      className="min-h-screen flex items-center justify-center pt-24 pb-12 sm:pt-32 px-6 relative overflow-hidden bg-[#0A0A0F]"
     >
+
       <div className="absolute inset-0 -z-10 pointer-events-none">
         <div className="absolute top-[-10%] right-[-10%] w-[800px] h-[800px] bg-accent-blue/5 rounded-full blur-[150px] animate-floatingSoft" />
         <div className="absolute bottom-[-10%] left-[-10%] w-[800px] h-[800px] bg-accent-cyan/5 rounded-full blur-[150px] animate-floatingSoft" style={{ animationDelay: '2s' }} />
@@ -265,27 +273,29 @@ export default function Hero() {
         }} />
       </div>
 
-      <div className="max-w-6xl mx-auto w-full grid md:grid-cols-2 gap-32 items-center relative z-10">
-        <div className="text-left space-y-8">
+      <div className="max-w-7xl mx-auto w-full grid lg:grid-cols-2 gap-16 lg:gap-32 items-center relative z-10">
+
+        <div className="flex flex-col items-center lg:items-start text-center lg:text-left space-y-8">
+
           <div className="space-y-4">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              className="flex items-center gap-4 py-4 justify-center md:justify-start"
-            >
-              <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl tracking-tight text-white flex items-baseline gap-x-2 md:gap-x-3 glint-effect p-2 pr-10 whitespace-nowrap">
-                <span className="font-black uppercase tracking-tighter">JAVIYA</span>
-                <span className="font-light text-accent-cyan italic">RAJ.</span>
-                <span className="h-1.5 w-1.5 md:h-2 md:w-2 rounded-full bg-accent-blue animate-pulse ml-1 shrink-0" />
-              </h1>
-            </motion.div>
+            <div className="flex items-center gap-4 py-4 justify-center md:justify-start">
+              <TextReveal
+                text="JAVIYA RAJ."
+                className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black text-white tracking-tighter uppercase italic"
+              />
+
+
+
+            </div>
+
 
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 1.5 }}
-              className="flex flex-col sm:flex-row items-center gap-4 text-lg md:text-2xl text-muted-foreground font-medium pt-4 md:pt-8"
+              className="flex flex-col sm:flex-row items-center gap-4 text-lg md:text-2xl text-muted-foreground font-medium pt-4 md:pt-8 justify-center lg:justify-start"
             >
+
               <div className="flex items-center gap-3">
                 <div className="p-2 rounded-lg bg-accent-cyan/10 text-accent-cyan">
                   <Terminal size={18} />
@@ -293,35 +303,47 @@ export default function Hero() {
                 <span className="whitespace-nowrap opacity-60">I'M A</span>
               </div>
               <div className="flex items-center min-h-[40px]">
-                <span className="text-white px-3 py-1 rounded-md bg-white/5 border-l-2 border-accent-cyan font-bold whitespace-nowrap animate-pulse transition-all min-h-[36px] flex items-center text-center sm:text-left">
+                <span className="text-white px-3 py-1 rounded-md bg-white/5 border-l-2 border-accent-cyan font-bold whitespace-nowrap animate-pulse transition-all min-h-[40px] flex items-center text-center sm:text-left text-lg sm:text-xl md:text-2xl">
                   {displayedText || '\u00A0'}
                 </span>
+
+
+
               </div>
             </motion.div>
           </div>
 
-          <p className="text-base md:text-xl text-muted max-w-lg leading-relaxed font-light text-center md:text-left">
-            Developing high-performance, scalable mobile applications using Flutter and Dart, leveraging Clean Architecture to ensure maintainability and efficiency since 2021.
-          </p>
+          <FadeIn direction="up" delay={0.2} blur scale={0.98}>
+            <p className="text-base md:text-xl text-muted max-w-lg leading-relaxed font-light text-center md:text-left">
+              Developing high-performance, scalable mobile applications using Flutter and Dart, leveraging Clean Architecture to ensure maintainability and efficiency since 2021.
+            </p>
+          </FadeIn>
 
-          <div className="flex flex-col sm:flex-row gap-5 pt-4">
-            <button
-              onClick={scrollToSection}
-              className="px-10 py-5 rounded-2xl bg-accent-blue hover:bg-accent-blue/80 text-white font-bold transition-all hover:scale-[1.02] active:scale-95 shadow-[0_0_30px_rgba(2,125,253,0.3)] shadow-accent-blue/20 flex items-center justify-center gap-3 group glint-effect"
-            >
-              <span>Explore My Work</span>
-              <ArrowDown size={20} className="group-hover:translate-y-1 transition-transform" />
-            </button>
-            <a
-              href="/resume.pdf"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="px-10 py-5 rounded-2xl border border-glass-border bg-white/5 hover:bg-white/10 text-foreground font-bold transition-all hover:scale-[1.02] active:scale-95 backdrop-blur-sm flex items-center justify-center gap-3 glint-effect"
-            >
-              <Download size={20} className="text-accent-cyan" />
-              <span>Resume.pdf</span>
-            </a>
+
+          <div className="flex flex-col sm:flex-row gap-5 pt-8 justify-center lg:justify-start">
+
+            <Magnetic>
+              <button
+                onClick={scrollToSection}
+                className="px-10 py-5 rounded-2xl bg-accent-blue hover:bg-accent-blue/80 text-white font-bold transition-all hover:scale-[1.02] active:scale-95 shadow-[0_0_30px_rgba(2,125,253,0.3)] shadow-accent-blue/20 flex items-center justify-center gap-3 group glint-effect"
+              >
+                <span>Explore My Work</span>
+                <ArrowDown size={20} className="group-hover:translate-y-1 transition-transform" />
+              </button>
+            </Magnetic>
+            <Magnetic>
+              <a
+                href="/resume.pdf"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="px-10 py-5 rounded-2xl border border-glass-border bg-white/5 hover:bg-white/10 text-foreground font-bold transition-all hover:scale-[1.02] active:scale-95 backdrop-blur-sm flex items-center justify-center gap-3 glint-effect"
+              >
+                <Download size={20} className="text-accent-cyan" />
+                <span>Resume.pdf</span>
+              </a>
+            </Magnetic>
           </div>
+
         </div>
 
         {/* Visual Content (Right Side): Sophisticated Minimalist Exhibit */}

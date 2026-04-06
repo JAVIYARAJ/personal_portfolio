@@ -3,6 +3,9 @@
 import { useState } from 'react'
 import { Mail, Linkedin, Github, Twitter, Copy, Check, Send } from 'lucide-react'
 import FadeIn from './fade-in'
+import TextReveal from './text-reveal'
+import Magnetic from './magnetic'
+
 
 export default function Contact() {
   const [formData, setFormData] = useState({
@@ -78,24 +81,28 @@ export default function Contact() {
       <div className="absolute top-0 left-1/2 w-96 h-96 bg-accent-cyan/5 rounded-full blur-3xl -translate-x-1/2 -translate-y-1/2" />
 
       <div className="max-w-5xl mx-auto relative z-10">
-        <FadeIn className="flex flex-col items-center text-center mb-16" direction="up">
-          <div className="inline-flex items-center gap-3 px-4 py-1.5 rounded-full bg-white/5 border border-white/10 text-accent-cyan text-[10px] font-black uppercase tracking-[0.3em] backdrop-blur-md mb-8">
-            Transmission Link
-          </div>
-          <h2 className="text-3xl md:text-6xl font-black mb-6 text-white text-balance tracking-tighter leading-tight">
-            Let&apos;s Build Something{' '}
-            <span className="bg-gradient-to-r from-accent-blue via-accent-cyan to-white bg-clip-text text-transparent italic">
-              Extraordinary.
-            </span>
-          </h2>
+        <FadeIn className="flex flex-col items-center text-center mb-16" direction="up" blur scale={0.95}>
+          <Magnetic>
+            <div className="inline-flex items-center gap-3 px-4 py-1.5 rounded-full bg-white/5 border border-white/10 text-accent-cyan text-[10px] font-black uppercase tracking-[0.3em] backdrop-blur-md mb-8">
+              Transmission Link
+            </div>
+          </Magnetic>
+          <TextReveal
+            text="Let's Build Something Extraordinary."
+            className="text-2xl sm:text-4xl md:text-5xl lg:text-6xl font-black mb-6 text-white text-balance tracking-tighter"
+          />
+
           <p className="text-base sm:text-xl text-white/40 max-w-2xl mx-auto font-light leading-relaxed">
             Whether you have an app idea, need technical consulting, or want to collaborate on open-source, I&apos;m all ears.
           </p>
         </FadeIn>
 
+
+
         <div className="grid lg:grid-cols-2 gap-12 lg:gap-24">
           {/* Contact Form */}
-          <FadeIn direction="right" delay={0.2}>
+          <FadeIn direction="right" delay={0.2} blur scale={0.98}>
+
             <form onSubmit={handleSubmit} className="space-y-6">
               <div className="p-6 sm:p-10 rounded-[2rem] sm:rounded-[3rem] border border-white/10 bg-white/5 backdrop-blur-xl transition-all duration-500 hover:bg-white/[0.08]">
                 <div className="space-y-6">
@@ -148,21 +155,25 @@ export default function Contact() {
                   </div>
                 </div>
 
-                <button
-                  type="submit"
-                  disabled={submitted}
-                  className="w-full mt-10 px-8 py-5 rounded-2xl bg-gradient-to-r from-accent-blue via-accent-cyan to-white bg-[length:200%_auto] hover:bg-right text-[#0A0A0F] font-black uppercase tracking-widest transition-all duration-700 hover:scale-[1.02] active:scale-95 flex items-center justify-center gap-3 group relative overflow-hidden shadow-2xl"
-                >
-                  <div className="absolute inset-0 bg-white/20 translate-x-full group-hover:translate-x-0 transition-transform duration-500" />
-                  <Send size={18} className="group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform relative z-10" />
-                  <span className="relative z-10">{submitted ? 'Transmission Received!' : 'Submit'}</span>
-                </button>
+                <Magnetic strength={0.1} className="w-full">
+                  <button
+                    type="submit"
+                    disabled={submitted}
+                    className="w-full mt-10 px-8 py-5 rounded-2xl bg-gradient-to-r from-accent-blue via-accent-cyan to-white bg-[length:200%_auto] hover:bg-right text-[#0A0A0F] font-black uppercase tracking-widest transition-all duration-700 hover:scale-[1.02] active:scale-95 flex items-center justify-center gap-3 group relative overflow-hidden shadow-2xl"
+                  >
+                    <div className="absolute inset-0 bg-white/20 translate-x-full group-hover:translate-x-0 transition-transform duration-500" />
+                    <Send size={18} className="group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform relative z-10" />
+                    <span className="relative z-10">{submitted ? 'Transmission Received!' : 'Submit'}</span>
+                  </button>
+                </Magnetic>
+
               </div>
             </form>
           </FadeIn>
 
           {/* Contact Info */}
-          <FadeIn direction="left" delay={0.3} className="flex flex-col gap-10 sm:gap-12">
+          <FadeIn direction="left" delay={0.3} blur scale={0.98} className="flex flex-col gap-10 sm:gap-12">
+
             <div className="space-y-6 text-center lg:text-left flex flex-col items-center lg:items-start">
               <h3 className="text-3xl md:text-5xl font-black text-white tracking-tighter leading-tight">Get in <span className="text-accent-blue italic">Touch.</span></h3>
               <p className="text-white/40 text-base sm:text-lg leading-relaxed font-light max-w-md lg:border-l border-white/10 lg:pl-6">
@@ -199,19 +210,22 @@ export default function Contact() {
                 {[
                   { icon: Github, label: 'GitHub', url: 'https://github.com/JAVIYARAJ' },
                   { icon: Linkedin, label: 'LinkedIn', url: 'https://www.linkedin.com/in/javiyaraj/' },
-                  { icon: Twitter, label: 'Twitter', url: '#' },
+                  { icon: Twitter, label: 'Twitter', url: 'https://x.com/Rjcoding' },
+
                 ].map(({ icon: Icon, label, url }) => (
-                  <a
-                    key={label}
-                    href={url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="w-14 h-14 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center text-white/40 hover:text-accent-cyan hover:border-accent-cyan/40 hover:bg-accent-cyan/5 transition-all hover:scale-110 group"
-                  >
-                    <Icon size={22} className="group-hover:rotate-12 transition-transform" />
-                  </a>
+                  <Magnetic key={label}>
+                    <a
+                      href={url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="w-14 h-14 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center text-white/40 hover:text-accent-cyan hover:border-accent-cyan/40 hover:bg-accent-cyan/5 transition-all group"
+                    >
+                      <Icon size={22} className="group-hover:rotate-12 transition-transform" />
+                    </a>
+                  </Magnetic>
                 ))}
               </div>
+
             </div>
 
             {/* Availability */}
