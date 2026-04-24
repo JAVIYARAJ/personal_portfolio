@@ -12,8 +12,11 @@ export default function Contact() {
     name: '',
     email: '',
     message: '',
+    website: '',
   })
+  const [submitting, setSubmitting] = useState(false)
   const [submitted, setSubmitted] = useState(false)
+  const [errorMessage, setErrorMessage] = useState<string | null>(null)
   const [copiedEmail, setCopiedEmail] = useState(false)
 
   const handleInputChange = (
@@ -26,17 +29,34 @@ export default function Contact() {
     }))
   }
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    // Here you would typically send the form data to your backend
-    console.log('Form submitted:', formData)
-    setSubmitted(true)
-    setFormData({ name: '', email: '', message: '' })
+    if (submitting) return
 
-    // Trigger confetti-like effect
-    triggerSuccessAnimation()
+    setErrorMessage(null)
+    setSubmitting(true)
 
-    setTimeout(() => setSubmitted(false), 3000)
+    try {
+      const res = await fetch('/api/contact', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formData),
+      })
+
+      if (!res.ok) {
+        const { error } = await res.json().catch(() => ({ error: null }))
+        throw new Error(error || 'Something went wrong. Please try again.')
+      }
+
+      setSubmitted(true)
+      setFormData({ name: '', email: '', message: '', website: '' })
+      triggerSuccessAnimation()
+      setTimeout(() => setSubmitted(false), 3000)
+    } catch (err) {
+      setErrorMessage(err instanceof Error ? err.message : 'Something went wrong.')
+    } finally {
+      setSubmitting(false)
+    }
   }
 
   const triggerSuccessAnimation = () => {
@@ -155,15 +175,37 @@ export default function Contact() {
                   </div>
                 </div>
 
+                {/* Honeypot — real users should never fill this */}
+                <div className="absolute -left-[9999px]" aria-hidden="true">
+                  <label htmlFor="website">Website</label>
+                  <input
+                    type="text"
+                    id="website"
+                    name="website"
+                    value={formData.website}
+                    onChange={handleInputChange}
+                    tabIndex={-1}
+                    autoComplete="off"
+                  />
+                </div>
+
+                {errorMessage && (
+                  <p className="mt-6 text-sm text-red-400" role="alert">
+                    {errorMessage}
+                  </p>
+                )}
+
                 <Magnetic strength={0.1} className="w-full">
                   <button
                     type="submit"
-                    disabled={submitted}
-                    className="w-full mt-10 px-8 py-5 rounded-2xl bg-gradient-to-r from-accent-blue via-accent-cyan to-white bg-[length:200%_auto] hover:bg-right text-[#0A0A0F] font-black uppercase tracking-widest transition-all duration-700 hover:scale-[1.02] active:scale-95 flex items-center justify-center gap-3 group relative overflow-hidden shadow-2xl"
+                    disabled={submitting || submitted}
+                    className="w-full mt-10 px-8 py-5 rounded-2xl bg-gradient-to-r from-accent-blue via-accent-cyan to-white bg-[length:200%_auto] hover:bg-right text-[#0A0A0F] font-black uppercase tracking-widest transition-all duration-700 hover:scale-[1.02] active:scale-95 flex items-center justify-center gap-3 group relative overflow-hidden shadow-2xl disabled:cursor-not-allowed disabled:opacity-70"
                   >
                     <div className="absolute inset-0 bg-white/20 translate-x-full group-hover:translate-x-0 transition-transform duration-500" />
                     <Send size={18} className="group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform relative z-10" />
-                    <span className="relative z-10">{submitted ? 'Transmission Received!' : 'Submit'}</span>
+                    <span className="relative z-10">
+                      {submitted ? 'Transmission Received!' : submitting ? 'Transmitting…' : 'Submit'}
+                    </span>
                   </button>
                 </Magnetic>
 
