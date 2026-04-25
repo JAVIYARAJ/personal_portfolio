@@ -1004,7 +1004,7 @@ export default function PortfolioHome() {
                 <div className="flex flex-wrap items-center justify-between gap-3">
                   <div className="section-kicker bg-white/80">
                     <span className="eyebrow-dot" />
-                    Available for freelance work
+                    Available for freelance
                   </div>
                   <span className="rounded-full bg-foreground px-3 py-1.5 text-xs font-medium uppercase tracking-[0.14em] text-background">
                     Since 2021
@@ -1051,7 +1051,7 @@ export default function PortfolioHome() {
               />
             </Reveal>
 
-            <div className="grid gap-6 lg:grid-cols-4">
+            <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
               {aboutFeatures.map((item, index) => {
                 const Icon = item.icon
 
@@ -1085,7 +1085,7 @@ export default function PortfolioHome() {
               />
             </Reveal>
 
-            <div className="grid gap-6 lg:grid-cols-4">
+            <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
               {impactStats.map((stat, index) => (
                 <Reveal key={stat.label} delay={0.05 + index * 0.05}>
                   <StatCard stat={stat} />
@@ -1105,7 +1105,7 @@ export default function PortfolioHome() {
                     </h3>
                   </div>
 
-                  <div className="grid gap-4 sm:grid-cols-3">
+                  <div className="grid grid-cols-3 gap-3">
                     {[
                       { label: 'RETENTION', value: '99%' },
                       { label: 'SATISFACTION', value: '4.9/5' },
@@ -1113,10 +1113,10 @@ export default function PortfolioHome() {
                     ].map((item) => (
                       <div
                         key={item.label}
-                        className="rounded-[1.5rem] border border-border bg-white/75 p-4 text-center"
+                        className="rounded-[1.5rem] border border-border bg-white/75 p-3 text-center sm:p-4"
                       >
-                        <p className="text-xl font-semibold text-foreground">{item.value}</p>
-                        <p className="mt-1 text-[0.72rem] font-semibold uppercase tracking-[0.16em] text-muted-foreground">
+                        <p className="text-lg font-semibold text-foreground sm:text-xl">{item.value}</p>
+                        <p className="mt-1 text-[0.65rem] font-semibold uppercase tracking-[0.1em] text-muted-foreground sm:text-[0.72rem] sm:tracking-[0.16em]">
                           {item.label}
                         </p>
                       </div>
@@ -1482,8 +1482,7 @@ export default function PortfolioHome() {
 
               <p className="max-w-md text-sm leading-7 text-muted-foreground">
                 Specialized in high-performance cross-platform development since
-                2021. Specialized in high-performance cross-platform development
-                with 3+ years of experience. Engineering scalable mobile
+                2021, with 3+ years of experience engineering scalable mobile
                 ecosystems with Clean Architecture.
               </p>
 
@@ -1507,7 +1506,7 @@ export default function PortfolioHome() {
               </div>
             </div>
 
-            <div className="grid gap-8 sm:grid-cols-3">
+            <div className="grid grid-cols-3 gap-4 sm:gap-8">
               {footerLinks.map((section) => (
                 <div key={section.title} className="space-y-4">
                   <p className="text-[0.72rem] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
