@@ -1506,7 +1506,7 @@ export default function PortfolioHome() {
               </div>
             </div>
 
-            <div className="grid grid-cols-3 gap-4 sm:gap-8">
+            <div className="grid gap-6 sm:grid-cols-3 sm:gap-8">
               {footerLinks.map((section) => (
                 <div key={section.title} className="space-y-4">
                   <p className="text-[0.72rem] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
@@ -1519,7 +1519,7 @@ export default function PortfolioHome() {
                         href={link.href}
                         target={link.href.startsWith('http') ? '_blank' : undefined}
                         rel={link.href.startsWith('http') ? 'noreferrer' : undefined}
-                        className="text-sm text-foreground/80 transition hover:text-foreground"
+                        className="break-words text-sm text-foreground/80 transition hover:text-foreground"
                       >
                         {link.name}
                       </a>
