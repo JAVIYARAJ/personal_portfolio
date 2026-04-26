@@ -1,5 +1,6 @@
 'use client'
 
+import type { GitHubStats, Repo } from '@/lib/github'
 import type { ChangeEvent, FormEvent, ReactNode } from 'react'
 import { useEffect, useState } from 'react'
 import { AnimatePresence, motion, useReducedMotion } from 'framer-motion'
@@ -431,24 +432,6 @@ const experiences = [
   },
 ]
 
-const repositories = [
-  {
-    name: 'split_ease',
-    description:
-      'A comprehensive expense management engine facilitating group orchestration, peer invitations, and automated split synchronization. Features multi-tier role management (Owner, Admin, Member) with granular permission control.',
-    stars: '420',
-    url: '#',
-    tech: 'FLUTTER / SUPABASE',
-  },
-  {
-    name: 'dart_platform_bridge',
-    description:
-      'Optimized Method Channel wrapper for seamless biometric and complex native permissions handling.',
-    stars: '215',
-    url: '#',
-    tech: 'DART / KOTLIN',
-  },
-]
 
 const footerLinks = [
   {
@@ -713,56 +696,61 @@ function ExperienceCard({
 }) {
   return (
     <Reveal delay={delay}>
-      <article className="surface-card-strong relative overflow-hidden p-6 sm:p-8">
-        <div className="absolute inset-y-8 left-6 w-px bg-border sm:left-8" />
+      <article className="surface-card-strong overflow-hidden">
+        {/* Header zone */}
+        <div className="relative border-b border-border bg-[rgba(199,107,79,0.045)] px-6 pb-7 pt-6 sm:px-8 sm:pb-8 sm:pt-7">
+          <div className="pointer-events-none absolute bottom-4 right-6 font-[family:var(--font-heading)] text-[5.5rem] font-black leading-none tracking-tighter text-foreground/[0.045] sm:right-8 sm:text-[8rem]">
+            0{index + 1}
+          </div>
 
-        <div className="relative grid gap-6 pl-6 sm:pl-8 lg:grid-cols-[220px_minmax(0,1fr)] lg:gap-10">
-          <div className="space-y-4">
-            <div className="flex items-center gap-3">
-              <span className="h-3 w-3 rounded-full bg-accent shadow-[0_0_0_6px_rgba(199,107,79,0.12)]" />
-              <span className="text-[0.72rem] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
+          <div className="relative z-10 space-y-5">
+            <div className="flex flex-wrap items-center gap-3">
+              <span className="inline-flex items-center gap-2 rounded-full bg-foreground px-3.5 py-1.5 text-[0.65rem] font-semibold uppercase tracking-[0.18em] text-background">
+                <span className="h-1.5 w-1.5 rounded-full bg-accent" />
                 Stage 0{index + 1}
+              </span>
+              <span className="text-[0.72rem] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
+                {item.duration}
               </span>
             </div>
 
-            <div className="rounded-[1.35rem] border border-border bg-white/75 p-4">
-              <p className="text-[0.72rem] font-semibold uppercase tracking-[0.16em] text-muted-foreground">
-                {item.duration}
-              </p>
-              <p className="mt-2 text-sm font-semibold uppercase tracking-[0.16em] text-foreground/65">
+            <div className="flex flex-wrap items-end justify-between gap-4">
+              <h3 className="font-[family:var(--font-heading)] text-3xl tracking-[-0.05em] text-foreground sm:text-4xl">
+                {item.role}
+              </h3>
+              <span className="rounded-full border border-border bg-white/75 px-4 py-2 text-[0.72rem] font-semibold uppercase tracking-[0.2em] text-muted-foreground">
                 {item.company}
-              </p>
+              </span>
             </div>
           </div>
+        </div>
 
-          <div className="space-y-5">
-            <h3 className="font-[family:var(--font-heading)] text-2xl tracking-[-0.04em] text-foreground sm:text-3xl">
-              {item.role}
-            </h3>
-            <p className="max-w-3xl text-sm leading-8 text-muted-foreground sm:text-base">
-              {item.summary}
-            </p>
-            <div className="grid gap-3">
-              {item.bullets.map((bullet) => (
-                <div
-                  key={bullet}
-                  className="flex items-start gap-3 rounded-[1.25rem] border border-border bg-white/75 p-4"
-                >
-                  <span className="mt-1 flex h-5 w-5 items-center justify-center rounded-full bg-foreground text-background">
-                    <Check size={12} />
-                  </span>
-                  <p className="text-sm leading-7 text-foreground/85">{bullet}</p>
-                </div>
-              ))}
+        {/* Bullet grid */}
+        <div className="grid gap-4 p-6 sm:grid-cols-3 sm:p-8">
+          {item.bullets.map((bullet) => (
+            <div
+              key={bullet}
+              className="rounded-[1.25rem] border border-border bg-white/60 p-5"
+            >
+              <span className="mb-4 flex h-7 w-7 items-center justify-center rounded-full bg-foreground text-background">
+                <Check size={13} />
+              </span>
+              <p className="text-sm leading-7 text-foreground/80">{bullet}</p>
             </div>
-          </div>
+          ))}
         </div>
       </article>
     </Reveal>
   )
 }
 
-export default function PortfolioHome() {
+export default function PortfolioHome({
+  repos = [],
+  githubStats = { repoCount: 0, commitCount: 0 },
+}: {
+  repos: Repo[]
+  githubStats: GitHubStats
+}) {
   const reduceMotion = useReducedMotion()
   const [menuOpen, setMenuOpen] = useState(false)
   const [copiedEmail, setCopiedEmail] = useState(false)
@@ -1234,7 +1222,7 @@ export default function PortfolioHome() {
                 <div className="flex flex-wrap items-center gap-6">
                   <div>
                     <p className="font-[family:var(--font-heading)] text-3xl tracking-[-0.05em] text-foreground">
-                      34+
+                      {githubStats.repoCount > 0 ? `${githubStats.repoCount}+` : '—'}
                     </p>
                     <p className="text-[0.72rem] font-semibold uppercase tracking-[0.16em] text-muted-foreground">
                       Repositories
@@ -1243,7 +1231,7 @@ export default function PortfolioHome() {
                   <div className="h-10 w-px bg-border" />
                   <div>
                     <p className="font-[family:var(--font-heading)] text-3xl tracking-[-0.05em] text-foreground">
-                      8k+
+                      {githubStats.commitCount > 0 ? `${githubStats.commitCount}+` : '—'}
                     </p>
                     <p className="text-[0.72rem] font-semibold uppercase tracking-[0.16em] text-muted-foreground">
                       Code Commits
@@ -1264,33 +1252,37 @@ export default function PortfolioHome() {
             </Reveal>
 
             <div className="grid gap-6 lg:grid-cols-2">
-              {repositories.map((repo, index) => (
-                <Reveal key={repo.name} delay={0.06 + index * 0.05}>
-                  <article className="surface-card h-full p-6 sm:p-8">
-                    <div className="flex items-start justify-between gap-4">
-                      <div className="flex h-12 w-12 items-center justify-center rounded-[1.25rem] bg-foreground text-background">
-                        <GitBranch size={20} />
+              {repos.length === 0 ? (
+                <p className="col-span-2 text-sm text-muted-foreground">
+                  No repositories found.
+                </p>
+              ) : (
+                repos.map((repo, index) => (
+                  <Reveal key={repo.name} delay={0.06 + index * 0.05}>
+                    <article className="surface-card h-full p-6 sm:p-8">
+                      <div className="flex items-start justify-between gap-4">
+                        <div className="flex h-12 w-12 items-center justify-center rounded-[1.25rem] bg-foreground text-background">
+                          <GitBranch size={20} />
+                        </div>
+                        <div className="inline-flex items-center gap-2 rounded-full border border-border bg-white/80 px-3 py-1.5 text-sm font-medium text-foreground">
+                          <Star size={14} />
+                          {repo.stars}
+                        </div>
                       </div>
-                      <div className="inline-flex items-center gap-2 rounded-full border border-border bg-white/80 px-3 py-1.5 text-sm font-medium text-foreground">
-                        <Star size={14} />
-                        {repo.stars}
-                      </div>
-                    </div>
 
-                    <div className="mt-6 space-y-2">
-                      <h3 className="font-[family:var(--font-heading)] text-3xl tracking-[-0.04em] text-foreground">
-                        {repo.name}
-                      </h3>
-                      <p className="text-[0.72rem] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
-                        {repo.tech}
+                      <div className="mt-6 space-y-2">
+                        <h3 className="font-[family:var(--font-heading)] text-3xl tracking-[-0.04em] text-foreground">
+                          {repo.name}
+                        </h3>
+                        <p className="text-[0.72rem] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
+                          {repo.language}
+                        </p>
+                      </div>
+
+                      <p className="mt-4 text-sm leading-7 text-muted-foreground sm:text-base">
+                        {repo.description}
                       </p>
-                    </div>
 
-                    <p className="mt-4 text-sm leading-7 text-muted-foreground sm:text-base">
-                      {repo.description}
-                    </p>
-
-                    {repo.url !== '#' ? (
                       <a
                         href={repo.url}
                         target="_blank"
@@ -1300,10 +1292,10 @@ export default function PortfolioHome() {
                         Open repository
                         <ArrowUpRight size={15} />
                       </a>
-                    ) : null}
-                  </article>
-                </Reveal>
-              ))}
+                    </article>
+                  </Reveal>
+                ))
+              )}
             </div>
           </div>
         </section>
@@ -1319,7 +1311,7 @@ export default function PortfolioHome() {
             </Reveal>
 
             <div className="grid gap-6 lg:grid-cols-[0.9fr_1.1fr]">
-              <Reveal delay={0.05}>
+              <Reveal delay={0.05} className="h-full">
                 <div className="surface-card-strong h-full p-8 sm:p-10">
                   <h3 className="font-[family:var(--font-heading)] text-3xl tracking-[-0.04em] sm:text-4xl">
                     Get in Touch.
@@ -1382,8 +1374,8 @@ export default function PortfolioHome() {
                 </div>
               </Reveal>
 
-              <Reveal delay={0.1}>
-                <form onSubmit={handleSubmit} className="surface-card-strong p-8 sm:p-10">
+              <Reveal delay={0.1} className="h-full">
+                <form onSubmit={handleSubmit} className="surface-card-strong h-full p-8 sm:p-10">
                   <div className="grid gap-5 sm:grid-cols-2">
                     <label className="grid gap-2 text-sm font-medium text-foreground">
                       Full Name
