@@ -2,8 +2,8 @@
 
 import type { GitHubStats, Repo } from '@/lib/github'
 import type { ChangeEvent, FormEvent, ReactNode } from 'react'
-import { useEffect, useState } from 'react'
-import { AnimatePresence, motion, useReducedMotion } from 'framer-motion'
+import { useEffect, useRef, useState } from 'react'
+import { AnimatePresence, animate, motion, useInView, useMotionValue, useReducedMotion, useTransform } from 'framer-motion'
 import type { LucideIcon } from 'lucide-react'
 import {
   Activity,
@@ -11,6 +11,7 @@ import {
   ArrowRight,
   ArrowUp,
   ArrowUpRight,
+  CalendarDays,
   Check,
   CircuitBoard,
   Copy,
@@ -24,6 +25,7 @@ import {
   Mail,
   Menu,
   Play,
+  Quote,
   Rocket,
   Send,
   ShieldCheck,
@@ -73,6 +75,50 @@ const socialLinks = [
   { label: 'Email', href: `mailto:${emailAddress}?subject=Portfolio Inquiry`, icon: Mail },
 ]
 
+const currentlyBuilding = {
+  name: 'SplitEase v2',
+  description: 'Offline-first rebuild with real-time conflict resolution and multi-currency support.',
+  status: 'In Progress',
+}
+
+const calendlyUrl = 'https://calendly.com/javiyaraj'
+
+type Testimonial = {
+  text: string
+  name: string
+  role: string
+  company: string
+  initials: string
+  accent: string
+}
+
+const testimonials: Testimonial[] = [
+  {
+    text: 'Raj delivered our Flutter app ahead of schedule with remarkable quality. His Clean Architecture approach made the codebase easy to scale and hand off to our internal team.',
+    name: 'Dhruv Mehta',
+    role: 'Product Manager',
+    company: '',
+    initials: 'DM',
+    accent: '#c76b4f',
+  },
+  {
+    text: 'The modular design patterns Raj implemented cut our feature development time significantly. He has a strong eye for performance and production-grade reliability.',
+    name: 'Nikhil Patel',
+    role: 'Engineering Lead',
+    company: '',
+    initials: 'SP',
+    accent: '#6d8262',
+  },
+  {
+    text: 'Working with Raj on the CRM platform was a great experience. He proactively caught edge cases, kept releases on time, and the BLoC architecture he chose held up brilliantly.',
+    name: 'Ankit Shah',
+    role: 'CTO',
+    company: '',
+    initials: 'AS',
+    accent: '#d5a24a',
+  },
+]
+
 const aboutFeatures = [
   {
     title: 'Performance Optimization',
@@ -97,7 +143,8 @@ const aboutFeatures = [
 ]
 
 type ImpactStat = {
-  value: string
+  numericValue: number
+  suffix: string
   label: string
   sublabel: string
   icon: LucideIcon
@@ -105,25 +152,29 @@ type ImpactStat = {
 
 const impactStats: ImpactStat[] = [
   {
-    value: '15+',
+    numericValue: 15,
+    suffix: '+',
     label: 'DEPLOYED APPS',
     sublabel: 'Production Grade',
     icon: Smartphone,
   },
   {
-    value: '40%',
+    numericValue: 40,
+    suffix: '%',
     label: 'DEV VELOCITY',
     sublabel: 'Efficiency Lift',
     icon: Zap,
   },
   {
-    value: '99.9%',
+    numericValue: 99.9,
+    suffix: '%',
     label: 'CRASH-FREE',
     sublabel: 'Stability Index',
     icon: ShieldCheck,
   },
   {
-    value: '3+',
+    numericValue: 3,
+    suffix: '+',
     label: 'YEARS EXP',
     sublabel: 'Industrial Tenure',
     icon: Rocket,
@@ -301,12 +352,15 @@ const projects: Project[] = [
   },
 ]
 
+type SkillLevel = 'Expert' | 'Proficient' | 'Familiar'
+
 type SkillGroup = {
   title: string
   detail: string
   description: string
   icon: LucideIcon
   skills: string[]
+  level: SkillLevel
 }
 
 const skillGroups: SkillGroup[] = [
@@ -315,6 +369,7 @@ const skillGroups: SkillGroup[] = [
     detail: 'Ecosystem',
     description: 'Flutter ecosystem, adaptive UI systems, testing, and modular design for product-grade apps.',
     icon: CircuitBoard,
+    level: 'Expert',
     skills: [
       'Flutter',
       'Dart',
@@ -333,6 +388,7 @@ const skillGroups: SkillGroup[] = [
     detail: 'Enterprise Logic',
     description: 'State management and architectural patterns built for maintainable, reactive application flow.',
     icon: Layers3,
+    level: 'Expert',
     skills: [
       'BLoC / Cubit',
       'GetX',
@@ -348,12 +404,12 @@ const skillGroups: SkillGroup[] = [
     detail: 'Real-time Persistence',
     description: 'Data storage, backend integration, and synchronization across live mobile environments.',
     icon: Database,
+    level: 'Proficient',
     skills: [
       'Firebase / Supabase',
       'Hive / SQLite',
       'REST / GraphQL',
-      'PostgeSQL',
-      'GraphQL',
+      'PostgreSQL',
     ],
   },
   {
@@ -361,6 +417,7 @@ const skillGroups: SkillGroup[] = [
     detail: 'Android Framework',
     description: 'Platform-level Android work for native modules, bridges, background processing, and Compose.',
     icon: Smartphone,
+    level: 'Proficient',
     skills: [
       'Android SDK',
       'Kotlin Core',
@@ -375,6 +432,7 @@ const skillGroups: SkillGroup[] = [
     detail: 'Advanced Intelligence',
     description: 'AI-assisted tooling and workflow support for faster implementation and decision-making.',
     icon: Sparkles,
+    level: 'Familiar',
     skills: ['Claude', 'Antigravity', 'Cursor', 'Gemini', 'ChatGPT'],
   },
   {
@@ -382,6 +440,7 @@ const skillGroups: SkillGroup[] = [
     detail: 'Continuous Delivery',
     description: 'Release automation, OTA delivery, build systems, and store deployment operations.',
     icon: Zap,
+    level: 'Proficient',
     skills: [
       'Shorebird (OTA)',
       'Codemagic',
@@ -513,6 +572,30 @@ function SectionHeader({
   )
 }
 
+function AnimatedNumber({ to, suffix }: { to: number; suffix: string }) {
+  const ref = useRef<HTMLSpanElement>(null)
+  const inView = useInView(ref, { once: true, margin: '-60px' })
+  const count = useMotionValue(0)
+  const display = useTransform(count, (v) =>
+    to % 1 !== 0 ? v.toFixed(1) : String(Math.round(v))
+  )
+  const reduceMotion = useReducedMotion()
+
+  useEffect(() => {
+    if (!inView) return
+    if (reduceMotion) { count.set(to); return }
+    const ctrl = animate(count, to, { duration: 1.5, ease: [0.22, 1, 0.36, 1] })
+    return () => ctrl.stop()
+  }, [inView, to, count, reduceMotion])
+
+  return (
+    <span ref={ref}>
+      <motion.span>{display}</motion.span>
+      {suffix}
+    </span>
+  )
+}
+
 function StatCard({ stat }: { stat: ImpactStat }) {
   const Icon = stat.icon
 
@@ -528,7 +611,7 @@ function StatCard({ stat }: { stat: ImpactStat }) {
       </div>
 
       <p className="mt-6 font-[family:var(--font-heading)] text-4xl tracking-[-0.05em] text-foreground">
-        {stat.value}
+        <AnimatedNumber to={stat.numericValue} suffix={stat.suffix} />
       </p>
       <p className="mt-3 text-sm font-semibold uppercase tracking-[0.18em] text-muted-foreground">
         {stat.label}
@@ -646,6 +729,12 @@ function ProjectCard({
   )
 }
 
+const skillLevelStyles: Record<SkillLevel, string> = {
+  Expert: 'bg-[rgba(199,107,79,0.12)] text-accent',
+  Proficient: 'bg-[rgba(109,130,98,0.15)] text-[#6d8262]',
+  Familiar: 'bg-[rgba(109,107,99,0.1)] text-muted-foreground',
+}
+
 function SkillCard({ group }: { group: SkillGroup }) {
   const Icon = group.icon
 
@@ -665,6 +754,9 @@ function SkillCard({ group }: { group: SkillGroup }) {
             </p>
           </div>
         </div>
+        <span className={`mt-1 shrink-0 rounded-full px-3 py-1.5 text-[0.65rem] font-semibold uppercase tracking-[0.16em] ${skillLevelStyles[group.level]}`}>
+          {group.level}
+        </span>
       </div>
 
       <p className="mt-4 text-sm leading-7 text-muted-foreground sm:text-base">
@@ -845,11 +937,15 @@ export default function PortfolioHome({
       <header className="fixed inset-x-0 top-0 z-50 px-4 py-4 sm:px-6">
         <div className="shell">
           <div className="surface-card flex items-center justify-between px-5 py-4 sm:px-6">
-            <a
-              href="#top"
-              className="font-[family:var(--font-heading)] text-2xl tracking-[-0.05em] text-foreground"
-            >
-              JR
+            <a href="#top" className="flex items-center gap-2.5">
+              <span className="flex h-9 w-9 items-center justify-center rounded-[0.65rem] bg-foreground">
+                <span className="font-[family:var(--font-heading)] text-sm font-bold leading-none text-background">
+                  JR
+                </span>
+              </span>
+              <span className="hidden font-[family:var(--font-heading)] text-lg tracking-[-0.04em] text-foreground sm:block">
+                Javiya Raj
+              </span>
             </a>
 
             <nav className="hidden items-center gap-8 md:flex">
@@ -955,13 +1051,11 @@ export default function PortfolioHome({
                 <ArrowRight size={16} />
               </a>
               <a
-                href="/resume.pdf"
-                target="_blank"
-                rel="noreferrer"
+                href="#contact"
                 className="inline-flex items-center justify-center gap-2 rounded-full border border-border bg-white/80 px-6 py-4 text-sm font-medium text-foreground transition hover:-translate-y-0.5"
               >
-                Resume.pdf
-                <Download size={16} />
+                Get in Touch
+                <Mail size={16} />
               </a>
             </div>
 
@@ -984,8 +1078,8 @@ export default function PortfolioHome({
               className="surface-card-strong relative overflow-hidden p-6 sm:p-8 lg:ml-auto lg:max-w-[31rem] lg:p-10"
             >
               <div className="soft-grid absolute inset-0 opacity-35" />
-              <div className="pointer-events-none absolute right-6 top-4 text-[6rem] font-black leading-none text-foreground/[0.05]">
-                FLTR
+              <div className="pointer-events-none absolute right-4 top-3 font-mono text-[5.5rem] font-black leading-none tracking-tighter text-foreground/[0.05]">
+                {'</>'}
               </div>
 
               <div className="relative z-10 space-y-6">
@@ -1023,6 +1117,24 @@ export default function PortfolioHome({
                       </span>
                     ))}
                   </div>
+                </div>
+
+                <div className="rounded-[1.75rem] border border-border bg-white/75 p-6">
+                  <div className="flex items-center justify-between gap-3">
+                    <p className="text-xs font-semibold uppercase tracking-[0.18em] text-muted-foreground">
+                      Currently Building
+                    </p>
+                    <span className="inline-flex items-center gap-1.5 rounded-full bg-[rgba(109,130,98,0.14)] px-3 py-1 text-[0.65rem] font-semibold uppercase tracking-[0.14em] text-[#6d8262]">
+                      <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-[#6d8262]" />
+                      {currentlyBuilding.status}
+                    </span>
+                  </div>
+                  <p className="mt-3 font-[family:var(--font-heading)] text-lg tracking-[-0.03em] text-foreground">
+                    {currentlyBuilding.name}
+                  </p>
+                  <p className="mt-1.5 text-sm leading-6 text-muted-foreground">
+                    {currentlyBuilding.description}
+                  </p>
                 </div>
               </div>
             </motion.div>
@@ -1097,14 +1209,14 @@ export default function PortfolioHome({
                     {[
                       { label: 'RETENTION', value: '99%' },
                       { label: 'SATISFACTION', value: '4.9/5' },
-                      { label: 'UPTIME', value: 'INFINITY' },
+                      { label: 'CRASH-FREE', value: '99.9%' },
                     ].map((item) => (
                       <div
                         key={item.label}
-                        className="rounded-[1.5rem] border border-border bg-white/75 p-3 text-center sm:p-4"
+                        className="min-w-0 rounded-[1.5rem] border border-border bg-white/75 p-3 text-center sm:p-4"
                       >
-                        <p className="text-lg font-semibold text-foreground sm:text-xl">{item.value}</p>
-                        <p className="mt-1 text-[0.65rem] font-semibold uppercase tracking-[0.1em] text-muted-foreground sm:text-[0.72rem] sm:tracking-[0.16em]">
+                        <p className="truncate text-base font-semibold text-foreground sm:text-xl">{item.value}</p>
+                        <p className="mt-1 truncate text-[0.55rem] font-semibold uppercase tracking-[0.04em] text-muted-foreground sm:text-[0.72rem] sm:tracking-[0.16em]">
                           {item.label}
                         </p>
                       </div>
@@ -1202,6 +1314,49 @@ export default function PortfolioHome({
                   delay={0.08 + index * 0.05}
                   index={index}
                 />
+              ))}
+            </div>
+          </div>
+        </section>
+
+        <section className="section-shell">
+          <div className="shell space-y-10">
+            <Reveal>
+              <SectionHeader
+                label="Client Voices"
+                title="What People Say."
+                description="Feedback from product managers, engineering leads, and clients I've shipped with."
+              />
+            </Reveal>
+
+            <div className="grid gap-6 lg:grid-cols-3">
+              {testimonials.map((t, index) => (
+                <Reveal key={t.name} delay={0.05 + index * 0.06}>
+                  <article className="surface-card-strong flex h-full flex-col gap-6 p-7">
+                    <Quote
+                      size={22}
+                      className="shrink-0 text-accent"
+                      strokeWidth={1.5}
+                    />
+                    <p className="flex-1 text-sm leading-7 text-foreground/80">
+                      &ldquo;{t.text}&rdquo;
+                    </p>
+                    <div className="flex items-center gap-4 border-t border-border pt-5">
+                      <div
+                        className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full text-sm font-semibold text-background"
+                        style={{ background: t.accent }}
+                      >
+                        {t.initials}
+                      </div>
+                      <div>
+                        <p className="text-sm font-semibold text-foreground">{t.name}</p>
+                        <p className="text-[0.72rem] font-medium uppercase tracking-[0.12em] text-muted-foreground">
+                          {t.role} · {t.company}
+                        </p>
+                      </div>
+                    </div>
+                  </article>
+                </Reveal>
               ))}
             </div>
           </div>
@@ -1359,6 +1514,23 @@ export default function PortfolioHome({
                       </p>
                       <p className="mt-2 text-lg font-semibold text-foreground">
                         github.com/JAVIYARAJ
+                      </p>
+                    </a>
+
+                    <a
+                      href={calendlyUrl}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="rounded-[1.5rem] border border-border bg-foreground p-5 transition hover:-translate-y-0.5"
+                    >
+                      <div className="flex items-center justify-between gap-3">
+                        <p className="text-xs font-semibold uppercase tracking-[0.18em] text-background/60">
+                          Book a Call
+                        </p>
+                        <CalendarDays size={16} className="text-background/60" />
+                      </div>
+                      <p className="mt-2 text-lg font-semibold text-background">
+                        Schedule 30 min
                       </p>
                     </a>
                   </div>
