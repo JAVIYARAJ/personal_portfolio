@@ -1,7 +1,5 @@
+import { Resend } from 'resend'
 import { NextResponse } from 'next/server'
-
-const NOTION_API = 'https://api.notion.com/v1/pages'
-const NOTION_VERSION = '2022-06-28'
 
 type ContactPayload = {
   name?: unknown
@@ -15,13 +13,12 @@ const MAX_EMAIL = 254
 const MAX_MESSAGE = 4000
 
 export async function POST(request: Request) {
-  const token = process.env.NOTION_TOKEN
-  const databaseId = process.env.NOTION_CONTACT_DATABASE_ID
+  const apiKey = process.env.RESEND_API_KEY
 
-  if (!token || !databaseId) {
+  if (!apiKey) {
     return NextResponse.json(
       { error: 'Contact form is not configured.' },
-      { status: 500 }
+      { status: 500 },
     )
   }
 
@@ -43,7 +40,7 @@ export async function POST(request: Request) {
   if (!name || !email || !message) {
     return NextResponse.json(
       { error: 'Name, email, and message are required.' },
-      { status: 400 }
+      { status: 400 },
     )
   }
 
@@ -59,33 +56,30 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: 'Invalid email.' }, { status: 400 })
   }
 
-  const referer = request.headers.get('referer') ?? 'unknown'
+  const resend = new Resend(apiKey)
 
-  const notionRes = await fetch(NOTION_API, {
-    method: 'POST',
-    headers: {
-      Authorization: `Bearer ${token}`,
-      'Notion-Version': NOTION_VERSION,
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({
-      parent: { database_id: databaseId },
-      properties: {
-        Name: { title: [{ text: { content: name } }] },
-        Email: { email },
-        Message: { rich_text: [{ text: { content: message } }] },
-        Status: { select: { name: 'New' } },
-        Source: { rich_text: [{ text: { content: referer } }] },
-      },
-    }),
+  const { error } = await resend.emails.send({
+    from: 'Portfolio Contact <onboarding@resend.dev>',
+    to: 'javiyaraj4@gmail.com',
+    replyTo: email,
+    subject: `New message from ${name}`,
+    html: `
+      <div style="font-family:sans-serif;max-width:560px;margin:0 auto">
+        <h2 style="margin-bottom:4px">New contact form submission</h2>
+        <hr style="border:none;border-top:1px solid #e5e5e5;margin:16px 0"/>
+        <p><strong>Name:</strong> ${name}</p>
+        <p><strong>Email:</strong> <a href="mailto:${email}">${email}</a></p>
+        <p><strong>Message:</strong></p>
+        <p style="white-space:pre-wrap;background:#f5f5f5;padding:12px;border-radius:6px">${message}</p>
+      </div>
+    `,
   })
 
-  if (!notionRes.ok) {
-    const detail = await notionRes.text()
-    console.error('Notion API error:', notionRes.status, detail)
+  if (error) {
+    console.error('Resend error:', error)
     return NextResponse.json(
-      { error: 'Failed to save submission.' },
-      { status: 502 }
+      { error: 'Failed to send message.' },
+      { status: 502 },
     )
   }
 

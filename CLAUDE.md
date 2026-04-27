@@ -16,10 +16,9 @@ There are no tests.
 
 Copy `.env.example` to `.env.local` and fill in:
 
-- `NOTION_TOKEN` — Notion internal integration secret
-- `NOTION_CONTACT_DATABASE_ID` — Notion database ID for contact submissions
+- `RESEND_API_KEY` — Resend API key; form submissions are emailed to javiyaraj4@gmail.com
 
-Without these, the contact form returns a 500 (by design, not a crash).
+Without this, the contact form returns a 500 (by design, not a crash).
 
 ## Architecture
 
@@ -27,7 +26,7 @@ This is a **Next.js 16 / React 19** single-page portfolio. The entire visible si
 
 **`components/portfolio/portfolio-home.tsx`** — contains all page data (projects, skills, experiences, navigation links) as module-level constants, all section-level components (`Reveal`, `SectionHeader`, `StatCard`, `ProjectCard`, `SkillCard`, `ExperienceCard`), and all interaction state (mobile menu, contact form). This is intentionally a single file; do not split it unless asked.
 
-**`app/api/contact/route.ts`** — Next.js Route Handler. Validates the incoming form payload, silently drops honeypot submissions (`website` field non-empty), then writes to Notion via their REST API.
+**`app/api/contact/route.ts`** — Next.js Route Handler. Validates the incoming form payload, silently drops honeypot submissions (`website` field non-empty), then sends an email via Resend to javiyaraj4@gmail.com.
 
 **`components/portfolio/contact.tsx`** — an older standalone contact section component. It is not imported anywhere currently; `portfolio-home.tsx` contains the live contact section inline.
 

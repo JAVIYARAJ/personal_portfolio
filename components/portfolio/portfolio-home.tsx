@@ -1430,28 +1430,40 @@ export default function PortfolioHome({
                     />
                   </div>
 
-                  <div className="mt-6 space-y-3">
-                    {submitted ? (
-                      <p className="rounded-[1.25rem] bg-[rgba(109,130,98,0.14)] px-4 py-3 text-sm text-foreground">
-                        Transmission Received!
-                      </p>
-                    ) : null}
+                  {errorMessage ? (
+                    <p className="mt-6 rounded-[1.25rem] bg-[rgba(185,65,36,0.12)] px-4 py-3 text-sm text-foreground">
+                      {errorMessage}
+                    </p>
+                  ) : null}
 
-                    {errorMessage ? (
-                      <p className="rounded-[1.25rem] bg-[rgba(185,65,36,0.12)] px-4 py-3 text-sm text-foreground">
-                        {errorMessage}
-                      </p>
-                    ) : null}
-                  </div>
-
-                  <button
-                    type="submit"
-                    disabled={submitting || submitted}
-                    className="mt-6 inline-flex h-14 items-center justify-center gap-2 rounded-full bg-foreground px-6 text-sm font-medium text-background transition hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-70"
-                  >
-                    <Send size={16} />
-                    {submitted ? 'Transmission Received!' : submitting ? 'Transmitting...' : 'Submit'}
-                  </button>
+                  {submitted ? (
+                    <motion.div
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      className="mt-6 rounded-[1.25rem] bg-[rgba(109,130,98,0.14)] px-6 py-5"
+                    >
+                      <div className="flex items-center gap-3">
+                        <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-foreground text-background">
+                          <Check size={16} strokeWidth={2.5} />
+                        </div>
+                        <div>
+                          <p className="font-semibold text-foreground">Message sent!</p>
+                          <p className="text-sm text-muted-foreground">
+                            Thanks for reaching out — I&apos;ll get back to you soon.
+                          </p>
+                        </div>
+                      </div>
+                    </motion.div>
+                  ) : (
+                    <button
+                      type="submit"
+                      disabled={submitting}
+                      className="mt-6 inline-flex h-14 items-center justify-center gap-2 rounded-full bg-foreground px-6 text-sm font-medium text-background transition hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-70"
+                    >
+                      <Send size={16} />
+                      {submitting ? 'Sending...' : 'Send Message'}
+                    </button>
+                  )}
                 </form>
               </Reveal>
             </div>
