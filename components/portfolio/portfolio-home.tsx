@@ -518,7 +518,7 @@ function StatCard({ stat }: { stat: ImpactStat }) {
 
   return (
     <div className="surface-card h-full p-6 sm:p-7">
-      <div className="flex items-center justify-between">
+      <div className="flex items-center gap-3">
         <div className="flex h-12 w-12 items-center justify-center rounded-[1.25rem] bg-foreground text-background">
           <Icon size={20} />
         </div>
@@ -746,7 +746,7 @@ function ExperienceCard({
 
 export default function PortfolioHome({
   repos = [],
-  githubStats = { repoCount: 0, commitCount: 0 },
+  githubStats = { repoCount: 0 },
 }: {
   repos: Repo[]
   githubStats: GitHubStats
@@ -1231,7 +1231,7 @@ export default function PortfolioHome({
                   <div className="h-10 w-px bg-border" />
                   <div>
                     <p className="font-[family:var(--font-heading)] text-3xl tracking-[-0.05em] text-foreground">
-                      {githubStats.commitCount > 0 ? `${githubStats.commitCount}+` : '—'}
+                      8k+
                     </p>
                     <p className="text-[0.72rem] font-semibold uppercase tracking-[0.16em] text-muted-foreground">
                       Code Commits

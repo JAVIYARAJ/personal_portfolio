@@ -8,7 +8,6 @@ export type Repo = {
 
 export type GitHubStats = {
   repoCount: number
-  commitCount: number
 }
 
 const GITHUB_USERNAME = 'JAVIYARAJ'
@@ -28,91 +27,27 @@ export async function fetchGitHubStats(): Promise<GitHubStats> {
   }
 
   try {
-    const userEndpoint = token
-      ? 'https://api.github.com/user'
-      : `https://api.github.com/users/${GITHUB_USERNAME}`
+    let repoCount = 0
+    let page = 1
 
-    const userRes = await fetch(userEndpoint, { headers, next: { revalidate: 5 } })
-    if (!userRes.ok) return { repoCount: 0, commitCount: 0 }
+    while (true) {
+      const endpoint = token
+        ? `https://api.github.com/user/repos?per_page=100&type=all&page=${page}`
+        : `https://api.github.com/users/${GITHUB_USERNAME}/repos?per_page=100&type=owner&page=${page}`
 
-    const userData = await userRes.json()
-    const repoCount = token
-      ? (userData.public_repos ?? 0) + (userData.total_private_repos ?? 0)
-      : (userData.public_repos ?? 0)
+      const res = await fetch(endpoint, { headers, next: { revalidate: 3600 } })
+      if (!res.ok) break
 
-    if (!token) return { repoCount, commitCount: 0 }
+      const repos: Array<unknown> = await res.json()
+      repoCount += repos.length
 
-    // All owned non-fork repos (private included with token)
-    const reposRes = await fetch(
-      'https://api.github.com/user/repos?per_page=100&type=owner',
-      { headers, next: { revalidate: 5 } },
-    )
-    if (!reposRes.ok) return { repoCount, commitCount: 0 }
+      if (repos.length < 100) break
+      page++
+    }
 
-    const repos: Array<{ name: string; fork: boolean; default_branch: string }> =
-      await reposRes.json()
-
-    // Per repo: walk every branch and deduplicate commit SHAs.
-    // Process default branch first so feature branches can exit early once
-    // they reach commits that are already in `seen`.
-    const repoCommitCounts = await Promise.all(
-      repos
-        .filter((r) => !r.fork)
-        .map(async (repo) => {
-          const branchesRes = await fetch(
-            `https://api.github.com/repos/${GITHUB_USERNAME}/${repo.name}/branches?per_page=100`,
-            { headers, next: { revalidate: 5 } },
-          )
-          if (!branchesRes.ok) return 0
-
-          const branches: Array<{ name: string; commit: { sha: string } }> =
-            await branchesRes.json()
-
-          // Default branch first
-          const ordered = [
-            ...branches.filter((b) => b.name === repo.default_branch),
-            ...branches.filter((b) => b.name !== repo.default_branch),
-          ]
-
-          const seen = new Set<string>()
-
-          for (const branch of ordered) {
-            let page = 1
-            while (true) {
-              const res = await fetch(
-                `https://api.github.com/repos/${GITHUB_USERNAME}/${repo.name}/commits` +
-                  `?sha=${branch.commit.sha}&author=${GITHUB_USERNAME}&per_page=100&page=${page}`,
-                { headers, next: { revalidate: 5 } },
-              )
-              if (!res.ok) break
-
-              const commits: Array<{ sha: string }> = await res.json()
-              if (commits.length === 0) break
-
-              let foundNew = false
-              for (const { sha } of commits) {
-                if (!seen.has(sha)) {
-                  seen.add(sha)
-                  foundNew = true
-                }
-              }
-
-              // Once a whole page contains only already-seen SHAs we've reached
-              // shared history — everything deeper is already counted.
-              if (!foundNew) break
-              if (commits.length < 100) break
-              page++
-            }
-          }
-
-          return seen.size
-        }),
-    )
-
-    const commitCount = repoCommitCounts.reduce((sum, n) => sum + n, 0)
-    return { repoCount, commitCount }
+    return { repoCount }
   } catch {
-    return { repoCount: 0, commitCount: 0 }
+    return { repoCount: 0 }
   }
 }
 
