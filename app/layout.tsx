@@ -1,15 +1,13 @@
 import type { Metadata } from 'next'
-import { Geist, Geist_Mono } from 'next/font/google'
+import type { ReactNode } from 'react'
 import { Analytics } from '@vercel/analytics/next'
+import Script from 'next/script'
 import './globals.css'
-
-const _geist = Geist({ subsets: ["latin"] });
-const _geistMono = Geist_Mono({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
   title: 'Javiya Raj - Flutter Developer',
-  description: 'Flutter developer building beautiful cross-platform apps. Available for freelance work.',
-  generator: 'v0.app',
+  description:
+    'Flutter developer building beautiful cross-platform apps. Available for freelance work.',
   icons: {
     icon: [
       {
@@ -32,13 +30,25 @@ export const metadata: Metadata = {
 export default function RootLayout({
   children,
 }: Readonly<{
-  children: React.ReactNode
+  children: ReactNode
 }>) {
   return (
     <html lang="en">
-      <body className="font-sans antialiased overflow-x-hidden">
+      <body className="overflow-x-hidden bg-background text-foreground antialiased">
         {children}
         <Analytics />
+        <Script
+          src="https://www.googletagmanager.com/gtag/js?id=G-ZC46FF98CN"
+          strategy="afterInteractive"
+        />
+        <Script id="google-analytics" strategy="afterInteractive">
+          {`
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+            gtag('config', 'G-ZC46FF98CN');
+          `}
+        </Script>
       </body>
     </html>
   )
