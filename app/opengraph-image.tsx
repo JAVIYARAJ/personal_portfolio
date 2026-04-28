@@ -8,7 +8,7 @@ export const contentType = 'image/png'
 const stack = ['Flutter', 'Dart', 'Clean Architecture', 'Supabase', 'BLoC', 'Kotlin']
 const stats = [
   { value: '15+', label: 'Apps' },
-  { value: '3+', label: 'Years' },
+  { value: '4+', label: 'Years' },
   { value: '99.9%', label: 'Crash-Free' },
 ]
 

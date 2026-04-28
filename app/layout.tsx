@@ -8,7 +8,7 @@ export const metadata: Metadata = {
   metadataBase: new URL('https://javiyaraj.dev'),
   title: 'Javiya Raj — Senior Flutter Developer | Cross-Platform Mobile Apps',
   description:
-    'Javiya Raj is a senior Flutter developer with 3+ years of experience shipping 15+ production-grade cross-platform apps. Expert in Flutter, Dart, Kotlin, Clean Architecture, Supabase, and BLoC. Available for freelance and consulting.',
+    'Javiya Raj is a senior Flutter developer with 4+ years of experience shipping 15+ production-grade cross-platform apps. Expert in Flutter, Dart, Kotlin, Clean Architecture, Supabase, and BLoC. Available for freelance and consulting.',
   keywords: [
     'Flutter developer',
     'Flutter freelancer',
@@ -24,7 +24,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: 'Javiya Raj — Senior Flutter Developer',
     description:
-      '3+ years · 15+ production apps · Flutter, Dart, Kotlin, Clean Architecture. Available for freelance and consulting.',
+      '4+ years · 15+ production apps · Flutter, Dart, Kotlin, Clean Architecture. Available for freelance and consulting.',
     url: 'https://javiyaraj.dev',
     siteName: 'Javiya Raj Portfolio',
     locale: 'en_US',
@@ -34,7 +34,7 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: 'Javiya Raj — Senior Flutter Developer',
     description:
-      '3+ years · 15+ production apps · Flutter, Dart, Kotlin. Available for freelance.',
+      '4+ years · 15+ production apps · Flutter, Dart, Kotlin. Available for freelance.',
     creator: '@Rjcoding',
   },
   icons: {
@@ -73,7 +73,7 @@ export default function RootLayout({
             url: 'https://javiyaraj.dev',
             jobTitle: 'Senior Flutter Developer',
             description:
-              'Senior Flutter developer with 3+ years of experience shipping 15+ production-grade cross-platform mobile apps.',
+              'Senior Flutter developer with 4+ years of experience shipping 15+ production-grade cross-platform mobile apps.',
             sameAs: [
               'https://github.com/JAVIYARAJ',
               'https://linkedin.com/in/javiyaraj/',
