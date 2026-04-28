@@ -723,12 +723,17 @@ function GalleryModal({
       </button>
 
       <div
-        className="relative flex h-[75vh] max-w-[340px] items-center justify-center"
+        className="relative flex h-[75vh] w-full items-center justify-center px-12 sm:max-w-[340px] sm:px-0"
         onClick={(e) => e.stopPropagation()}
+        onTouchStart={(e) => { touchStartX.current = e.touches[0].clientX }}
+        onTouchEnd={(e) => {
+          const diff = touchStartX.current - e.changedTouches[0].clientX
+          if (Math.abs(diff) > 50) diff > 0 ? next() : prev()
+        }}
       >
         <button
           onClick={prev}
-          className="absolute -left-14 flex h-10 w-10 items-center justify-center rounded-full bg-white/10 text-white transition hover:bg-white/20"
+          className="absolute left-2 flex h-10 w-10 items-center justify-center rounded-full bg-white/10 text-white transition hover:bg-white/20 sm:-left-14"
         >
           <ChevronLeft size={20} />
         </button>
@@ -748,18 +753,19 @@ function GalleryModal({
 
         <button
           onClick={next}
-          className="absolute -right-14 flex h-10 w-10 items-center justify-center rounded-full bg-white/10 text-white transition hover:bg-white/20"
+          className="absolute right-2 flex h-10 w-10 items-center justify-center rounded-full bg-white/10 text-white transition hover:bg-white/20 sm:-right-14"
         >
           <ChevronRight size={20} />
         </button>
       </div>
 
       <div
-        className="mt-6 flex gap-3"
+        ref={thumbsRef}
+        className="mt-6 flex gap-3 overflow-x-auto px-4 pb-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
         onClick={(e) => e.stopPropagation()}
       >
         {images.map((src, i) => (
-          <button key={i} onClick={() => setIndex(i)}>
+          <button key={i} onClick={() => setIndex(i)} className="shrink-0">
             <img
               src={src}
               alt={`Thumb ${i + 1}`}
@@ -807,20 +813,20 @@ function ProjectCard({
       />
 
       <div className="relative z-10 flex h-full flex-col gap-6">
-        <div className="flex items-start justify-between gap-4">
-          <div className="space-y-3">
+        <div className="flex items-start justify-between gap-3">
+          <div className="min-w-0 space-y-3">
             <div className="flex flex-wrap items-center gap-2 text-[0.72rem] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
               <span className="rounded-full border border-border bg-white/80 px-3 py-1">
                 {project.category}
               </span>
               <span>{project.type}</span>
             </div>
-            <h3 className="font-[family:var(--font-heading)] text-3xl tracking-[-0.04em] sm:text-4xl">
+            <h3 className="font-[family:var(--font-heading)] text-2xl tracking-[-0.04em] sm:text-3xl lg:text-4xl">
               {project.name}
             </h3>
           </div>
 
-          <div className={`flex shrink-0 items-center justify-center rounded-[1.4rem] border border-border bg-white/75 text-foreground shadow-[0_18px_40px_rgba(27,30,24,0.08)] ${project.appIconWide ? 'w-32 p-3' : 'h-14 w-14'}`}>
+          <div className={`flex shrink-0 items-center justify-center rounded-[1.4rem] border border-border bg-white/75 text-foreground shadow-[0_18px_40px_rgba(27,30,24,0.08)] ${project.appIconWide ? 'w-24 p-2 sm:w-32 sm:p-3' : 'h-12 w-12 sm:h-14 sm:w-14'}`}>
             {project.appIcon ? (
               <img src={project.appIcon} alt={project.name} className={`${project.appIconWide ? 'h-auto w-full object-contain' : 'h-full w-full rounded-[1.3rem] object-cover'}`} />
             ) : (
