@@ -1,5 +1,6 @@
 'use client'
 
+import NextImage from 'next/image'
 import type { GitHubStats, Repo } from '@/lib/github'
 import type { ChangeEvent, FormEvent, ReactNode } from 'react'
 import { useEffect, useRef, useState } from 'react'
@@ -717,9 +718,9 @@ function GalleryModal({
     >
       <button
         onClick={onClose}
-        className="absolute right-5 top-5 flex h-10 w-10 items-center justify-center rounded-full bg-white/10 text-white transition hover:bg-white/20"
+        className="absolute right-4 top-4 z-10 flex h-11 w-11 items-center justify-center rounded-full bg-white/25 text-white transition hover:bg-white/40"
       >
-        <X size={18} />
+        <X size={20} />
       </button>
 
       <div
@@ -769,6 +770,7 @@ function GalleryModal({
             <img
               src={src}
               alt={`Thumb ${i + 1}`}
+              loading="lazy"
               className={`h-14 w-auto rounded-xl object-cover transition ${i === index ? 'ring-2 ring-white opacity-100' : 'opacity-40 hover:opacity-70'}`}
             />
           </button>
@@ -828,7 +830,11 @@ function ProjectCard({
 
           <div className={`flex shrink-0 items-center justify-center rounded-[1.4rem] border border-border bg-white/75 text-foreground shadow-[0_18px_40px_rgba(27,30,24,0.08)] ${project.appIconWide ? 'w-24 p-2 sm:w-32 sm:p-3' : 'h-12 w-12 sm:h-14 sm:w-14'}`}>
             {project.appIcon ? (
-              <img src={project.appIcon} alt={project.name} className={`${project.appIconWide ? 'h-auto w-full object-contain' : 'h-full w-full rounded-[1.3rem] object-cover'}`} />
+              project.appIconWide ? (
+                <img src={project.appIcon} alt={project.name} className="h-auto w-full object-contain" loading="lazy" />
+              ) : (
+                <NextImage src={project.appIcon} alt={project.name} width={56} height={56} className="h-full w-full rounded-[1.3rem] object-cover" />
+              )
             ) : (
               <Icon size={22} />
             )}

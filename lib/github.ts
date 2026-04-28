@@ -67,7 +67,7 @@ export async function fetchStarredRepos(): Promise<Repo[]> {
   try {
     const res = await fetch(endpoint, {
       headers,
-      next: { revalidate: 5 },
+      next: { revalidate: 86400 },
     })
 
     if (!res.ok) return []
