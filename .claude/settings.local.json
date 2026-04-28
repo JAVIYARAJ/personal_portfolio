@@ -5,7 +5,10 @@
       "Bash(python3 -c \"import sys,json; d=json.load\\(sys.stdin\\); print\\('public starred:', len\\(d\\)\\); [print\\('-', r.get\\('name'\\)\\) for r in d]\")",
       "Bash(python3 -c \"import sys,json; d=json.load\\(sys.stdin\\); print\\('repo access:', d.get\\('name', d.get\\('message', 'unknown'\\)\\)\\)\")",
       "Bash(curl -s http://localhost:3000)",
-      "Bash(node *)"
+      "Bash(node *)",
+      "Bash(mkdir -p /Users/rajjaviya/Documents/Coding/web/node/project/personal_portfolio/public/projects/split-ease)",
+      "Bash(cp /Users/rajjaviya/Documents/Coding/flutter/project/other/split_ease/assets/app_icon.png /Users/rajjaviya/Documents/Coding/web/node/project/personal_portfolio/public/projects/split-ease/icon.png)",
+      "Bash(npm run *)"
     ]
   }
 }

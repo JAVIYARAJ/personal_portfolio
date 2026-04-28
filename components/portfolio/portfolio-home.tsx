@@ -13,6 +13,8 @@ import {
   ArrowUpRight,
   CalendarDays,
   Check,
+  ChevronLeft,
+  ChevronRight,
   CircuitBoard,
   Copy,
   Database,
@@ -20,6 +22,7 @@ import {
   ExternalLink,
   GitBranch,
   Github,
+  Images,
   Layers3,
   Linkedin,
   Mail,
@@ -50,7 +53,7 @@ const navigation = [
 
 const heroFacts = [
   '15+ Production Apps',
-  '3+ Years Experience',
+  '4+ Years Experience',
   'Freelance Available',
 ]
 
@@ -76,7 +79,7 @@ const socialLinks = [
 ]
 
 const currentlyBuilding = {
-  name: 'SplitEase v2',
+  name: 'SplitEase',
   description: 'Offline-first rebuild with real-time conflict resolution and multi-currency support.',
   status: 'In Progress',
 }
@@ -200,6 +203,8 @@ type Project = {
   span: string
   links: ProjectLink[]
   appIcon?: string
+  appIconWide?: boolean
+  mockups?: string[]
 }
 
 const projects: Project[] = [
@@ -227,6 +232,26 @@ const projects: Project[] = [
       'Architected a scalable group-logic system with multi-tier role permissions and instant synchronization.',
     accent: '#d98f6b',
     icon: Layers3,
+    appIcon: '/projects/split-ease/icon.png',
+    mockups: [
+      '/projects/split-ease/mockup-1.png',
+      '/projects/split-ease/mockup-2.png',
+      '/projects/split-ease/mockup-3.png',
+      '/projects/split-ease/mockup-4.png',
+      '/projects/split-ease/mockup-5.png',
+      '/projects/split-ease/mockup-6.png',
+      '/projects/split-ease/mockup-7.png',
+      '/projects/split-ease/mockup-8.png',
+      '/projects/split-ease/mockup-9.png',
+      '/projects/split-ease/mockup-10.png',
+      '/projects/split-ease/mockup-11.png',
+      '/projects/split-ease/mockup-12.png',
+      '/projects/split-ease/mockup-13.png',
+      '/projects/split-ease/mockup-14.png',
+      '/projects/split-ease/mockup-15.png',
+      '/projects/split-ease/mockup-16.png',
+      '/projects/split-ease/mockup-17.png',
+    ],
     span: 'lg:col-span-7',
     links: [],
   },
@@ -256,6 +281,24 @@ const projects: Project[] = [
     span: 'lg:col-span-5',
     links: [],
     appIcon: '/projects/pocket-score/icon.png',
+    mockups: [
+      '/projects/pocket-score/mockup-1.png',
+      '/projects/pocket-score/mockup-2.png',
+      '/projects/pocket-score/mockup-3.png',
+      '/projects/pocket-score/mockup-4.png',
+      '/projects/pocket-score/mockup-5.png',
+      '/projects/pocket-score/mockup-6.png',
+      '/projects/pocket-score/mockup-7.png',
+      '/projects/pocket-score/mockup-8.png',
+      '/projects/pocket-score/mockup-9.png',
+      '/projects/pocket-score/mockup-10.png',
+      '/projects/pocket-score/mockup-11.png',
+      '/projects/pocket-score/mockup-12.png',
+      '/projects/pocket-score/mockup-13.png',
+      '/projects/pocket-score/mockup-14.png',
+      '/projects/pocket-score/mockup-15.png',
+      '/projects/pocket-score/mockup-16.png',
+    ],
   },
   {
     name: 'DYSHEZ',
@@ -281,6 +324,14 @@ const projects: Project[] = [
       'Engineered a 30% increase in repeat orders via modular loyalty logic.',
     accent: '#d5a24a',
     icon: Smartphone,
+    appIcon: '/projects/dyshez/icon.png',
+    mockups: [
+      '/projects/dyshez/mockup-1.png',
+      '/projects/dyshez/mockup-2.png',
+      '/projects/dyshez/mockup-3.png',
+      '/projects/dyshez/mockup-4.png',
+      '/projects/dyshez/mockup-5.png',
+    ],
     span: 'lg:col-span-6',
     links: [
       {
@@ -342,6 +393,8 @@ const projects: Project[] = [
       'Optimized network layer resulting in 30% faster data availability.',
     accent: '#8b6d5c',
     icon: Database,
+    appIcon: '/projects/goals/icon.svg',
+    appIconWide: true,
     span: 'lg:col-span-12',
     links: [
       {
@@ -621,6 +674,108 @@ function StatCard({ stat }: { stat: ImpactStat }) {
   )
 }
 
+function GalleryModal({
+  images,
+  onClose,
+}: {
+  images: string[]
+  onClose: () => void
+}) {
+  const [index, setIndex] = useState(0)
+  const reduceMotion = useReducedMotion()
+  const thumbsRef = useRef<HTMLDivElement>(null)
+  const touchStartX = useRef(0)
+
+  const prev = () => setIndex((i) => (i - 1 + images.length) % images.length)
+  const next = () => setIndex((i) => (i + 1) % images.length)
+
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') onClose()
+      if (e.key === 'ArrowRight') next()
+      if (e.key === 'ArrowLeft') prev()
+    }
+    window.addEventListener('keydown', handler)
+    return () => window.removeEventListener('keydown', handler)
+  }, [onClose])
+
+  useEffect(() => {
+    const el = thumbsRef.current
+    if (!el) return
+    const thumb = el.children[index] as HTMLElement
+    thumb?.scrollIntoView({ inline: 'center', behavior: 'smooth', block: 'nearest' })
+  }, [index])
+
+  return (
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      transition={{ duration: reduceMotion ? 0 : 0.2 }}
+      className="fixed inset-0 z-[999] flex flex-col items-center justify-center bg-black/85 backdrop-blur-md"
+      onClick={onClose}
+    >
+      <button
+        onClick={onClose}
+        className="absolute right-5 top-5 flex h-10 w-10 items-center justify-center rounded-full bg-white/10 text-white transition hover:bg-white/20"
+      >
+        <X size={18} />
+      </button>
+
+      <div
+        className="relative flex h-[75vh] max-w-[340px] items-center justify-center"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <button
+          onClick={prev}
+          className="absolute -left-14 flex h-10 w-10 items-center justify-center rounded-full bg-white/10 text-white transition hover:bg-white/20"
+        >
+          <ChevronLeft size={20} />
+        </button>
+
+        <AnimatePresence mode="wait">
+          <motion.img
+            key={index}
+            src={images[index]}
+            alt={`Screenshot ${index + 1}`}
+            initial={{ opacity: 0, scale: reduceMotion ? 1 : 0.96 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: reduceMotion ? 1 : 0.96 }}
+            transition={{ duration: reduceMotion ? 0 : 0.2 }}
+            className="h-full w-auto rounded-[2rem] object-contain shadow-2xl"
+          />
+        </AnimatePresence>
+
+        <button
+          onClick={next}
+          className="absolute -right-14 flex h-10 w-10 items-center justify-center rounded-full bg-white/10 text-white transition hover:bg-white/20"
+        >
+          <ChevronRight size={20} />
+        </button>
+      </div>
+
+      <div
+        className="mt-6 flex gap-3"
+        onClick={(e) => e.stopPropagation()}
+      >
+        {images.map((src, i) => (
+          <button key={i} onClick={() => setIndex(i)}>
+            <img
+              src={src}
+              alt={`Thumb ${i + 1}`}
+              className={`h-14 w-auto rounded-xl object-cover transition ${i === index ? 'ring-2 ring-white opacity-100' : 'opacity-40 hover:opacity-70'}`}
+            />
+          </button>
+        ))}
+      </div>
+
+      <p className="mt-4 text-sm text-white/40">
+        {index + 1} / {images.length} · Press ← → to navigate, Esc to close
+      </p>
+    </motion.div>
+  )
+}
+
 function ProjectCard({
   project,
   index,
@@ -630,8 +785,15 @@ function ProjectCard({
 }) {
   const reduceMotion = useReducedMotion()
   const Icon = project.icon
+  const [galleryOpen, setGalleryOpen] = useState(false)
 
   return (
+    <>
+    <AnimatePresence>
+      {galleryOpen && project.mockups && (
+        <GalleryModal images={project.mockups} onClose={() => setGalleryOpen(false)} />
+      )}
+    </AnimatePresence>
     <motion.article
       whileHover={reduceMotion ? undefined : { y: -6 }}
       transition={{ duration: 0.25, ease: 'easeOut' }}
@@ -643,9 +805,6 @@ function ProjectCard({
           background: `radial-gradient(circle at top right, ${project.accent}22 0%, transparent 55%)`,
         }}
       />
-      <div className="pointer-events-none absolute right-5 top-5 text-[6.5rem] font-black leading-none text-foreground/[0.04]">
-        0{index + 1}
-      </div>
 
       <div className="relative z-10 flex h-full flex-col gap-6">
         <div className="flex items-start justify-between gap-4">
@@ -661,9 +820,9 @@ function ProjectCard({
             </h3>
           </div>
 
-          <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-[1.4rem] border border-border bg-white/75 text-foreground shadow-[0_18px_40px_rgba(27,30,24,0.08)]">
+          <div className={`flex shrink-0 items-center justify-center rounded-[1.4rem] border border-border bg-white/75 text-foreground shadow-[0_18px_40px_rgba(27,30,24,0.08)] ${project.appIconWide ? 'w-32 p-3' : 'h-14 w-14'}`}>
             {project.appIcon ? (
-              <img src={project.appIcon} alt={project.name} className="h-full w-full rounded-[1.3rem] object-cover" />
+              <img src={project.appIcon} alt={project.name} className={`${project.appIconWide ? 'h-auto w-full object-contain' : 'h-full w-full rounded-[1.3rem] object-cover'}`} />
             ) : (
               <Icon size={22} />
             )}
@@ -708,7 +867,7 @@ function ProjectCard({
           </div>
         </div>
 
-        {project.links.length > 0 ? (
+        {(project.links.length > 0 || project.mockups) ? (
           <div className="mt-auto flex flex-wrap gap-3">
             {project.links.map((link) => {
               const LinkIcon = link.icon
@@ -727,10 +886,20 @@ function ProjectCard({
                 </a>
               )
             })}
+            {project.mockups && (
+              <button
+                onClick={() => setGalleryOpen(true)}
+                className="inline-flex items-center gap-2 rounded-full border border-border bg-white/80 px-4 py-2.5 text-sm font-medium text-foreground transition hover:-translate-y-0.5 hover:bg-white"
+              >
+                <Images size={16} />
+                Screenshots
+              </button>
+            )}
           </div>
         ) : null}
       </div>
     </motion.article>
+    </>
   )
 }
 
@@ -1443,15 +1612,22 @@ export default function PortfolioHome({
                         {repo.description}
                       </p>
 
-                      <a
-                        href={repo.url}
-                        target="_blank"
-                        rel="noreferrer"
-                        className="mt-6 inline-flex items-center gap-2 text-sm font-medium text-foreground transition hover:text-accent"
-                      >
-                        Open repository
-                        <ArrowUpRight size={15} />
-                      </a>
+                      {repo.private ? (
+                        <span className="mt-6 inline-flex items-center gap-1.5 rounded-full border border-border bg-white/60 px-3 py-1.5 text-xs font-semibold uppercase tracking-[0.12em] text-muted-foreground select-none">
+                          <ShieldCheck size={13} />
+                          Private
+                        </span>
+                      ) : (
+                        <a
+                          href={repo.url}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="mt-6 inline-flex items-center gap-2 text-sm font-medium text-foreground transition hover:text-accent"
+                        >
+                          Open repository
+                          <ArrowUpRight size={15} />
+                        </a>
+                      )}
                     </article>
                   </Reveal>
                 ))
@@ -1522,7 +1698,7 @@ export default function PortfolioHome({
                       </p>
                     </a>
 
-                    <a
+                    {/* <a
                       href={calendlyUrl}
                       target="_blank"
                       rel="noreferrer"
@@ -1537,7 +1713,7 @@ export default function PortfolioHome({
                       <p className="mt-2 text-lg font-semibold text-background">
                         Schedule 30 min
                       </p>
-                    </a>
+                    </a> */}
                   </div>
 
                   <button
@@ -1663,7 +1839,7 @@ export default function PortfolioHome({
 
               <p className="max-w-md text-sm leading-7 text-muted-foreground">
                 Specialized in high-performance cross-platform development since
-                2021, with 3+ years of experience engineering scalable mobile
+                2021, with 4+ years of experience engineering scalable mobile
                 ecosystems with Clean Architecture.
               </p>
 

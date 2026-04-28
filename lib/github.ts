@@ -4,6 +4,7 @@ export type Repo = {
   stars: number
   language: string
   url: string
+  private: boolean
 }
 
 export type GitHubStats = {
@@ -77,6 +78,7 @@ export async function fetchStarredRepos(): Promise<Repo[]> {
       stargazers_count: number
       language: string | null
       html_url: string
+      private: boolean
     }> = await res.json()
 
     return data.map((repo) => ({
@@ -85,6 +87,7 @@ export async function fetchStarredRepos(): Promise<Repo[]> {
       stars: repo.stargazers_count,
       language: repo.language ?? 'Unknown',
       url: repo.html_url,
+      private: repo.private,
     }))
   } catch {
     return []

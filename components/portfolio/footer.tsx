@@ -65,7 +65,7 @@ export default function Footer() {
 
             <p className="text-sm text-white/40 leading-relaxed font-light max-w-xs">
               Specialized in high-performance cross-platform development since 2021.
-              Specialized in high-performance cross-platform development with 3+ years of experience.
+              Specialized in high-performance cross-platform development with 4+ years of experience.
               Engineering scalable mobile ecosystems with Clean Architecture.
             </p>
 
