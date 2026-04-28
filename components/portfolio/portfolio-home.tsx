@@ -199,6 +199,7 @@ type Project = {
   icon: LucideIcon
   span: string
   links: ProjectLink[]
+  appIcon?: string
 }
 
 const projects: Project[] = [
@@ -230,6 +231,33 @@ const projects: Project[] = [
     links: [],
   },
   {
+    name: 'POCKET SCORE',
+    category: 'Sports / Cricket',
+    type: 'Personal',
+    description:
+      'A real-time cricket scoring app built for gully cricket. Features live ball-by-ball scoring with animated FOUR/SIX celebrations, squad management, match setup with coin toss, wicket tracking, and player rankings — all offline-first.',
+    tags: [
+      'Flutter',
+      'Dart',
+      'Hive (Local DB)',
+      'Custom Animations',
+      'Offline First',
+      'Clean Architecture',
+      'State Management',
+    ],
+    stats: [
+      { label: 'Screens', value: '16+' },
+      { label: 'Offline', value: '100%' },
+    ],
+    impact:
+      'Crafted a full cricket match lifecycle — from squad setup to live scoring to scorecard — entirely offline with smooth animated feedback.',
+    accent: '#7c6fcf',
+    icon: Sparkles,
+    span: 'lg:col-span-5',
+    links: [],
+    appIcon: '/projects/pocket-score/icon.png',
+  },
+  {
     name: 'DYSHEZ',
     category: 'Logistics / Consumer',
     type: 'Esparkbiz',
@@ -253,7 +281,7 @@ const projects: Project[] = [
       'Engineered a 30% increase in repeat orders via modular loyalty logic.',
     accent: '#d5a24a',
     icon: Smartphone,
-    span: 'lg:col-span-5',
+    span: 'lg:col-span-6',
     links: [
       {
         label: 'App Store',
@@ -289,7 +317,7 @@ const projects: Project[] = [
       'Transformed sales workflow into a mobile-first intelligent engine.',
     accent: '#6d8262',
     icon: Activity,
-    span: 'lg:col-span-5',
+    span: 'lg:col-span-6',
     links: [],
   },
   {
@@ -314,7 +342,7 @@ const projects: Project[] = [
       'Optimized network layer resulting in 30% faster data availability.',
     accent: '#8b6d5c',
     icon: Database,
-    span: 'lg:col-span-7',
+    span: 'lg:col-span-12',
     links: [
       {
         label: 'Website',
@@ -322,33 +350,6 @@ const projects: Project[] = [
         icon: ExternalLink,
       },
     ],
-  },
-  {
-    name: 'PADDLE',
-    category: 'Job Portal / HR Tech',
-    type: 'Esparkbiz',
-    description:
-      'A comprehensive job portal platform for seekers and admins. Optimized recruitment workflows via BLoC state management and robust candidate tracking.',
-    tags: [
-      'Flutter',
-      'Dart',
-      'BLoC',
-      'Clean Architecture',
-      'Dio',
-      'Firebase Auth',
-      'Push Notifications',
-      'Socket.Io',
-    ],
-    stats: [
-      { label: 'Workflows', value: '+30%' },
-      { label: 'Engagement', value: '25%' },
-    ],
-    impact:
-      'Reduced bug reports by 20% and improved development speed by 15% through Clean Architecture.',
-    accent: '#c76b4f',
-    icon: Workflow,
-    span: 'lg:col-span-12',
-    links: [],
   },
 ]
 
@@ -661,7 +662,11 @@ function ProjectCard({
           </div>
 
           <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-[1.4rem] border border-border bg-white/75 text-foreground shadow-[0_18px_40px_rgba(27,30,24,0.08)]">
-            <Icon size={22} />
+            {project.appIcon ? (
+              <img src={project.appIcon} alt={project.name} className="h-full w-full rounded-[1.3rem] object-cover" />
+            ) : (
+              <Icon size={22} />
+            )}
           </div>
         </div>
 
