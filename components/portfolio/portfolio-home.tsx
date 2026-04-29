@@ -110,7 +110,7 @@ const testimonials: Testimonial[] = [
     name: 'Nikhil Patel',
     role: 'Engineering Lead',
     company: '',
-    initials: 'SP',
+    initials: 'NP',
     accent: '#6d8262',
   },
   {
@@ -177,7 +177,7 @@ const impactStats: ImpactStat[] = [
     icon: ShieldCheck,
   },
   {
-    numericValue: 3,
+    numericValue: 4,
     suffix: '+',
     label: 'YEARS EXP',
     sublabel: 'Industrial Tenure',
@@ -235,23 +235,23 @@ const projects: Project[] = [
     icon: Layers3,
     appIcon: '/projects/split-ease/icon.png',
     mockups: [
-      '/projects/split-ease/mockup-1.png',
-      '/projects/split-ease/mockup-2.png',
-      '/projects/split-ease/mockup-3.png',
-      '/projects/split-ease/mockup-4.png',
-      '/projects/split-ease/mockup-5.png',
-      '/projects/split-ease/mockup-6.png',
-      '/projects/split-ease/mockup-7.png',
-      '/projects/split-ease/mockup-8.png',
-      '/projects/split-ease/mockup-9.png',
-      '/projects/split-ease/mockup-10.png',
-      '/projects/split-ease/mockup-11.png',
-      '/projects/split-ease/mockup-12.png',
-      '/projects/split-ease/mockup-13.png',
-      '/projects/split-ease/mockup-14.png',
-      '/projects/split-ease/mockup-15.png',
-      '/projects/split-ease/mockup-16.png',
-      '/projects/split-ease/mockup-17.png',
+      '/projects/split-ease/mockup-1.webp',
+      '/projects/split-ease/mockup-2.webp',
+      '/projects/split-ease/mockup-3.webp',
+      '/projects/split-ease/mockup-4.webp',
+      '/projects/split-ease/mockup-5.webp',
+      '/projects/split-ease/mockup-6.webp',
+      '/projects/split-ease/mockup-7.webp',
+      '/projects/split-ease/mockup-8.webp',
+      '/projects/split-ease/mockup-9.webp',
+      '/projects/split-ease/mockup-10.webp',
+      '/projects/split-ease/mockup-11.webp',
+      '/projects/split-ease/mockup-12.webp',
+      '/projects/split-ease/mockup-13.webp',
+      '/projects/split-ease/mockup-14.webp',
+      '/projects/split-ease/mockup-15.webp',
+      '/projects/split-ease/mockup-16.webp',
+      '/projects/split-ease/mockup-17.webp',
     ],
     span: 'lg:col-span-7',
     links: [],
@@ -283,22 +283,22 @@ const projects: Project[] = [
     links: [],
     appIcon: '/projects/pocket-score/icon.png',
     mockups: [
-      '/projects/pocket-score/mockup-1.png',
-      '/projects/pocket-score/mockup-2.png',
-      '/projects/pocket-score/mockup-3.png',
-      '/projects/pocket-score/mockup-4.png',
-      '/projects/pocket-score/mockup-5.png',
-      '/projects/pocket-score/mockup-6.png',
-      '/projects/pocket-score/mockup-7.png',
-      '/projects/pocket-score/mockup-8.png',
-      '/projects/pocket-score/mockup-9.png',
-      '/projects/pocket-score/mockup-10.png',
-      '/projects/pocket-score/mockup-11.png',
-      '/projects/pocket-score/mockup-12.png',
-      '/projects/pocket-score/mockup-13.png',
-      '/projects/pocket-score/mockup-14.png',
-      '/projects/pocket-score/mockup-15.png',
-      '/projects/pocket-score/mockup-16.png',
+      '/projects/pocket-score/mockup-1.webp',
+      '/projects/pocket-score/mockup-2.webp',
+      '/projects/pocket-score/mockup-3.webp',
+      '/projects/pocket-score/mockup-4.webp',
+      '/projects/pocket-score/mockup-5.webp',
+      '/projects/pocket-score/mockup-6.webp',
+      '/projects/pocket-score/mockup-7.webp',
+      '/projects/pocket-score/mockup-8.webp',
+      '/projects/pocket-score/mockup-9.webp',
+      '/projects/pocket-score/mockup-10.webp',
+      '/projects/pocket-score/mockup-11.webp',
+      '/projects/pocket-score/mockup-12.webp',
+      '/projects/pocket-score/mockup-13.webp',
+      '/projects/pocket-score/mockup-14.webp',
+      '/projects/pocket-score/mockup-15.webp',
+      '/projects/pocket-score/mockup-16.webp',
     ],
   },
   {
@@ -327,11 +327,11 @@ const projects: Project[] = [
     icon: Smartphone,
     appIcon: '/projects/dyshez/icon.png',
     mockups: [
-      '/projects/dyshez/mockup-1.png',
-      '/projects/dyshez/mockup-2.png',
-      '/projects/dyshez/mockup-3.png',
-      '/projects/dyshez/mockup-4.png',
-      '/projects/dyshez/mockup-5.png',
+      '/projects/dyshez/mockup-1.webp',
+      '/projects/dyshez/mockup-2.webp',
+      '/projects/dyshez/mockup-3.webp',
+      '/projects/dyshez/mockup-4.webp',
+      '/projects/dyshez/mockup-5.webp',
     ],
     span: 'lg:col-span-6',
     links: [
@@ -683,12 +683,43 @@ function GalleryModal({
   onClose: () => void
 }) {
   const [index, setIndex] = useState(0)
+  const [loadedSet, setLoadedSet] = useState<Set<number>>(new Set())
   const reduceMotion = useReducedMotion()
   const thumbsRef = useRef<HTMLDivElement>(null)
   const touchStartX = useRef(0)
 
+  const markLoaded = (i: number) => setLoadedSet((prev) => { const s = new Set(prev); s.add(i); return s })
+
   const prev = () => setIndex((i) => (i - 1 + images.length) % images.length)
   const next = () => setIndex((i) => (i + 1) % images.length)
+
+  // Eagerly preload the first 3 images on mount; preload the rest lazily behind the scenes
+  useEffect(() => {
+    const preload = (i: number) => {
+      if (i >= images.length) return
+      const img = new window.Image()
+      img.onload = () => markLoaded(i)
+      img.src = images[i]
+    }
+    preload(0); preload(1); preload(2)
+    const id = window.setTimeout(() => {
+      for (let i = 3; i < images.length; i++) preload(i)
+    }, 800)
+    return () => window.clearTimeout(id)
+  }, [images])
+
+  // Preload adjacent slides when the user navigates
+  useEffect(() => {
+    const preloadAdjacent = (i: number) => {
+      if (!loadedSet.has(i)) {
+        const img = new window.Image()
+        img.onload = () => markLoaded(i)
+        img.src = images[i]
+      }
+    }
+    preloadAdjacent((index + 1) % images.length)
+    preloadAdjacent((index - 1 + images.length) % images.length)
+  }, [index, images])
 
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
@@ -706,6 +737,8 @@ function GalleryModal({
     const thumb = el.children[index] as HTMLElement
     thumb?.scrollIntoView({ inline: 'center', behavior: 'smooth', block: 'nearest' })
   }, [index])
+
+  const isLoaded = loadedSet.has(index)
 
   return (
     <motion.div
@@ -739,18 +772,37 @@ function GalleryModal({
           <ChevronLeft size={20} />
         </button>
 
-        <AnimatePresence mode="wait">
-          <motion.img
-            key={index}
-            src={images[index]}
-            alt={`Screenshot ${index + 1}`}
-            initial={{ opacity: 0, scale: reduceMotion ? 1 : 0.96 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: reduceMotion ? 1 : 0.96 }}
-            transition={{ duration: reduceMotion ? 0 : 0.2 }}
-            className="h-full w-auto rounded-[2rem] object-contain shadow-2xl"
-          />
-        </AnimatePresence>
+        <div className="relative flex h-full w-full items-center justify-center">
+          {/* Spinner shown while the current image hasn't loaded yet */}
+          <AnimatePresence>
+            {!isLoaded && (
+              <motion.div
+                key="spinner"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.15 }}
+                className="absolute inset-0 flex items-center justify-center"
+              >
+                <div className="h-10 w-10 animate-spin rounded-full border-2 border-white/20 border-t-white" />
+              </motion.div>
+            )}
+          </AnimatePresence>
+
+          <AnimatePresence mode="wait">
+            <motion.img
+              key={index}
+              src={images[index]}
+              alt={`Screenshot ${index + 1}`}
+              initial={{ opacity: 0, scale: reduceMotion ? 1 : 0.96 }}
+              animate={{ opacity: isLoaded ? 1 : 0, scale: 1 }}
+              exit={{ opacity: 0, scale: reduceMotion ? 1 : 0.96 }}
+              transition={{ duration: reduceMotion ? 0 : 0.2 }}
+              className="h-full w-auto rounded-[2rem] object-contain shadow-2xl"
+              onLoad={() => markLoaded(index)}
+            />
+          </AnimatePresence>
+        </div>
 
         <button
           onClick={next}
@@ -770,7 +822,6 @@ function GalleryModal({
             <img
               src={src}
               alt={`Thumb ${i + 1}`}
-              loading="lazy"
               className={`h-14 w-auto rounded-xl object-cover transition ${i === index ? 'ring-2 ring-white opacity-100' : 'opacity-40 hover:opacity-70'}`}
             />
           </button>
@@ -901,6 +952,9 @@ function ProjectCard({
             {project.mockups && (
               <button
                 onClick={() => setGalleryOpen(true)}
+                onMouseEnter={() => {
+                  project.mockups!.forEach((src) => { const img = new window.Image(); img.src = src })
+                }}
                 className="inline-flex items-center gap-2 rounded-full border border-border bg-white/80 px-4 py-2.5 text-sm font-medium text-foreground transition hover:-translate-y-0.5 hover:bg-white"
               >
                 <Images size={16} />
@@ -1031,16 +1085,33 @@ export default function PortfolioHome({
 }) {
   const reduceMotion = useReducedMotion()
   const [menuOpen, setMenuOpen] = useState(false)
+  const [activeSection, setActiveSection] = useState('')
   const [copiedEmail, setCopiedEmail] = useState(false)
   const [submitting, setSubmitting] = useState(false)
   const [submitted, setSubmitted] = useState(false)
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
+  const [formErrors, setFormErrors] = useState<{ name?: string; email?: string; message?: string }>({})
   const [formData, setFormData] = useState({
     name: '',
     email: '',
     message: '',
     website: '',
   })
+
+  useEffect(() => {
+    const sectionIds = navigation.map((n) => n.href.replace('#', ''))
+    const observers = sectionIds.map((id) => {
+      const el = document.getElementById(id)
+      if (!el) return null
+      const observer = new IntersectionObserver(
+        ([entry]) => { if (entry.isIntersecting) setActiveSection(id) },
+        { rootMargin: '-40% 0px -55% 0px', threshold: 0 }
+      )
+      observer.observe(el)
+      return observer
+    })
+    return () => observers.forEach((o) => o?.disconnect())
+  }, [])
 
   useEffect(() => {
     const previousOverflow = document.body.style.overflow
@@ -1076,12 +1147,24 @@ export default function PortfolioHome({
     }
   }
 
+  const validateForm = () => {
+    const errors: typeof formErrors = {}
+    if (!formData.name.trim()) errors.name = 'Name is required.'
+    if (!formData.email.trim()) {
+      errors.email = 'Email is required.'
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
+      errors.email = 'Enter a valid email address.'
+    }
+    if (!formData.message.trim()) errors.message = 'Message is required.'
+    setFormErrors(errors)
+    return Object.keys(errors).length === 0
+  }
+
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
 
-    if (submitting) {
-      return
-    }
+    if (submitting) return
+    if (!validateForm()) return
 
     setSubmitting(true)
     setErrorMessage(null)
@@ -1139,9 +1222,12 @@ export default function PortfolioHome({
                 <a
                   key={item.label}
                   href={item.href}
-                  className="text-sm font-medium text-muted-foreground transition hover:text-foreground"
+                  className={`text-sm font-medium transition hover:text-foreground ${activeSection === item.href.replace('#', '') ? 'text-foreground' : 'text-muted-foreground'}`}
                 >
                   {item.label}
+                  {activeSection === item.href.replace('#', '') && (
+                    <span className="mt-0.5 block h-0.5 w-full rounded-full bg-accent" />
+                  )}
                 </a>
               ))}
             </nav>
@@ -1537,7 +1623,7 @@ export default function PortfolioHome({
                       <div>
                         <p className="text-sm font-semibold text-foreground">{t.name}</p>
                         <p className="text-[0.72rem] font-medium uppercase tracking-[0.12em] text-muted-foreground">
-                          {t.role} · {t.company}
+                          {t.role}{t.company ? ` · ${t.company}` : ''}
                         </p>
                       </div>
                     </div>
@@ -1748,11 +1834,11 @@ export default function PortfolioHome({
                         type="text"
                         name="name"
                         value={formData.name}
-                        onChange={handleInputChange}
-                        required
+                        onChange={(e) => { handleInputChange(e); if (formErrors.name) setFormErrors((p) => ({ ...p, name: undefined })) }}
                         placeholder="Javiya Raj"
-                        className="h-14 rounded-2xl border border-border bg-white/80 px-4 text-sm text-foreground outline-none transition focus:border-foreground/20 focus:ring-2 focus:ring-ring/20"
+                        className={`h-14 rounded-2xl border bg-white/80 px-4 text-sm text-foreground outline-none transition focus:ring-2 focus:ring-ring/20 ${formErrors.name ? 'border-destructive focus:border-destructive' : 'border-border focus:border-foreground/20'}`}
                       />
+                      {formErrors.name && <span className="text-xs text-destructive">{formErrors.name}</span>}
                     </label>
 
                     <label className="grid gap-2 text-sm font-medium text-foreground">
@@ -1761,11 +1847,11 @@ export default function PortfolioHome({
                         type="email"
                         name="email"
                         value={formData.email}
-                        onChange={handleInputChange}
-                        required
+                        onChange={(e) => { handleInputChange(e); if (formErrors.email) setFormErrors((p) => ({ ...p, email: undefined })) }}
                         placeholder="your@email.com"
-                        className="h-14 rounded-2xl border border-border bg-white/80 px-4 text-sm text-foreground outline-none transition focus:border-foreground/20 focus:ring-2 focus:ring-ring/20"
+                        className={`h-14 rounded-2xl border bg-white/80 px-4 text-sm text-foreground outline-none transition focus:ring-2 focus:ring-ring/20 ${formErrors.email ? 'border-destructive focus:border-destructive' : 'border-border focus:border-foreground/20'}`}
                       />
+                      {formErrors.email && <span className="text-xs text-destructive">{formErrors.email}</span>}
                     </label>
                   </div>
 
@@ -1774,12 +1860,12 @@ export default function PortfolioHome({
                     <textarea
                       name="message"
                       value={formData.message}
-                      onChange={handleInputChange}
-                      required
+                      onChange={(e) => { handleInputChange(e); if (formErrors.message) setFormErrors((p) => ({ ...p, message: undefined })) }}
                       rows={7}
                       placeholder="Tell me about your vision..."
-                      className="rounded-[1.5rem] border border-border bg-white/80 px-4 py-4 text-sm text-foreground outline-none transition focus:border-foreground/20 focus:ring-2 focus:ring-ring/20"
+                      className={`rounded-[1.5rem] border bg-white/80 px-4 py-4 text-sm text-foreground outline-none transition focus:ring-2 focus:ring-ring/20 ${formErrors.message ? 'border-destructive focus:border-destructive' : 'border-border focus:border-foreground/20'}`}
                     />
+                    {formErrors.message && <span className="text-xs text-destructive">{formErrors.message}</span>}
                   </label>
 
                   <div className="absolute -left-[9999px]" aria-hidden="true">
