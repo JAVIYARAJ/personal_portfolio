@@ -1,6 +1,5 @@
 import { ImageResponse } from 'next/og'
 
-export const runtime = 'edge'
 export const alt = 'Javiya Raj — Flutter Developer'
 export const size = { width: 1200, height: 630 }
 export const contentType = 'image/png'
@@ -15,7 +14,7 @@ const stats = [
 export default async function Image() {
   const fontData = await fetch(
     'https://fonts.gstatic.com/s/playfairdisplay/v37/nuFiD-vYSZviVYUb_rj3ij__anPXDTzYh3Afv8Bvr0E.woff2'
-  ).then((res) => res.arrayBuffer()).catch(() => null)
+  ).then((res) => (res.ok ? res.arrayBuffer() : null)).catch(() => null)
 
   return new ImageResponse(
     (
