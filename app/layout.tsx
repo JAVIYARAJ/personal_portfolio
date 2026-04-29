@@ -8,7 +8,7 @@ export const metadata: Metadata = {
   metadataBase: new URL('https://javiyaraj.dev'),
   title: 'Javiya Raj — Senior Flutter Developer | Cross-Platform Mobile Apps',
   description:
-    'Javiya Raj is a senior Flutter developer with 4+ years of experience shipping 15+ production-grade cross-platform apps. Expert in Flutter, Dart, Kotlin, Clean Architecture, Supabase, and BLoC. Available for freelance and consulting.',
+    'Senior Flutter developer with 4+ years experience shipping 15+ production apps. Expert in Flutter, Dart, Kotlin, Clean Architecture & BLoC. Available for freelance.',
   keywords: [
     'Flutter developer',
     'Flutter freelancer',
@@ -21,14 +21,36 @@ export const metadata: Metadata = {
     'mobile app development',
     'Javiya Raj',
   ],
+  alternates: {
+    canonical: 'https://javiyaraj.dev',
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      'max-snippet': -1,
+      'max-image-preview': 'large',
+      'max-video-preview': -1,
+    },
+  },
   openGraph: {
     title: 'Javiya Raj — Senior Flutter Developer',
     description:
-      '4+ years · 15+ production apps · Flutter, Dart, Kotlin, Clean Architecture. Available for freelance and consulting.',
+      '4+ years · 15+ production apps · Flutter, Dart, Kotlin, Clean Architecture. Available for freelance.',
     url: 'https://javiyaraj.dev',
     siteName: 'Javiya Raj Portfolio',
     locale: 'en_US',
     type: 'website',
+    images: [
+      {
+        url: '/opengraph-image',
+        width: 1200,
+        height: 630,
+        alt: 'Javiya Raj — Senior Flutter Developer',
+      },
+    ],
   },
   twitter: {
     card: 'summary_large_image',
@@ -36,6 +58,7 @@ export const metadata: Metadata = {
     description:
       '4+ years · 15+ production apps · Flutter, Dart, Kotlin. Available for freelance.',
     creator: '@Rjcoding',
+    images: ['/opengraph-image'],
   },
   icons: {
     icon: [
