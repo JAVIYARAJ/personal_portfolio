@@ -1,8 +1,6 @@
 @import 'tailwindcss';
 @import 'tw-animate-css';
 
-@custom-variant dark (&:is(.dark *));
-
 :root {
   --font-heading: 'Iowan Old Style', 'Palatino Linotype', 'Book Antiqua', 'Georgia', serif;
   --background: #f6f1e8;
@@ -30,46 +28,6 @@
   --chart-4: #8b6d5c;
   --chart-5: #9e8c68;
   --radius: 1rem;
-  --sidebar: #fffaf2;
-  --sidebar-foreground: #1b1e18;
-  --sidebar-primary: #1b1e18;
-  --sidebar-primary-foreground: #fffaf2;
-  --sidebar-accent: #e7dac3;
-  --sidebar-accent-foreground: #1b1e18;
-  --sidebar-border: rgba(27, 30, 24, 0.1);
-  --sidebar-ring: #c76b4f;
-  --accent-blue: #6d8262;
-  --accent-cyan: #c76b4f;
-  --accent-purple: #d5a24a;
-  --glass-border: rgba(27, 30, 24, 0.1);
-}
-
-.dark {
-  --font-heading: 'Iowan Old Style', 'Palatino Linotype', 'Book Antiqua', 'Georgia', serif;
-  --background: #f6f1e8;
-  --foreground: #1b1e18;
-  --card: #fffaf2;
-  --card-foreground: #1b1e18;
-  --popover: #fffaf2;
-  --popover-foreground: #1b1e18;
-  --primary: #1b1e18;
-  --primary-foreground: #f6f1e8;
-  --secondary: #e7dac3;
-  --secondary-foreground: #1b1e18;
-  --muted: #6d6b63;
-  --muted-foreground: #6d6b63;
-  --accent: #c76b4f;
-  --accent-foreground: #fffaf2;
-  --destructive: #b94124;
-  --destructive-foreground: #fffaf2;
-  --border: rgba(27, 30, 24, 0.1);
-  --input: #fffaf2;
-  --ring: #c76b4f;
-  --chart-1: #6d8262;
-  --chart-2: #c76b4f;
-  --chart-3: #d5a24a;
-  --chart-4: #8b6d5c;
-  --chart-5: #9e8c68;
   --sidebar: #fffaf2;
   --sidebar-foreground: #1b1e18;
   --sidebar-primary: #1b1e18;
