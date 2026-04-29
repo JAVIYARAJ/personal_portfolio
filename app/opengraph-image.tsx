@@ -14,7 +14,7 @@ const stats = [
 export default async function Image() {
   const fontData = await fetch(
     'https://fonts.gstatic.com/s/playfairdisplay/v37/nuFiD-vYSZviVYUb_rj3ij__anPXDTzYh3Afv8Bvr0E.woff2'
-  ).then((res) => res.arrayBuffer()).catch(() => null)
+  ).then((res) => (res.ok ? res.arrayBuffer() : null)).catch(() => null)
 
   return new ImageResponse(
     (
