@@ -80,8 +80,8 @@ const socialLinks = [
 ]
 
 const currentlyBuilding = {
-  name: 'SplitEase',
-  description: 'Offline-first rebuild with real-time conflict resolution and multi-currency support.',
+  name: 'Orbit',
+  description: 'A private, self-hosted operating system for developers — built to replace the 6+ tools developers juggle daily. Manage projects, tasks, notes, secrets, time tracking, email templates, and developer utilities in one fast, keyboard-first interface.',
   status: 'In Progress',
 }
 
