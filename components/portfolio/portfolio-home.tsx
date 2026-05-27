@@ -210,6 +210,33 @@ type Project = {
 
 const projects: Project[] = [
   {
+    name: 'ORBIT',
+    category: 'Developer OS / Productivity',
+    type: 'Personal',
+    description:
+      'A private, self-hosted operating system for developers — built to replace the 6+ tools a typical developer juggles daily. Projects, tasks, notes, secrets, time tracking, email templates, and developer utilities — all in one fast, keyboard-first interface.',
+    tags: [
+      'React 19',
+      'Vite',
+      'Supabase',
+      'PostgreSQL',
+      'AES-256 Encryption',
+      'Self-hosted',
+      'Keyboard-first',
+      'Vercel',
+    ],
+    stats: [
+      { label: 'Modules', value: '10+' },
+      { label: 'Tools replaced', value: '6+' },
+    ],
+    impact:
+      'Collapsed 6+ developer tools into one self-hosted, keyboard-first OS — with client-side encrypted secrets vault and a real-time Supabase backend.',
+    accent: '#5b7fa6',
+    icon: Workflow,
+    span: 'lg:col-span-12',
+    links: [],
+  },
+  {
     name: 'SPLITEASE',
     category: 'FinTech / Social Expense',
     type: 'Personal',
