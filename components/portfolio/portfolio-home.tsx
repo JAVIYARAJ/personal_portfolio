@@ -206,6 +206,7 @@ type Project = {
   appIcon?: string
   appIconWide?: boolean
   mockups?: string[]
+  isActive?: boolean
 }
 
 const projects: Project[] = [
@@ -235,6 +236,7 @@ const projects: Project[] = [
     icon: Workflow,
     span: 'lg:col-span-12',
     links: [],
+    isActive: true,
   },
   {
     name: 'SPLITEASE',
@@ -900,6 +902,12 @@ function ProjectCard({
                 {project.category}
               </span>
               <span>{project.type}</span>
+              {project.isActive && (
+                <span className="inline-flex items-center gap-1.5 rounded-full bg-[rgba(109,130,98,0.14)] px-3 py-1 text-[0.65rem] font-semibold uppercase tracking-[0.14em] text-[#6d8262]">
+                  <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-[#6d8262]" />
+                  In Development
+                </span>
+              )}
             </div>
             <h3 className="font-[family:var(--font-heading)] text-2xl tracking-[-0.04em] sm:text-3xl lg:text-4xl">
               {project.name}
