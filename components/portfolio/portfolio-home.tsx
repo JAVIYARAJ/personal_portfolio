@@ -1119,8 +1119,15 @@ export default function PortfolioHome({
   githubStats: GitHubStats
 }) {
   const reduceMotion = useReducedMotion()
+  const [orbitBannerDismissed, setOrbitBannerDismissed] = useState(false)
   const [menuOpen, setMenuOpen] = useState(false)
   const [activeSection, setActiveSection] = useState('')
+  const [showChip, setShowChip] = useState(false)
+
+  useEffect(() => {
+    const id = window.setTimeout(() => setShowChip(true), 3000)
+    return () => window.clearTimeout(id)
+  }, [])
   const [copiedEmail, setCopiedEmail] = useState(false)
   const [submitting, setSubmitting] = useState(false)
   const [submitted, setSubmitted] = useState(false)
@@ -1238,7 +1245,101 @@ export default function PortfolioHome({
 
   return (
     <div id="top" className="relative overflow-x-hidden">
-      <header className="fixed inset-x-0 top-0 z-50 px-4 py-4 sm:px-6">
+
+      {/* ORBIT Launch Banner */}
+      <AnimatePresence>
+        {!orbitBannerDismissed && (
+          <motion.div
+            key="orbit-banner"
+            initial={reduceMotion ? { opacity: 1 } : { y: -60, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            exit={reduceMotion ? { opacity: 0 } : { y: -60, opacity: 0 }}
+            transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
+            className="fixed inset-x-0 top-0 z-[60] h-[60px] overflow-hidden"
+            style={{ background: 'linear-gradient(100deg, #12304f 0%, #1e4d80 35%, #2563a8 60%, #1a3e6a 100%)' }}
+          >
+            {/* Shimmer sweep */}
+            <motion.div
+              className="pointer-events-none absolute inset-y-0 w-[30%]"
+              style={{ background: 'linear-gradient(to right, transparent, rgba(255,255,255,0.07), transparent)' }}
+              animate={{ x: ['-100%', '450%'] }}
+              transition={{ duration: 3, repeat: Infinity, ease: 'linear', repeatDelay: 2.5 }}
+            />
+
+            {/* ── Desktop layout (sm+): single row ── */}
+            <div className="relative hidden h-full items-center justify-center gap-3 px-12 sm:flex">
+              <span className="shrink-0 rounded-full bg-white/15 px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider text-white">
+                New
+              </span>
+              <span className="relative flex h-1.5 w-1.5 shrink-0">
+                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-sky-300 opacity-75" />
+                <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-sky-300" />
+              </span>
+              <p className="text-sm font-medium text-white/85">
+                <span className="font-bold text-white">ORBIT v1 is live</span>
+                <span className="mx-2 opacity-30">—</span>
+                Self-hosted dev OS: manage projects, tasks, notes &amp; encrypted secrets in one keyboard-first app.
+              </p>
+              <a
+                href="https://orbit-sand-alpha.vercel.app/"
+                target="_blank"
+                rel="noreferrer"
+                className="inline-flex shrink-0 items-center gap-1.5 rounded-full border border-white/20 bg-white/15 px-4 py-1.5 text-xs font-semibold text-white backdrop-blur-sm transition hover:border-white/35 hover:bg-white/25"
+              >
+                Visit Now <ArrowUpRight size={11} />
+              </a>
+              <button
+                type="button"
+                aria-label="Dismiss banner"
+                onClick={() => setOrbitBannerDismissed(true)}
+                className="absolute right-3 top-1/2 -translate-y-1/2 flex h-7 w-7 items-center justify-center rounded-full text-white/40 transition hover:bg-white/10 hover:text-white"
+              >
+                <X size={14} />
+              </button>
+            </div>
+
+            {/* ── Mobile layout: two-row stack ── */}
+            <div className="relative flex h-full flex-col items-start justify-center gap-0.5 pl-4 pr-10 sm:hidden">
+              {/* Row 1: title + badge + dot */}
+              <div className="flex items-center gap-2">
+                <span className="relative flex h-1.5 w-1.5 shrink-0">
+                  <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-sky-300 opacity-75" />
+                  <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-sky-300" />
+                </span>
+                <span className="text-sm font-bold text-white leading-tight">ORBIT v1 is live</span>
+                <span className="rounded-full bg-white/15 px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider text-white">
+                  New
+                </span>
+              </div>
+              {/* Row 2: description + CTA */}
+              <div className="flex items-center gap-2">
+                <p className="text-[11px] leading-tight text-white/70">
+                  Self-hosted dev workspace — projects, tasks, notes &amp; secrets vault.
+                </p>
+                <a
+                  href="https://orbit-sand-alpha.vercel.app/"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="inline-flex shrink-0 items-center gap-1 rounded-full border border-white/20 bg-white/15 px-2.5 py-1 text-[10px] font-semibold text-white transition hover:bg-white/25"
+                >
+                  Visit <ArrowUpRight size={9} />
+                </a>
+              </div>
+              {/* Dismiss */}
+              <button
+                type="button"
+                aria-label="Dismiss banner"
+                onClick={() => setOrbitBannerDismissed(true)}
+                className="absolute right-2 top-1/2 -translate-y-1/2 flex h-7 w-7 items-center justify-center rounded-full text-white/40 transition hover:bg-white/10 hover:text-white"
+              >
+                <X size={14} />
+              </button>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      <header className={`fixed inset-x-0 z-50 px-4 py-4 sm:px-6 transition-[top] duration-300 ${orbitBannerDismissed ? 'top-0' : 'top-[60px]'}`}>
         <div className="shell">
           <div className="surface-card flex items-center justify-between px-5 py-4 sm:px-6">
             <a href="#top" className="flex items-center gap-2.5">
@@ -1298,7 +1399,7 @@ export default function PortfolioHome({
             animate={reduceMotion ? { opacity: 1 } : { opacity: 1, y: 0 }}
             exit={reduceMotion ? { opacity: 0 } : { opacity: 0, y: -16 }}
             transition={{ duration: 0.25, ease: 'easeOut' }}
-            className="fixed inset-x-4 top-[5.25rem] z-40 md:hidden"
+            className={`fixed inset-x-4 z-40 md:hidden ${orbitBannerDismissed ? 'top-[5.25rem]' : 'top-[calc(5.25rem+60px)]'}`}
           >
             <div className="surface-card-strong p-6">
               <div className="flex flex-col gap-4">
@@ -1327,7 +1428,7 @@ export default function PortfolioHome({
         ) : null}
       </AnimatePresence>
 
-      <main className="pt-28 sm:pt-32">
+      <main className={`transition-[padding] duration-300 ${orbitBannerDismissed ? 'pt-28 sm:pt-32' : 'pt-[calc(7rem+60px)] sm:pt-[calc(8rem+60px)]'}`}>
         <section className="shell grid gap-10 pb-24 pt-8 lg:grid-cols-[minmax(0,0.98fr)_minmax(360px,0.82fr)] lg:items-center lg:gap-14 lg:pb-32 lg:pt-16">
           <Reveal className="max-w-[40rem] space-y-9">
             <div className="section-kicker">
@@ -2036,6 +2137,23 @@ export default function PortfolioHome({
           </div>
         </div>
       </footer>
+
+      <AnimatePresence>
+        {showChip && activeSection !== 'contact' && (
+          <motion.a
+            href="#contact"
+            initial={reduceMotion ? { opacity: 0 } : { opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={reduceMotion ? { opacity: 0 } : { opacity: 0, y: 16 }}
+            transition={{ duration: reduceMotion ? 0 : 0.4, ease: [0.22, 1, 0.36, 1] }}
+            className="fixed bottom-6 right-6 z-40 inline-flex items-center gap-2.5 rounded-full border border-border bg-white/90 px-5 py-3 text-sm font-medium text-foreground shadow-[0_8px_32px_rgba(27,30,24,0.14)] backdrop-blur-md transition hover:-translate-y-0.5 hover:bg-white"
+          >
+            <span className="h-2 w-2 animate-pulse rounded-full bg-[#6d8262]" />
+            Available for Freelance
+            <ArrowRight size={14} />
+          </motion.a>
+        )}
+      </AnimatePresence>
     </div>
   )
 }
