@@ -4,7 +4,7 @@ import NextImage from 'next/image'
 import type { GitHubStats, Repo } from '@/lib/github'
 import type { ChangeEvent, FormEvent, ReactNode } from 'react'
 import { useEffect, useRef, useState } from 'react'
-import { AnimatePresence, animate, motion, useInView, useMotionValue, useReducedMotion, useTransform } from 'framer-motion'
+import { AnimatePresence, animate, motion, useInView, useMotionTemplate, useMotionValue, useReducedMotion, useScroll, useSpring, useTransform } from 'framer-motion'
 import type { LucideIcon } from 'lucide-react'
 import {
   Activity,
@@ -58,12 +58,30 @@ const heroFacts = [
   'Freelance Available',
 ]
 
-const heroStack = [
+const marqueeTech = [
   'Flutter',
   'Dart',
-  'Clean Architecture',
-  'Supabase',
   'Kotlin',
+  'Clean Architecture',
+  'BLoC / Cubit',
+  'Riverpod',
+  'Supabase',
+  'Firebase',
+  'PostgreSQL',
+  'Jetpack Compose',
+  'CI/CD',
+  'Shorebird OTA',
+  'REST / GraphQL',
+  'GetIt',
+]
+
+// Only tilted/framed mockups here — Dyshez shots are straight-vertical and would
+// look inconsistent in the floating hero device.
+const heroShots = [
+  '/projects/split-ease/mockup-1.webp',
+  '/projects/pocket-score/mockup-1.webp',
+  '/projects/split-ease/mockup-3.webp',
+  '/projects/pocket-score/mockup-3.webp',
 ]
 
 const experienceHighlights = [
@@ -78,12 +96,6 @@ const socialLinks = [
   { label: 'Twitter', href: 'https://x.com/Rjcoding', icon: Twitter },
   { label: 'Email', href: `mailto:${emailAddress}?subject=Portfolio Inquiry`, icon: Mail },
 ]
-
-const currentlyBuilding = {
-  name: 'Orbit',
-  description: 'A private, self-hosted operating system for developers — built to replace the 6+ tools developers juggle daily. Manage projects, tasks, notes, secrets, time tracking, email templates, and developer utilities in one fast, keyboard-first interface.',
-  status: 'In Progress',
-}
 
 const calendlyUrl = 'https://calendly.com/javiyaraj'
 
@@ -631,6 +643,353 @@ function Reveal({ children, className = '', delay = 0 }: RevealProps) {
   )
 }
 
+function ScrollProgress() {
+  const { scrollYProgress } = useScroll()
+  const scaleX = useSpring(scrollYProgress, { stiffness: 120, damping: 30, mass: 0.3 })
+
+  return (
+    <motion.div
+      style={{ scaleX }}
+      className="grad-accent-bg fixed inset-x-0 top-0 z-[80] h-0.5 origin-left"
+    />
+  )
+}
+
+type SpotlightProps = {
+  children: ReactNode
+  className?: string
+  glow?: string
+  tilt?: boolean
+}
+
+// Card wrapper: pointer-following radial glow + subtle 3D tilt. Becomes the card surface.
+function Spotlight({ children, className = '', glow = '124,92,255', tilt = true }: SpotlightProps) {
+  const reduce = useReducedMotion()
+  const ref = useRef<HTMLDivElement>(null)
+  const px = useMotionValue(0.5)
+  const py = useMotionValue(0.5)
+  const rotateX = useSpring(useTransform(py, [0, 1], [tilt ? 5 : 0, tilt ? -5 : 0]), { stiffness: 150, damping: 18 })
+  const rotateY = useSpring(useTransform(px, [0, 1], [tilt ? -5 : 0, tilt ? 5 : 0]), { stiffness: 150, damping: 18 })
+  const gx = useTransform(px, (v) => `${v * 100}%`)
+  const gy = useTransform(py, (v) => `${v * 100}%`)
+  const background = useMotionTemplate`radial-gradient(420px circle at ${gx} ${gy}, rgba(${glow}, 0.16), transparent 60%)`
+
+  if (reduce) {
+    return <div className={className}>{children}</div>
+  }
+
+  return (
+    <motion.div
+      ref={ref}
+      onMouseMove={(e) => {
+        const el = ref.current
+        if (!el) return
+        const r = el.getBoundingClientRect()
+        px.set((e.clientX - r.left) / r.width)
+        py.set((e.clientY - r.top) / r.height)
+      }}
+      onMouseLeave={() => {
+        px.set(0.5)
+        py.set(0.5)
+      }}
+      style={{ rotateX, rotateY, transformPerspective: 1000 }}
+      className={`group/spot relative overflow-hidden ${className}`}
+    >
+      <motion.span
+        aria-hidden
+        style={{ background }}
+        className="pointer-events-none absolute inset-0 z-[1] opacity-0 transition-opacity duration-300 group-hover/spot:opacity-100"
+      />
+      <div className="relative z-[2] flex h-full flex-col">{children}</div>
+    </motion.div>
+  )
+}
+
+type MagneticButtonProps = {
+  children: ReactNode
+  className?: string
+  href: string
+  target?: string
+  rel?: string
+}
+
+// Anchor CTA that gently pulls toward the cursor.
+function MagneticButton({ children, className = '', href, target, rel }: MagneticButtonProps) {
+  const reduce = useReducedMotion()
+  const ref = useRef<HTMLAnchorElement>(null)
+  const x = useMotionValue(0)
+  const y = useMotionValue(0)
+  const sx = useSpring(x, { stiffness: 220, damping: 16 })
+  const sy = useSpring(y, { stiffness: 220, damping: 16 })
+
+  return (
+    <motion.a
+      ref={ref}
+      href={href}
+      target={target}
+      rel={rel}
+      style={reduce ? undefined : { x: sx, y: sy }}
+      onMouseMove={(e) => {
+        if (reduce) return
+        const el = ref.current
+        if (!el) return
+        const r = el.getBoundingClientRect()
+        x.set((e.clientX - (r.left + r.width / 2)) * 0.3)
+        y.set((e.clientY - (r.top + r.height / 2)) * 0.3)
+      }}
+      onMouseLeave={() => {
+        x.set(0)
+        y.set(0)
+      }}
+      className={className}
+    >
+      {children}
+    </motion.a>
+  )
+}
+
+// Hero name: per-letter staggered reveal.
+function LetterReveal({ text, className = '' }: { text: string; className?: string }) {
+  const reduce = useReducedMotion()
+
+  if (reduce) {
+    return <span className={className}>{text}</span>
+  }
+
+  return (
+    <motion.span
+      aria-label={text}
+      initial="hidden"
+      animate="show"
+      variants={{ show: { transition: { staggerChildren: 0.045, delayChildren: 0.1 } } }}
+      className={className}
+    >
+      {Array.from(text).map((ch, i) => (
+        <motion.span
+          key={i}
+          aria-hidden
+          className="inline-block"
+          variants={{ hidden: { opacity: 0, y: '0.55em' }, show: { opacity: 1, y: 0 } }}
+          transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+        >
+          {ch === ' ' ? ' ' : ch}
+        </motion.span>
+      ))}
+    </motion.span>
+  )
+}
+
+// Infinite horizontal tech strip.
+function Marquee({ items }: { items: string[] }) {
+  const loop = [...items, ...items]
+
+  return (
+    <div className="marquee-mask overflow-hidden py-1">
+      <div className="marquee-track">
+        {loop.map((item, i) => (
+          <span
+            key={i}
+            className="mx-1.5 inline-flex shrink-0 items-center gap-2 rounded-full border border-white/[0.1] bg-white/[0.04] px-4 py-2 text-sm text-foreground/80"
+          >
+            <span className="grad-accent-bg h-1.5 w-1.5 rounded-full" />
+            {item}
+          </span>
+        ))}
+      </div>
+    </div>
+  )
+}
+
+// Pointer-following cursor glow + a slow reactive aurora blob behind content.
+function AmbientFX() {
+  const reduce = useReducedMotion()
+  const [enabled, setEnabled] = useState(false)
+  const [visible, setVisible] = useState(false)
+  const [active, setActive] = useState(false)
+  const gx = useMotionValue(-300)
+  const gy = useMotionValue(-300)
+  const cursorX = useSpring(gx, { stiffness: 500, damping: 40, mass: 0.4 })
+  const cursorY = useSpring(gy, { stiffness: 500, damping: 40, mass: 0.4 })
+  const auroraX = useSpring(gx, { stiffness: 40, damping: 25, mass: 1 })
+  const auroraY = useSpring(gy, { stiffness: 40, damping: 25, mass: 1 })
+
+  useEffect(() => {
+    if (reduce) return
+    const fine = window.matchMedia('(hover: hover) and (pointer: fine)')
+    if (!fine.matches) return
+    setEnabled(true)
+
+    const onMove = (e: MouseEvent) => {
+      gx.set(e.clientX)
+      gy.set(e.clientY)
+      setVisible(true)
+      const el = e.target as HTMLElement | null
+      setActive(!!el?.closest('a, button, [role="button"], input, textarea, label, [data-cursor]'))
+    }
+    const onLeave = () => setVisible(false)
+
+    window.addEventListener('mousemove', onMove)
+    document.addEventListener('mouseleave', onLeave)
+    return () => {
+      window.removeEventListener('mousemove', onMove)
+      document.removeEventListener('mouseleave', onLeave)
+    }
+  }, [reduce, gx, gy])
+
+  if (reduce || !enabled) return null
+
+  return (
+    <>
+      <motion.div
+        aria-hidden
+        style={{ left: auroraX, top: auroraY, zIndex: -1 }}
+        className="pointer-events-none fixed hidden -translate-x-1/2 -translate-y-1/2 lg:block"
+      >
+        <div
+          className="h-[440px] w-[440px] rounded-full opacity-[0.16] blur-[90px]"
+          style={{ background: 'radial-gradient(circle, rgba(124,92,255,0.9), rgba(34,211,238,0.4) 50%, transparent 70%)' }}
+        />
+      </motion.div>
+
+      <motion.div
+        aria-hidden
+        style={{ left: cursorX, top: cursorY }}
+        animate={{ opacity: visible ? 1 : 0, scale: active ? 2.1 : 1 }}
+        transition={{ opacity: { duration: 0.2 }, scale: { duration: 0.18, ease: 'easeOut' } }}
+        className="pointer-events-none fixed z-[90] -translate-x-1/2 -translate-y-1/2 mix-blend-screen"
+      >
+        <div
+          className="h-6 w-6 rounded-full"
+          style={{
+            background: 'radial-gradient(circle, rgba(124,92,255,0.6), rgba(34,211,238,0.28) 60%, transparent 75%)',
+            boxShadow: '0 0 24px 6px rgba(124,92,255,0.35)',
+          }}
+        />
+      </motion.div>
+    </>
+  )
+}
+
+// One-time intro curtain: name reveals, then lifts. Skipped for reduced motion.
+function IntroOverlay() {
+  const reduce = useReducedMotion()
+  // Start shown so the curtain is painted on first load (no flash of content),
+  // then lift it after a beat. Reduced-motion users skip it entirely.
+  const [done, setDone] = useState(false)
+
+  useEffect(() => {
+    if (reduce) {
+      setDone(true)
+      return
+    }
+    document.body.style.overflow = 'hidden'
+    const t = window.setTimeout(() => {
+      setDone(true)
+      document.body.style.overflow = ''
+    }, 1500)
+    return () => {
+      window.clearTimeout(t)
+      document.body.style.overflow = ''
+    }
+  }, [reduce])
+
+  if (reduce) return null
+
+  return (
+    <AnimatePresence>
+      {!done && (
+        <motion.div
+          key="intro"
+          className="fixed inset-0 z-[200] flex flex-col items-center justify-center bg-[#08090c]"
+          initial={{ opacity: 1 }}
+          exit={{ opacity: 0, transition: { duration: 0.6, ease: [0.22, 1, 0.36, 1] } }}
+        >
+          <motion.div
+            initial={{ opacity: 0, scale: 0.92 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+            className="flex flex-col items-center gap-6"
+          >
+            <span className="font-[family:var(--font-heading)] text-4xl tracking-[-0.05em] sm:text-6xl">
+              <LetterReveal text="JAVIYA RAJ" className="text-gradient" />
+            </span>
+            <motion.span
+              className="grad-accent-bg block h-[3px] w-0 rounded-full"
+              animate={{ width: '12rem' }}
+              transition={{ duration: 1, ease: [0.22, 1, 0.36, 1], delay: 0.2 }}
+            />
+          </motion.div>
+        </motion.div>
+      )}
+    </AnimatePresence>
+  )
+}
+
+// Tilted phone showcase that cycles through real app screenshots.
+function HeroDevice() {
+  const reduce = useReducedMotion()
+  const [index, setIndex] = useState(0)
+
+  useEffect(() => {
+    if (reduce) return
+    const id = window.setInterval(() => {
+      setIndex((p) => (p + 1) % heroShots.length)
+    }, 2800)
+    return () => window.clearInterval(id)
+  }, [reduce])
+
+  return (
+    <div className="relative mx-auto w-full max-w-[20rem] lg:ml-auto lg:mr-0">
+      {/* glow behind device */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute -inset-10 rounded-full opacity-70 blur-3xl"
+        style={{ background: 'radial-gradient(circle, rgba(124,92,255,0.35), rgba(34,211,238,0.12) 55%, transparent 70%)' }}
+      />
+
+      {/* The mockups are already rendered inside a phone frame, so we float the
+          image directly (no extra device frame / tilt) to avoid a phone-in-phone look. */}
+      <div className="float-slow relative aspect-[3/5] w-full">
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={index}
+            initial={reduce ? { opacity: 1 } : { opacity: 0, scale: 0.97 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={reduce ? { opacity: 0 } : { opacity: 0, scale: 0.97 }}
+            transition={{ duration: reduce ? 0 : 0.55, ease: [0.22, 1, 0.36, 1] }}
+            className="absolute inset-0"
+          >
+            <NextImage
+              src={heroShots[index]}
+              alt="App screenshot from a shipped project"
+              fill
+              priority={index === 0}
+              sizes="(max-width: 1024px) 80vw, 20rem"
+              className="object-contain drop-shadow-[0_30px_55px_rgba(0,0,0,0.55)]"
+            />
+          </motion.div>
+        </AnimatePresence>
+      </div>
+
+      {/* floating chips */}
+      <div className="float-slower absolute -left-4 top-20 hidden rounded-2xl border border-white/[0.1] bg-white/[0.06] px-4 py-3 backdrop-blur-xl sm:block">
+        <div className="flex items-center gap-2">
+          <span className="relative flex h-2 w-2">
+            <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[#6d8262] opacity-75" />
+            <span className="relative inline-flex h-2 w-2 rounded-full bg-[#6d8262]" />
+          </span>
+          <span className="text-xs font-medium text-foreground">Available for freelance</span>
+        </div>
+      </div>
+
+      <div className="absolute -right-3 bottom-24 hidden rounded-2xl border border-white/[0.1] bg-white/[0.06] px-4 py-3 backdrop-blur-xl sm:block">
+        <p className="text-[0.6rem] font-semibold uppercase tracking-[0.16em] text-muted-foreground">Currently building</p>
+        <p className="mt-0.5 font-[family:var(--font-heading)] text-sm tracking-[-0.02em] text-gradient">ORBIT</p>
+      </div>
+    </div>
+  )
+}
+
 function SectionHeader({
   label,
   title,
@@ -684,9 +1043,9 @@ function StatCard({ stat }: { stat: ImpactStat }) {
   const Icon = stat.icon
 
   return (
-    <div className="surface-card h-full p-6 sm:p-7">
+    <Spotlight className="surface-card h-full p-6 sm:p-7" glow="34,211,238">
       <div className="flex items-center gap-3">
-        <div className="flex h-12 w-12 items-center justify-center rounded-[1.25rem] bg-foreground text-background">
+        <div className="flex h-12 w-12 items-center justify-center rounded-[1.25rem] grad-accent-bg text-white shadow-[0_10px_30px_rgba(124,92,255,0.32)]">
           <Icon size={20} />
         </div>
         <span className="text-[0.72rem] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
@@ -695,12 +1054,14 @@ function StatCard({ stat }: { stat: ImpactStat }) {
       </div>
 
       <p className="mt-6 font-[family:var(--font-heading)] text-4xl tracking-[-0.05em] text-foreground">
-        <AnimatedNumber to={stat.numericValue} suffix={stat.suffix} />
+        <span className="text-gradient">
+          <AnimatedNumber to={stat.numericValue} suffix={stat.suffix} />
+        </span>
       </p>
       <p className="mt-3 text-sm font-semibold uppercase tracking-[0.18em] text-muted-foreground">
         {stat.label}
       </p>
-    </div>
+    </Spotlight>
   )
 }
 
@@ -715,6 +1076,7 @@ function GalleryModal({
   const [loadedSet, setLoadedSet] = useState<Set<number>>(new Set())
   const reduceMotion = useReducedMotion()
   const thumbsRef = useRef<HTMLDivElement>(null)
+  const dialogRef = useRef<HTMLDivElement>(null)
   const touchStartX = useRef(0)
 
   const markLoaded = (i: number) => setLoadedSet((prev) => { const s = new Set(prev); s.add(i); return s })
@@ -760,6 +1122,13 @@ function GalleryModal({
     return () => window.removeEventListener('keydown', handler)
   }, [onClose])
 
+  // Move focus into the dialog on open, restore it to the opener on close (a11y).
+  useEffect(() => {
+    const opener = document.activeElement as HTMLElement | null
+    dialogRef.current?.focus()
+    return () => opener?.focus?.()
+  }, [])
+
   useEffect(() => {
     const el = thumbsRef.current
     if (!el) return
@@ -771,11 +1140,16 @@ function GalleryModal({
 
   return (
     <motion.div
+      ref={dialogRef}
+      role="dialog"
+      aria-modal="true"
+      aria-label="Project screenshots"
+      tabIndex={-1}
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
       transition={{ duration: reduceMotion ? 0 : 0.2 }}
-      className="fixed inset-0 z-[999] flex flex-col items-center justify-center bg-black/85 backdrop-blur-md"
+      className="fixed inset-0 z-[999] flex flex-col items-center justify-center bg-black/85 backdrop-blur-md focus:outline-none"
       onClick={onClose}
     >
       <button
@@ -874,6 +1248,14 @@ function ProjectCard({
   const reduceMotion = useReducedMotion()
   const Icon = project.icon
   const [galleryOpen, setGalleryOpen] = useState(false)
+  const cardRef = useRef<HTMLDivElement>(null)
+  const px = useMotionValue(0.5)
+  const py = useMotionValue(0.5)
+  const rotateX = useSpring(useTransform(py, [0, 1], [4, -4]), { stiffness: 150, damping: 18 })
+  const rotateY = useSpring(useTransform(px, [0, 1], [-4, 4]), { stiffness: 150, damping: 18 })
+  const gx = useTransform(px, (v) => `${v * 100}%`)
+  const gy = useTransform(py, (v) => `${v * 100}%`)
+  const pointerGlow = useMotionTemplate`radial-gradient(460px circle at ${gx} ${gy}, ${project.accent}38, transparent 60%)`
 
   return (
     <>
@@ -883,9 +1265,23 @@ function ProjectCard({
       )}
     </AnimatePresence>
     <motion.article
+      ref={cardRef}
       whileHover={reduceMotion ? undefined : { y: -6 }}
+      onMouseMove={(e) => {
+        if (reduceMotion) return
+        const el = cardRef.current
+        if (!el) return
+        const r = el.getBoundingClientRect()
+        px.set((e.clientX - r.left) / r.width)
+        py.set((e.clientY - r.top) / r.height)
+      }}
+      onMouseLeave={() => {
+        px.set(0.5)
+        py.set(0.5)
+      }}
+      style={reduceMotion ? undefined : { rotateX, rotateY, transformPerspective: 1200 }}
       transition={{ duration: 0.25, ease: 'easeOut' }}
-      className="surface-card-strong relative h-full overflow-hidden p-6 sm:p-8"
+      className="surface-card-strong group/proj relative h-full overflow-hidden p-6 sm:p-8"
     >
       <div
         className="pointer-events-none absolute inset-0 opacity-80"
@@ -894,11 +1290,19 @@ function ProjectCard({
         }}
       />
 
+      {!reduceMotion && (
+        <motion.div
+          aria-hidden
+          style={{ background: pointerGlow }}
+          className="pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-300 group-hover/proj:opacity-100"
+        />
+      )}
+
       <div className="relative z-10 flex h-full flex-col gap-6">
         <div className="flex items-start justify-between gap-3">
           <div className="min-w-0 space-y-3">
             <div className="flex flex-wrap items-center gap-2 text-[0.72rem] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
-              <span className="rounded-full border border-border bg-white/80 px-3 py-1">
+              <span className="rounded-full border border-border bg-white/[0.06] px-3 py-1">
                 {project.category}
               </span>
               <span>{project.type}</span>
@@ -914,7 +1318,7 @@ function ProjectCard({
             </h3>
           </div>
 
-          <div className={`flex shrink-0 items-center justify-center rounded-[1.4rem] border border-border bg-white/75 text-foreground shadow-[0_18px_40px_rgba(27,30,24,0.08)] ${project.appIconWide ? 'w-24 p-2 sm:w-32 sm:p-3' : 'h-12 w-12 sm:h-14 sm:w-14'}`}>
+          <div className={`flex shrink-0 items-center justify-center rounded-[1.4rem] border border-border bg-white/[0.05] text-foreground shadow-[0_18px_40px_rgba(0,0,0,0.4)] ${project.appIconWide ? 'w-24 p-2 sm:w-32 sm:p-3' : 'h-12 w-12 sm:h-14 sm:w-14'}`}>
             {project.appIcon ? (
               project.appIconWide ? (
                 <img src={project.appIcon} alt={project.name} className="h-auto w-full object-contain" loading="lazy" />
@@ -935,7 +1339,7 @@ function ProjectCard({
           {project.tags.map((tag) => (
             <span
               key={tag}
-              className="rounded-full border border-border bg-white/75 px-3 py-1.5 text-sm text-foreground/80"
+              className="rounded-full border border-border bg-white/[0.05] px-3 py-1.5 text-sm text-foreground/80"
             >
               {tag}
             </span>
@@ -943,7 +1347,7 @@ function ProjectCard({
         </div>
 
         <div className="grid gap-4 sm:grid-cols-[1.1fr_0.9fr]">
-          <div className="rounded-[1.5rem] border border-border bg-white/78 p-4">
+          <div className="rounded-[1.5rem] border border-border bg-white/[0.05] p-4">
             <p className="text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">
               Engineering Impact
             </p>
@@ -954,7 +1358,7 @@ function ProjectCard({
             {project.stats.map((item) => (
               <div
                 key={item.label}
-                className="rounded-[1.5rem] border border-border bg-white/78 p-4"
+                className="rounded-[1.5rem] border border-border bg-white/[0.05] p-4"
               >
                 <p className="text-[0.72rem] font-semibold uppercase tracking-[0.16em] text-muted-foreground">
                   {item.label}
@@ -976,7 +1380,7 @@ function ProjectCard({
                   href={link.href}
                   target="_blank"
                   rel="noreferrer"
-                  className="inline-flex items-center gap-2 rounded-full border border-border bg-white/80 px-4 py-2.5 text-sm font-medium text-foreground transition hover:-translate-y-0.5 hover:bg-white"
+                  className="inline-flex items-center gap-2 rounded-full border border-border bg-white/[0.06] px-4 py-2.5 text-sm font-medium text-foreground transition hover:-translate-y-0.5 hover:bg-white/[0.12]"
                 >
                   <LinkIcon size={16} />
                   {link.label}
@@ -990,7 +1394,7 @@ function ProjectCard({
                 onMouseEnter={() => {
                   project.mockups!.forEach((src) => { const img = new window.Image(); img.src = src })
                 }}
-                className="inline-flex items-center gap-2 rounded-full border border-border bg-white/80 px-4 py-2.5 text-sm font-medium text-foreground transition hover:-translate-y-0.5 hover:bg-white"
+                className="inline-flex items-center gap-2 rounded-full border border-border bg-white/[0.06] px-4 py-2.5 text-sm font-medium text-foreground transition hover:-translate-y-0.5 hover:bg-white/[0.12]"
               >
                 <Images size={16} />
                 Screenshots
@@ -1005,19 +1409,19 @@ function ProjectCard({
 }
 
 const skillLevelStyles: Record<SkillLevel, string> = {
-  Expert: 'bg-[rgba(199,107,79,0.12)] text-accent',
-  Proficient: 'bg-[rgba(109,130,98,0.15)] text-[#6d8262]',
-  Familiar: 'bg-[rgba(109,107,99,0.1)] text-muted-foreground',
+  Expert: 'bg-[rgba(124,92,255,0.16)] text-[#b9a6ff] border border-[rgba(124,92,255,0.3)]',
+  Proficient: 'bg-[rgba(34,211,238,0.14)] text-[#7fe3f2] border border-[rgba(34,211,238,0.28)]',
+  Familiar: 'bg-white/[0.06] text-muted-foreground border border-white/[0.1]',
 }
 
 function SkillCard({ group }: { group: SkillGroup }) {
   const Icon = group.icon
 
   return (
-    <div className="surface-card h-full p-6 sm:p-7">
+    <Spotlight className="surface-card h-full p-6 sm:p-7">
       <div className="flex items-start justify-between gap-4">
         <div className="space-y-3">
-          <div className="flex h-12 w-12 items-center justify-center rounded-[1.25rem] bg-foreground text-background">
+          <div className="flex h-12 w-12 items-center justify-center rounded-[1.25rem] grad-accent-bg text-white shadow-[0_10px_30px_rgba(124,92,255,0.32)]">
             <Icon size={20} />
           </div>
           <div>
@@ -1042,13 +1446,13 @@ function SkillCard({ group }: { group: SkillGroup }) {
         {group.skills.map((skill) => (
           <span
             key={skill}
-            className="rounded-full border border-border bg-white/75 px-3 py-1.5 text-sm text-foreground/80"
+            className="rounded-full border border-border bg-white/[0.05] px-3 py-1.5 text-sm text-foreground/80"
           >
             {skill}
           </span>
         ))}
       </div>
-    </div>
+    </Spotlight>
   )
 }
 
@@ -1065,7 +1469,7 @@ function ExperienceCard({
     <Reveal delay={delay}>
       <article className="surface-card-strong overflow-hidden">
         {/* Header zone */}
-        <div className="relative border-b border-border bg-[rgba(199,107,79,0.045)] px-6 pb-7 pt-6 sm:px-8 sm:pb-8 sm:pt-7">
+        <div className="relative border-b border-border bg-[rgba(124,92,255,0.07)] px-6 pb-7 pt-6 sm:px-8 sm:pb-8 sm:pt-7">
           <div className="pointer-events-none absolute bottom-4 right-6 font-[family:var(--font-heading)] text-[5.5rem] font-black leading-none tracking-tighter text-foreground/[0.045] sm:right-8 sm:text-[8rem]">
             0{index + 1}
           </div>
@@ -1085,7 +1489,7 @@ function ExperienceCard({
               <h3 className="font-[family:var(--font-heading)] text-3xl tracking-[-0.05em] text-foreground sm:text-4xl">
                 {item.role}
               </h3>
-              <span className="rounded-full border border-border bg-white/75 px-4 py-2 text-[0.72rem] font-semibold uppercase tracking-[0.2em] text-muted-foreground">
+              <span className="rounded-full border border-border bg-white/[0.05] px-4 py-2 text-[0.72rem] font-semibold uppercase tracking-[0.2em] text-muted-foreground">
                 {item.company}
               </span>
             </div>
@@ -1097,9 +1501,9 @@ function ExperienceCard({
           {item.bullets.map((bullet) => (
             <div
               key={bullet}
-              className="rounded-[1.25rem] border border-border bg-white/60 p-5"
+              className="rounded-[1.25rem] border border-border bg-white/[0.04] p-5"
             >
-              <span className="mb-4 flex h-7 w-7 items-center justify-center rounded-full bg-foreground text-background">
+              <span className="mb-4 flex h-7 w-7 items-center justify-center rounded-full grad-accent-bg text-white">
                 <Check size={13} />
               </span>
               <p className="text-sm leading-7 text-foreground/80">{bullet}</p>
@@ -1246,6 +1650,17 @@ export default function PortfolioHome({
   return (
     <div id="top" className="relative overflow-x-hidden">
 
+      <a
+        href="#main-content"
+        className="sr-only z-[210] rounded-full grad-accent-bg px-5 py-3 text-sm font-medium text-white focus:not-sr-only focus:fixed focus:left-4 focus:top-4"
+      >
+        Skip to content
+      </a>
+
+      <IntroOverlay />
+      <AmbientFX />
+      <ScrollProgress />
+
       {/* ORBIT Launch Banner */}
       <AnimatePresence>
         {!orbitBannerDismissed && (
@@ -1343,8 +1758,8 @@ export default function PortfolioHome({
         <div className="shell">
           <div className="surface-card flex items-center justify-between px-5 py-4 sm:px-6">
             <a href="#top" className="flex items-center gap-2.5">
-              <span className="flex h-9 w-9 items-center justify-center rounded-[0.65rem] bg-foreground">
-                <span className="font-[family:var(--font-heading)] text-sm font-bold leading-none text-background">
+              <span className="flex h-9 w-9 items-center justify-center rounded-[0.65rem] grad-accent-bg shadow-[0_6px_18px_rgba(124,92,255,0.4)]">
+                <span className="font-[family:var(--font-heading)] text-sm font-bold leading-none text-white">
                   JR
                 </span>
               </span>
@@ -1373,7 +1788,7 @@ export default function PortfolioHome({
                 href="/resume.pdf"
                 target="_blank"
                 rel="noreferrer"
-                className="inline-flex items-center gap-2 rounded-full bg-foreground px-5 py-3 text-sm font-medium text-background transition hover:-translate-y-0.5"
+                className="inline-flex items-center gap-2 rounded-full grad-accent-bg px-5 py-3 text-sm font-medium text-white shadow-[0_10px_30px_rgba(124,92,255,0.3)] transition hover:-translate-y-0.5"
               >
                 Resume.pdf
                 <Download size={16} />
@@ -1384,7 +1799,7 @@ export default function PortfolioHome({
               type="button"
               aria-label={menuOpen ? 'Close menu' : 'Open menu'}
               onClick={() => setMenuOpen((open) => !open)}
-              className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-border bg-white/70 text-foreground md:hidden"
+              className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-border bg-white/[0.05] text-foreground md:hidden"
             >
               {menuOpen ? <X size={18} /> : <Menu size={18} />}
             </button>
@@ -1408,7 +1823,7 @@ export default function PortfolioHome({
                     key={item.label}
                     href={item.href}
                     onClick={() => setMenuOpen(false)}
-                    className="rounded-[1.25rem] border border-border bg-white/75 px-4 py-4 text-sm font-medium text-foreground"
+                    className="rounded-[1.25rem] border border-border bg-white/[0.05] px-4 py-4 text-sm font-medium text-foreground"
                   >
                     {item.label}
                   </a>
@@ -1417,7 +1832,7 @@ export default function PortfolioHome({
                   href="/resume.pdf"
                   target="_blank"
                   rel="noreferrer"
-                  className="inline-flex items-center justify-center gap-2 rounded-[1.25rem] bg-foreground px-4 py-4 text-sm font-medium text-background"
+                  className="inline-flex items-center justify-center gap-2 rounded-[1.25rem] grad-accent-bg px-4 py-4 text-sm font-medium text-white"
                 >
                   Resume.pdf
                   <Download size={16} />
@@ -1428,7 +1843,7 @@ export default function PortfolioHome({
         ) : null}
       </AnimatePresence>
 
-      <main className={`transition-[padding] duration-300 ${orbitBannerDismissed ? 'pt-28 sm:pt-32' : 'pt-[calc(7rem+60px)] sm:pt-[calc(8rem+60px)]'}`}>
+      <main id="main-content" className={`transition-[padding] duration-300 ${orbitBannerDismissed ? 'pt-28 sm:pt-32' : 'pt-[calc(7rem+60px)] sm:pt-[calc(8rem+60px)]'}`}>
         <section className="shell grid gap-10 pb-24 pt-8 lg:grid-cols-[minmax(0,0.98fr)_minmax(360px,0.82fr)] lg:items-center lg:gap-14 lg:pb-32 lg:pt-16">
           <Reveal className="max-w-[40rem] space-y-9">
             <div className="section-kicker">
@@ -1438,7 +1853,7 @@ export default function PortfolioHome({
 
             <div className="space-y-6">
               <h1 className="font-[family:var(--font-heading)] text-5xl tracking-[-0.075em] text-foreground sm:text-6xl lg:text-[5.5rem] lg:leading-[0.92]">
-                JAVIYA RAJ.
+                <LetterReveal text="JAVIYA RAJ." className="text-gradient" />
               </h1>
               <p className="max-w-xl text-xl font-medium leading-8 text-foreground/82 sm:text-2xl">
                 Flutter developer building beautiful cross-platform apps.
@@ -1451,27 +1866,27 @@ export default function PortfolioHome({
             </div>
 
             <div className="flex flex-col gap-4 sm:flex-row">
-              <a
+              <MagneticButton
                 href="#projects"
-                className="inline-flex items-center justify-center gap-2 rounded-full bg-foreground px-6 py-4 text-sm font-medium text-background transition hover:-translate-y-0.5"
+                className="inline-flex items-center justify-center gap-2 rounded-full grad-accent-bg px-6 py-4 text-sm font-medium text-white shadow-[0_12px_34px_rgba(124,92,255,0.34)] transition hover:shadow-[0_16px_44px_rgba(124,92,255,0.5)]"
               >
                 Explore My Work
                 <ArrowRight size={16} />
-              </a>
-              <a
+              </MagneticButton>
+              <MagneticButton
                 href="#contact"
-                className="inline-flex items-center justify-center gap-2 rounded-full border border-border bg-white/80 px-6 py-4 text-sm font-medium text-foreground transition hover:-translate-y-0.5"
+                className="inline-flex items-center justify-center gap-2 rounded-full border border-white/[0.12] bg-white/[0.06] px-6 py-4 text-sm font-medium text-foreground transition hover:border-white/25 hover:bg-white/[0.1]"
               >
                 Get in Touch
                 <Mail size={16} />
-              </a>
+              </MagneticButton>
             </div>
 
             <div className="flex flex-wrap gap-3 pt-1">
               {heroFacts.map((fact) => (
                 <span
                   key={fact}
-                  className="rounded-full border border-border bg-white/72 px-4 py-2 text-sm text-foreground/80"
+                  className="rounded-full border border-border bg-white/[0.05] px-4 py-2 text-sm text-foreground/80"
                 >
                   {fact}
                 </span>
@@ -1480,74 +1895,13 @@ export default function PortfolioHome({
           </Reveal>
 
           <Reveal delay={0.08}>
-            <motion.div
-              whileHover={reduceMotion ? undefined : { y: -4 }}
-              transition={{ duration: 0.25, ease: 'easeOut' }}
-              className="surface-card-strong relative overflow-hidden p-6 sm:p-8 lg:ml-auto lg:max-w-[31rem] lg:p-10"
-            >
-              <div className="soft-grid absolute inset-0 opacity-35" />
-              <div className="pointer-events-none absolute right-4 top-3 font-mono text-[5.5rem] font-black leading-none tracking-tighter text-foreground/[0.05]">
-                {'</>'}
-              </div>
-
-              <div className="relative z-10 space-y-6">
-                <div className="flex flex-wrap items-center justify-between gap-3">
-                  <div className="section-kicker bg-white/80">
-                    <span className="eyebrow-dot" />
-                    Available for freelance
-                  </div>
-                  <span className="rounded-full bg-foreground px-3 py-1.5 text-xs font-medium uppercase tracking-[0.14em] text-background">
-                    Since 2021
-                  </span>
-                </div>
-
-                <div className="rounded-[1.75rem] bg-foreground p-6 text-background shadow-[0_24px_80px_rgba(27,30,24,0.18)]">
-                  <p className="text-xs font-semibold uppercase tracking-[0.18em] text-background/70">
-                    Core Focus
-                  </p>
-                  <p className="mt-3 font-[family:var(--font-heading)] text-2xl tracking-[-0.04em]">
-                    High-performance Flutter apps with clean architecture,
-                    scalable delivery, and strong production UX.
-                  </p>
-                </div>
-
-                <div className="rounded-[1.75rem] border border-border bg-white/75 p-6">
-                  <p className="text-xs font-semibold uppercase tracking-[0.18em] text-muted-foreground">
-                    Current Stack
-                  </p>
-                  <div className="mt-4 flex flex-wrap gap-2">
-                    {heroStack.map((item) => (
-                      <span
-                        key={item}
-                        className="rounded-full bg-[rgba(217,143,107,0.12)] px-3 py-1.5 text-sm text-foreground"
-                      >
-                        {item}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-
-                <div className="rounded-[1.75rem] border border-border bg-white/75 p-6">
-                  <div className="flex items-center justify-between gap-3">
-                    <p className="text-xs font-semibold uppercase tracking-[0.18em] text-muted-foreground">
-                      Currently Building
-                    </p>
-                    <span className="inline-flex items-center gap-1.5 rounded-full bg-[rgba(109,130,98,0.14)] px-3 py-1 text-[0.65rem] font-semibold uppercase tracking-[0.14em] text-[#6d8262]">
-                      <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-[#6d8262]" />
-                      {currentlyBuilding.status}
-                    </span>
-                  </div>
-                  <p className="mt-3 font-[family:var(--font-heading)] text-lg tracking-[-0.03em] text-foreground">
-                    {currentlyBuilding.name}
-                  </p>
-                  <p className="mt-1.5 text-sm leading-6 text-muted-foreground">
-                    {currentlyBuilding.description}
-                  </p>
-                </div>
-              </div>
-            </motion.div>
+            <HeroDevice />
           </Reveal>
         </section>
+
+        <div className="relative border-y border-white/[0.06] bg-white/[0.015] py-5">
+          <Marquee items={marqueeTech} />
+        </div>
 
         <section id="about" className="section-shell">
           <div className="shell space-y-10">
@@ -1566,7 +1920,7 @@ export default function PortfolioHome({
                 return (
                   <Reveal key={item.title} delay={0.08 + index * 0.05}>
                     <div className="surface-card h-full p-6">
-                      <div className="flex h-12 w-12 items-center justify-center rounded-[1.25rem] bg-foreground text-background">
+                      <div className="flex h-12 w-12 items-center justify-center rounded-[1.25rem] grad-accent-bg text-white shadow-[0_10px_30px_rgba(124,92,255,0.32)]">
                         <Icon size={20} />
                       </div>
                       <h3 className="mt-5 text-xl font-semibold text-foreground">
@@ -1621,7 +1975,7 @@ export default function PortfolioHome({
                     ].map((item) => (
                       <div
                         key={item.label}
-                        className="min-w-0 rounded-[1.5rem] border border-border bg-white/75 p-3 text-center sm:p-4"
+                        className="min-w-0 rounded-[1.5rem] border border-border bg-white/[0.05] p-3 text-center sm:p-4"
                       >
                         <p className="truncate text-base font-semibold text-foreground sm:text-xl">{item.value}</p>
                         <p className="mt-1 truncate text-[0.55rem] font-semibold uppercase tracking-[0.04em] text-muted-foreground sm:text-[0.72rem] sm:tracking-[0.16em]">
@@ -1705,7 +2059,7 @@ export default function PortfolioHome({
                   {experienceHighlights.map((item) => (
                     <span
                       key={item}
-                      className="rounded-full border border-border bg-white/75 px-4 py-2 text-sm text-foreground/80"
+                      className="rounded-full border border-border bg-white/[0.05] px-4 py-2 text-sm text-foreground/80"
                     >
                       {item}
                     </span>
@@ -1751,7 +2105,7 @@ export default function PortfolioHome({
                     </p>
                     <div className="flex items-center gap-4 border-t border-border pt-5">
                       <div
-                        className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full text-sm font-semibold text-background"
+                        className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full text-sm font-semibold text-white"
                         style={{ background: t.accent }}
                       >
                         {t.initials}
@@ -1806,7 +2160,7 @@ export default function PortfolioHome({
                   href="https://github.com/JAVIYARAJ"
                   target="_blank"
                   rel="noreferrer"
-                  className="inline-flex items-center gap-2 rounded-full bg-foreground px-5 py-3 text-sm font-medium text-background transition hover:-translate-y-0.5"
+                  className="inline-flex items-center gap-2 rounded-full grad-accent-bg px-5 py-3 text-sm font-medium text-white shadow-[0_10px_30px_rgba(124,92,255,0.3)] transition hover:-translate-y-0.5"
                 >
                   Follow my ecosystem on GitHub
                   <ArrowUpRight size={16} />
@@ -1824,10 +2178,10 @@ export default function PortfolioHome({
                   <Reveal key={repo.name} delay={0.06 + index * 0.05}>
                     <article className="surface-card h-full p-6 sm:p-8">
                       <div className="flex items-start justify-between gap-4">
-                        <div className="flex h-12 w-12 items-center justify-center rounded-[1.25rem] bg-foreground text-background">
+                        <div className="flex h-12 w-12 items-center justify-center rounded-[1.25rem] grad-accent-bg text-white shadow-[0_10px_30px_rgba(124,92,255,0.32)]">
                           <GitBranch size={20} />
                         </div>
-                        <div className="inline-flex items-center gap-2 rounded-full border border-border bg-white/80 px-3 py-1.5 text-sm font-medium text-foreground">
+                        <div className="inline-flex items-center gap-2 rounded-full border border-border bg-white/[0.06] px-3 py-1.5 text-sm font-medium text-foreground">
                           <Star size={14} />
                           {repo.stars}
                         </div>
@@ -1847,7 +2201,7 @@ export default function PortfolioHome({
                       </p>
 
                       {repo.private ? (
-                        <span className="mt-6 inline-flex items-center gap-1.5 rounded-full border border-border bg-white/60 px-3 py-1.5 text-xs font-semibold uppercase tracking-[0.12em] text-muted-foreground select-none">
+                        <span className="mt-6 inline-flex items-center gap-1.5 rounded-full border border-border bg-white/[0.04] px-3 py-1.5 text-xs font-semibold uppercase tracking-[0.12em] text-muted-foreground select-none">
                           <ShieldCheck size={13} />
                           Private
                         </span>
@@ -1894,7 +2248,7 @@ export default function PortfolioHome({
                   <div className="mt-8 grid gap-4">
                     <a
                       href={`mailto:${emailAddress}?subject=Project Inquiry`}
-                      className="rounded-[1.5rem] border border-border bg-white/75 p-5 transition hover:-translate-y-0.5"
+                      className="rounded-[1.5rem] border border-border bg-white/[0.05] p-5 transition hover:-translate-y-0.5"
                     >
                       <p className="text-xs font-semibold uppercase tracking-[0.18em] text-muted-foreground">
                         Direct Communication
@@ -1908,7 +2262,7 @@ export default function PortfolioHome({
                       href="https://linkedin.com/in/javiyaraj/"
                       target="_blank"
                       rel="noreferrer"
-                      className="rounded-[1.5rem] border border-border bg-white/75 p-5 transition hover:-translate-y-0.5"
+                      className="rounded-[1.5rem] border border-border bg-white/[0.05] p-5 transition hover:-translate-y-0.5"
                     >
                       <p className="text-xs font-semibold uppercase tracking-[0.18em] text-muted-foreground">
                         LinkedIn
@@ -1922,7 +2276,7 @@ export default function PortfolioHome({
                       href="https://github.com/JAVIYARAJ"
                       target="_blank"
                       rel="noreferrer"
-                      className="rounded-[1.5rem] border border-border bg-white/75 p-5 transition hover:-translate-y-0.5"
+                      className="rounded-[1.5rem] border border-border bg-white/[0.05] p-5 transition hover:-translate-y-0.5"
                     >
                       <p className="text-xs font-semibold uppercase tracking-[0.18em] text-muted-foreground">
                         GitHub
@@ -1953,7 +2307,7 @@ export default function PortfolioHome({
                   <button
                     type="button"
                     onClick={handleCopyEmail}
-                    className="mt-8 inline-flex items-center gap-2 rounded-full bg-foreground px-5 py-3 text-sm font-medium text-background transition hover:-translate-y-0.5"
+                    className="mt-8 inline-flex items-center gap-2 rounded-full grad-accent-bg px-5 py-3 text-sm font-medium text-white shadow-[0_10px_30px_rgba(124,92,255,0.3)] transition hover:-translate-y-0.5"
                   >
                     {copiedEmail ? <Check size={16} /> : <Copy size={16} />}
                     {copiedEmail ? 'Email copied' : 'Copy email'}
@@ -1972,7 +2326,7 @@ export default function PortfolioHome({
                         value={formData.name}
                         onChange={(e) => { handleInputChange(e); if (formErrors.name) setFormErrors((p) => ({ ...p, name: undefined })) }}
                         placeholder="Javiya Raj"
-                        className={`h-14 rounded-2xl border bg-white/80 px-4 text-sm text-foreground outline-none transition focus:ring-2 focus:ring-ring/20 ${formErrors.name ? 'border-destructive focus:border-destructive' : 'border-border focus:border-foreground/20'}`}
+                        className={`h-14 rounded-2xl border bg-white/[0.06] px-4 text-sm text-foreground outline-none transition focus:ring-2 focus:ring-ring/20 ${formErrors.name ? 'border-destructive focus:border-destructive' : 'border-border focus:border-foreground/20'}`}
                       />
                       {formErrors.name && <span className="text-xs text-destructive">{formErrors.name}</span>}
                     </label>
@@ -1985,7 +2339,7 @@ export default function PortfolioHome({
                         value={formData.email}
                         onChange={(e) => { handleInputChange(e); if (formErrors.email) setFormErrors((p) => ({ ...p, email: undefined })) }}
                         placeholder="your@email.com"
-                        className={`h-14 rounded-2xl border bg-white/80 px-4 text-sm text-foreground outline-none transition focus:ring-2 focus:ring-ring/20 ${formErrors.email ? 'border-destructive focus:border-destructive' : 'border-border focus:border-foreground/20'}`}
+                        className={`h-14 rounded-2xl border bg-white/[0.06] px-4 text-sm text-foreground outline-none transition focus:ring-2 focus:ring-ring/20 ${formErrors.email ? 'border-destructive focus:border-destructive' : 'border-border focus:border-foreground/20'}`}
                       />
                       {formErrors.email && <span className="text-xs text-destructive">{formErrors.email}</span>}
                     </label>
@@ -1999,7 +2353,7 @@ export default function PortfolioHome({
                       onChange={(e) => { handleInputChange(e); if (formErrors.message) setFormErrors((p) => ({ ...p, message: undefined })) }}
                       rows={7}
                       placeholder="Tell me about your vision..."
-                      className={`rounded-[1.5rem] border bg-white/80 px-4 py-4 text-sm text-foreground outline-none transition focus:ring-2 focus:ring-ring/20 ${formErrors.message ? 'border-destructive focus:border-destructive' : 'border-border focus:border-foreground/20'}`}
+                      className={`rounded-[1.5rem] border bg-white/[0.06] px-4 py-4 text-sm text-foreground outline-none transition focus:ring-2 focus:ring-ring/20 ${formErrors.message ? 'border-destructive focus:border-destructive' : 'border-border focus:border-foreground/20'}`}
                     />
                     {formErrors.message && <span className="text-xs text-destructive">{formErrors.message}</span>}
                   </label>
@@ -2030,7 +2384,7 @@ export default function PortfolioHome({
                       className="mt-6 rounded-[1.25rem] bg-[rgba(109,130,98,0.14)] px-6 py-5"
                     >
                       <div className="flex items-center gap-3">
-                        <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-foreground text-background">
+                        <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full grad-accent-bg text-white">
                           <Check size={16} strokeWidth={2.5} />
                         </div>
                         <div>
@@ -2045,7 +2399,7 @@ export default function PortfolioHome({
                     <button
                       type="submit"
                       disabled={submitting}
-                      className="mt-6 inline-flex h-14 items-center justify-center gap-2 rounded-full bg-foreground px-6 text-sm font-medium text-background transition hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-70"
+                      className="mt-6 inline-flex h-14 items-center justify-center gap-2 rounded-full grad-accent-bg px-6 text-sm font-medium text-white shadow-[0_12px_34px_rgba(124,92,255,0.34)] transition hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-70"
                     >
                       <Send size={16} />
                       {submitting ? 'Sending...' : 'Send Message'}
@@ -2087,7 +2441,7 @@ export default function PortfolioHome({
                       href={item.href}
                       target={item.href.startsWith('mailto:') ? undefined : '_blank'}
                       rel={item.href.startsWith('mailto:') ? undefined : 'noreferrer'}
-                      className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-border bg-white/75 text-foreground transition hover:-translate-y-0.5"
+                      className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-border bg-white/[0.05] text-foreground transition hover:-translate-y-0.5"
                       aria-label={item.label}
                     >
                       <Icon size={16} />
@@ -2146,7 +2500,7 @@ export default function PortfolioHome({
             animate={{ opacity: 1, y: 0 }}
             exit={reduceMotion ? { opacity: 0 } : { opacity: 0, y: 16 }}
             transition={{ duration: reduceMotion ? 0 : 0.4, ease: [0.22, 1, 0.36, 1] }}
-            className="fixed bottom-6 right-6 z-40 inline-flex items-center gap-2.5 rounded-full border border-border bg-white/90 px-5 py-3 text-sm font-medium text-foreground shadow-[0_8px_32px_rgba(27,30,24,0.14)] backdrop-blur-md transition hover:-translate-y-0.5 hover:bg-white"
+            className="fixed bottom-6 right-6 z-40 inline-flex items-center gap-2.5 rounded-full border border-border bg-white/[0.07] px-5 py-3 text-sm font-medium text-foreground shadow-[0_8px_32px_rgba(0,0,0,0.5)] backdrop-blur-md transition hover:-translate-y-0.5 hover:bg-white/[0.12]"
           >
             <span className="h-2 w-2 animate-pulse rounded-full bg-[#6d8262]" />
             Available for Freelance
