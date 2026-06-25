@@ -24,35 +24,35 @@ export default async function Image() {
           width: '100%',
           height: '100%',
           display: 'flex',
-          background: 'linear-gradient(135deg, #f6f1e8 0%, #f1e6d6 55%, #ede0cc 100%)',
+          background: '#08090c',
           padding: '56px 64px',
           fontFamily: fontData ? 'Playfair Display' : 'Georgia, serif',
           position: 'relative',
           overflow: 'hidden',
         }}
       >
-        {/* subtle radial blobs */}
+        {/* aurora blobs */}
         <div
           style={{
             position: 'absolute',
-            top: -80,
-            left: -80,
-            width: 400,
-            height: 400,
+            top: -120,
+            left: -100,
+            width: 460,
+            height: 460,
             borderRadius: '50%',
-            background: 'radial-gradient(circle, rgba(199,107,79,0.18) 0%, transparent 70%)',
+            background: 'radial-gradient(circle, rgba(124,92,255,0.40) 0%, transparent 70%)',
             display: 'flex',
           }}
         />
         <div
           style={{
             position: 'absolute',
-            bottom: -60,
-            right: 320,
-            width: 340,
-            height: 340,
+            bottom: -140,
+            right: 200,
+            width: 420,
+            height: 420,
             borderRadius: '50%',
-            background: 'radial-gradient(circle, rgba(109,130,98,0.15) 0%, transparent 70%)',
+            background: 'radial-gradient(circle, rgba(34,211,238,0.28) 0%, transparent 70%)',
             display: 'flex',
           }}
         />
@@ -80,10 +80,10 @@ export default async function Image() {
             >
               <div
                 style={{
-                  width: 8,
-                  height: 8,
+                  width: 9,
+                  height: 9,
                   borderRadius: '50%',
-                  background: '#c76b4f',
+                  background: 'linear-gradient(100deg, #7c5cff, #22d3ee)',
                   display: 'flex',
                 }}
               />
@@ -94,21 +94,24 @@ export default async function Image() {
                   fontWeight: 600,
                   letterSpacing: '0.22em',
                   textTransform: 'uppercase',
-                  color: '#6d6b63',
+                  color: '#8b8f9a',
                 }}
               >
                 Senior Flutter Developer
               </span>
             </div>
 
-            {/* name */}
+            {/* name — gradient */}
             <div
               style={{
                 fontSize: 88,
                 fontWeight: 700,
                 lineHeight: 0.9,
                 letterSpacing: '-0.04em',
-                color: '#1b1e18',
+                background: 'linear-gradient(100deg, #b9a6ff 0%, #7fe3f2 100%)',
+                backgroundClip: 'text',
+                WebkitBackgroundClip: 'text',
+                color: 'transparent',
                 marginBottom: 28,
                 display: 'flex',
               }}
@@ -121,7 +124,7 @@ export default async function Image() {
               style={{
                 fontSize: 22,
                 lineHeight: 1.55,
-                color: '#4a4a42',
+                color: '#c3c6cf',
                 fontFamily: 'Georgia, serif',
                 maxWidth: 480,
                 display: 'flex',
@@ -139,14 +142,14 @@ export default async function Image() {
                 style={{
                   display: 'flex',
                   flexDirection: 'column',
-                  background: 'rgba(255,250,242,0.85)',
-                  border: '1px solid rgba(27,30,24,0.12)',
+                  background: 'rgba(255,255,255,0.045)',
+                  border: '1px solid rgba(255,255,255,0.1)',
                   borderRadius: 20,
                   padding: '14px 22px',
                   minWidth: 110,
                 }}
               >
-                <span style={{ fontSize: 28, fontWeight: 700, color: '#1b1e18', lineHeight: 1 }}>
+                <span style={{ fontSize: 28, fontWeight: 700, color: '#e7e9ee', lineHeight: 1 }}>
                   {s.value}
                 </span>
                 <span
@@ -156,7 +159,7 @@ export default async function Image() {
                     fontWeight: 600,
                     letterSpacing: '0.14em',
                     textTransform: 'uppercase',
-                    color: '#6d6b63',
+                    color: '#8b8f9a',
                     marginTop: 6,
                   }}
                 >
@@ -179,7 +182,7 @@ export default async function Image() {
               style={{
                 fontSize: 14,
                 fontFamily: 'Georgia, serif',
-                color: '#9e9e90',
+                color: '#6b6f7a',
                 letterSpacing: '0.06em',
               }}
             >
@@ -188,31 +191,31 @@ export default async function Image() {
           </div>
         </div>
 
-        {/* right column — dark card */}
+        {/* right column — accent gradient card */}
         <div
           style={{
             display: 'flex',
             flexDirection: 'column',
             width: 310,
-            background: '#1b1e18',
+            background: 'linear-gradient(155deg, #7c5cff 0%, #5b6bff 45%, #22d3ee 130%)',
             borderRadius: 32,
             padding: '36px 32px',
-            boxShadow: '0 32px 80px rgba(27,30,24,0.22)',
+            boxShadow: '0 32px 80px rgba(124,92,255,0.35)',
             justifyContent: 'space-between',
             position: 'relative',
             overflow: 'hidden',
           }}
         >
-          {/* accent glow */}
+          {/* highlight glow */}
           <div
             style={{
               position: 'absolute',
-              top: -40,
-              right: -40,
-              width: 200,
-              height: 200,
+              top: -50,
+              right: -50,
+              width: 220,
+              height: 220,
               borderRadius: '50%',
-              background: 'radial-gradient(circle, rgba(199,107,79,0.35) 0%, transparent 70%)',
+              background: 'radial-gradient(circle, rgba(255,255,255,0.30) 0%, transparent 70%)',
               display: 'flex',
             }}
           />
@@ -223,7 +226,7 @@ export default async function Image() {
               display: 'flex',
               alignItems: 'center',
               gap: 8,
-              background: 'rgba(199,107,79,0.18)',
+              background: 'rgba(255,255,255,0.2)',
               borderRadius: 100,
               padding: '8px 16px',
               alignSelf: 'flex-start',
@@ -234,7 +237,7 @@ export default async function Image() {
                 width: 7,
                 height: 7,
                 borderRadius: '50%',
-                background: '#c76b4f',
+                background: '#ffffff',
                 display: 'flex',
               }}
             />
@@ -245,7 +248,7 @@ export default async function Image() {
                 fontWeight: 600,
                 letterSpacing: '0.16em',
                 textTransform: 'uppercase',
-                color: '#c76b4f',
+                color: '#ffffff',
               }}
             >
               Freelance Open
@@ -260,7 +263,7 @@ export default async function Image() {
               fontWeight: 600,
               letterSpacing: '0.2em',
               textTransform: 'uppercase',
-              color: 'rgba(246,241,232,0.45)',
+              color: 'rgba(255,255,255,0.7)',
               marginTop: 32,
               display: 'flex',
             }}
@@ -284,11 +287,11 @@ export default async function Image() {
                 style={{
                   fontSize: 13,
                   fontFamily: 'Georgia, serif',
-                  background: 'rgba(246,241,232,0.1)',
-                  border: '1px solid rgba(246,241,232,0.12)',
+                  background: 'rgba(255,255,255,0.16)',
+                  border: '1px solid rgba(255,255,255,0.22)',
                   borderRadius: 100,
                   padding: '6px 14px',
-                  color: 'rgba(246,241,232,0.82)',
+                  color: '#ffffff',
                 }}
               >
                 {item}
@@ -301,7 +304,7 @@ export default async function Image() {
             style={{
               fontSize: 13,
               fontFamily: 'Georgia, serif',
-              color: 'rgba(246,241,232,0.4)',
+              color: 'rgba(255,255,255,0.7)',
               marginTop: 28,
               letterSpacing: '0.04em',
               display: 'flex',
