@@ -32,7 +32,6 @@ import {
   Mail,
   Menu,
   Play,
-  Quote,
   Rocket,
   Search,
   Send,
@@ -106,40 +105,44 @@ const socialLinks = [
 // or Google Calendar "Appointment schedules" and paste the public URL here.
 const bookingUrl = 'https://cal.com/raj-javiya-qkewzq/30min'
 
-type Testimonial = {
-  text: string
-  name: string
-  role: string
-  company: string
-  initials: string
-  accent: string
+type StoreLink = {
+  app: string
+  sub: string
+  rating: string | null
+  href: string
+  icon: LucideIcon
 }
 
-const testimonials: Testimonial[] = [
+// Real, publicly verifiable listings (no placeholder testimonials).
+const storeLinks: StoreLink[] = [
   {
-    text: 'Raj delivered our Flutter app ahead of schedule with remarkable quality. His Clean Architecture approach made the codebase easy to scale and hand off to our internal team.',
-    name: 'Dhruv Mehta',
-    role: 'Product Manager',
-    company: '',
-    initials: 'DM',
-    accent: '#c76b4f',
+    app: 'Dyshez',
+    sub: 'Download on the App Store',
+    rating: '4.8',
+    href: 'https://apps.apple.com/in/app/dyshez/id6474236767',
+    icon: Apple,
   },
   {
-    text: 'The modular design patterns Raj implemented cut our feature development time significantly. He has a strong eye for performance and production-grade reliability.',
-    name: 'Nikhil Patel',
-    role: 'Engineering Lead',
-    company: '',
-    initials: 'NP',
-    accent: '#6d8262',
+    app: 'Dyshez',
+    sub: 'Get it on Google Play',
+    rating: '4.8',
+    href: 'https://play.google.com/store/apps/details?id=com.dyshez.app',
+    icon: Play,
   },
   {
-    text: 'Working with Raj on the CRM platform was a great experience. He proactively caught edge cases, kept releases on time, and the BLoC architecture he chose held up brilliantly.',
-    name: 'Ankit Shah',
-    role: 'CTO',
-    company: '',
-    initials: 'AS',
-    accent: '#d5a24a',
+    app: 'Goals.com',
+    sub: 'Visit the live website',
+    rating: null,
+    href: 'https://www.goals.com/',
+    icon: ExternalLink,
   },
+]
+
+const proofPoints = [
+  { value: '4.8★', label: 'App Store rating' },
+  { value: '10K+', label: 'Active users' },
+  { value: '15+', label: 'Apps shipped' },
+  { value: '2', label: 'App stores live' },
 ]
 
 const aboutFeatures = [
@@ -2455,41 +2458,72 @@ export default function PortfolioHome({
           <div className="shell space-y-10">
             <Reveal>
               <SectionHeader
-                label="Client Voices"
-                title="What People Say."
-                description="Feedback from product managers, engineering leads, and clients I've shipped with."
+                label="Proof of Work"
+                title="Shipped to Real Users."
+                description="Not just prototypes — apps live on the App Store and Google Play, used by thousands in production."
               />
             </Reveal>
 
-            <div className="grid gap-6 lg:grid-cols-3">
-              {testimonials.map((t, index) => (
-                <Reveal key={t.name} delay={0.05 + index * 0.06}>
-                  <article className="surface-card-strong flex h-full flex-col gap-6 p-7">
-                    <Quote
-                      size={22}
-                      className="shrink-0 text-accent"
-                      strokeWidth={1.5}
-                    />
-                    <p className="flex-1 text-sm leading-7 text-foreground/80">
-                      &ldquo;{t.text}&rdquo;
-                    </p>
-                    <div className="flex items-center gap-4 border-t border-border pt-5">
-                      <div
-                        className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full text-sm font-semibold text-white"
-                        style={{ background: t.accent }}
-                      >
-                        {t.initials}
-                      </div>
-                      <div>
-                        <p className="text-sm font-semibold text-foreground">{t.name}</p>
-                        <p className="text-[0.72rem] font-medium uppercase tracking-[0.12em] text-muted-foreground">
-                          {t.role}{t.company ? ` · ${t.company}` : ''}
+            <div className="grid gap-6 lg:grid-cols-[1.05fr_0.95fr]">
+              <Reveal>
+                <Spotlight className="surface-card-strong h-full p-8 sm:p-10" glow="34,211,238">
+                  <div className="section-kicker">
+                    <span className="eyebrow-dot" />
+                    Live in production
+                  </div>
+                  <h3 className="mt-5 font-[family:var(--font-heading)] text-2xl tracking-[-0.04em] text-foreground sm:text-3xl">
+                    Production-grade apps trusted on the stores and inside enterprise teams at Esparkbiz.
+                  </h3>
+
+                  <div className="mt-8 grid grid-cols-2 gap-4">
+                    {proofPoints.map((p) => (
+                      <div key={p.label} className="rounded-[1.5rem] border border-white/[0.08] bg-white/[0.04] p-5">
+                        <p className="text-gradient font-[family:var(--font-heading)] text-3xl tracking-[-0.04em]">
+                          {p.value}
+                        </p>
+                        <p className="mt-1.5 text-[0.72rem] font-semibold uppercase tracking-[0.16em] text-muted-foreground">
+                          {p.label}
                         </p>
                       </div>
-                    </div>
-                  </article>
-                </Reveal>
-              ))}
+                    ))}
+                  </div>
+                </Spotlight>
+              </Reveal>
+
+              <div className="grid gap-4">
+                {storeLinks.map((store, index) => {
+                  const Icon = store.icon
+
+                  return (
+                    <Reveal key={`${store.app}-${store.sub}`} delay={0.05 + index * 0.06} className="h-full">
+                      <a
+                        href={store.href}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="surface-card group flex h-full items-center gap-4 p-5 transition hover:-translate-y-0.5 sm:p-6"
+                      >
+                        <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-[1.1rem] border border-white/[0.1] bg-white/[0.05] text-foreground">
+                          <Icon size={22} />
+                        </span>
+                        <div className="min-w-0 flex-1">
+                          <p className="text-[0.68rem] font-medium uppercase tracking-[0.16em] text-muted-foreground">
+                            {store.sub}
+                          </p>
+                          <p className="mt-0.5 truncate text-lg font-semibold text-foreground">{store.app}</p>
+                        </div>
+                        {store.rating ? (
+                          <span className="inline-flex shrink-0 items-center gap-1 rounded-full border border-white/[0.1] bg-white/[0.05] px-3 py-1.5 text-sm font-semibold text-foreground">
+                            <Star size={13} className="text-accent" />
+                            {store.rating}
+                          </span>
+                        ) : (
+                          <ArrowUpRight size={18} className="shrink-0 text-muted-foreground transition group-hover:text-foreground" />
+                        )}
+                      </a>
+                    </Reveal>
+                  )
+                })}
+              </div>
             </div>
           </div>
         </section>
