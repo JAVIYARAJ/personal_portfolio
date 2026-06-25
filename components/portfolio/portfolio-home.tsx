@@ -830,9 +830,12 @@ function AmbientFX() {
 
     window.addEventListener('mousemove', onMove)
     document.addEventListener('mouseleave', onLeave)
+    // Hide the native cursor while the custom one is active.
+    document.documentElement.classList.add('custom-cursor')
     return () => {
       window.removeEventListener('mousemove', onMove)
       document.removeEventListener('mouseleave', onLeave)
+      document.documentElement.classList.remove('custom-cursor')
     }
   }, [reduce, gx, gy])
 
@@ -851,12 +854,13 @@ function AmbientFX() {
         />
       </motion.div>
 
+      {/* Trailing glow ring */}
       <motion.div
         aria-hidden
         style={{ left: cursorX, top: cursorY }}
         animate={{ opacity: visible ? 1 : 0, scale: active ? 2.1 : 1 }}
         transition={{ opacity: { duration: 0.2 }, scale: { duration: 0.18, ease: 'easeOut' } }}
-        className="pointer-events-none fixed z-[90] -translate-x-1/2 -translate-y-1/2 mix-blend-screen"
+        className="pointer-events-none fixed z-[1000] -translate-x-1/2 -translate-y-1/2 mix-blend-screen"
       >
         <div
           className="h-6 w-6 rounded-full"
@@ -866,16 +870,30 @@ function AmbientFX() {
           }}
         />
       </motion.div>
+
+      {/* Precise center dot — follows the pointer exactly so click targeting stays accurate */}
+      <motion.div
+        aria-hidden
+        style={{ left: gx, top: gy }}
+        animate={{ opacity: visible ? 1 : 0, scale: active ? 0 : 1 }}
+        transition={{ opacity: { duration: 0.15 }, scale: { duration: 0.15, ease: 'easeOut' } }}
+        className="pointer-events-none fixed z-[1001] h-1.5 w-1.5 -translate-x-1/2 -translate-y-1/2 rounded-full bg-white"
+      />
     </>
   )
 }
 
-// One-time intro curtain: name reveals, then lifts. Skipped for reduced motion.
+// One-time intro loader: name sweeps up behind a mask, a counter fills to 100,
+// then the whole curtain lifts to reveal the page. Skipped for reduced motion.
+const INTRO_NAME = 'JAVIYA RAJ'
+
 function IntroOverlay() {
   const reduce = useReducedMotion()
-  // Start shown so the curtain is painted on first load (no flash of content),
-  // then lift it after a beat. Reduced-motion users skip it entirely.
+  // Start shown so the curtain is painted on first load (no flash of content).
   const [done, setDone] = useState(false)
+  const count = useMotionValue(0)
+  const rounded = useTransform(count, (v) => String(Math.round(v)).padStart(2, '0'))
+  const width = useTransform(count, (v) => `${v}%`)
 
   useEffect(() => {
     if (reduce) {
@@ -883,15 +901,17 @@ function IntroOverlay() {
       return
     }
     document.body.style.overflow = 'hidden'
+    const controls = animate(count, 100, { duration: 1.5, ease: [0.45, 0, 0.1, 1] })
     const t = window.setTimeout(() => {
       setDone(true)
       document.body.style.overflow = ''
-    }, 1500)
+    }, 1900)
     return () => {
+      controls.stop()
       window.clearTimeout(t)
       document.body.style.overflow = ''
     }
-  }, [reduce])
+  }, [reduce, count])
 
   if (reduce) return null
 
@@ -900,24 +920,68 @@ function IntroOverlay() {
       {!done && (
         <motion.div
           key="intro"
-          className="fixed inset-0 z-[200] flex flex-col items-center justify-center bg-[#08090c]"
-          initial={{ opacity: 1 }}
-          exit={{ opacity: 0, transition: { duration: 0.6, ease: [0.22, 1, 0.36, 1] } }}
+          className="fixed inset-0 z-[200] flex flex-col items-center justify-center overflow-hidden bg-[#08090c]"
+          initial={{ y: 0 }}
+          exit={{ y: '-100%', transition: { duration: 0.9, ease: [0.76, 0, 0.24, 1] } }}
         >
+          {/* soft accent glow behind the name */}
+          <div
+            aria-hidden
+            className="pointer-events-none absolute h-[460px] w-[460px] rounded-full opacity-40 blur-[130px]"
+            style={{ background: 'radial-gradient(circle, rgba(124,92,255,0.55), rgba(34,211,238,0.18) 55%, transparent 72%)' }}
+          />
+
           <motion.div
-            initial={{ opacity: 0, scale: 0.92 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
-            className="flex flex-col items-center gap-6"
+            exit={{ opacity: 0, transition: { duration: 0.3 } }}
+            className="relative flex flex-col items-center gap-7 px-6"
           >
-            <span className="font-[family:var(--font-heading)] text-4xl tracking-[-0.05em] sm:text-6xl">
-              <LetterReveal text="JAVIYA RAJ" className="text-gradient" />
-            </span>
+            {/* role kicker */}
             <motion.span
-              className="grad-accent-bg block h-[3px] w-0 rounded-full"
-              animate={{ width: '12rem' }}
-              transition={{ duration: 1, ease: [0.22, 1, 0.36, 1], delay: 0.2 }}
-            />
+              initial={{ opacity: 0, y: 12, filter: 'blur(6px)' }}
+              animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
+              transition={{ duration: 0.6, delay: 0.15, ease: [0.22, 1, 0.36, 1] }}
+              className="text-gradient font-mono text-[0.7rem] uppercase tracking-[0.45em]"
+            >
+              Flutter Engineer
+            </motion.span>
+
+            {/* name — per-letter mask rise */}
+            <h1
+              aria-label={INTRO_NAME}
+              className="flex font-[family:var(--font-heading)] text-5xl tracking-[-0.05em] text-white sm:text-7xl"
+            >
+              {Array.from(INTRO_NAME).map((ch, i) => (
+                <span key={i} aria-hidden className="inline-block overflow-hidden pb-[0.14em]">
+                  <motion.span
+                    className="inline-block"
+                    initial={{ y: '120%' }}
+                    animate={{ y: '0%' }}
+                    transition={{ duration: 0.75, delay: 0.3 + i * 0.05, ease: [0.22, 1, 0.36, 1] }}
+                  >
+                    {ch === ' ' ? ' ' : ch}
+                  </motion.span>
+                </span>
+              ))}
+            </h1>
+
+            {/* progress bar + live counter */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.5, delay: 0.4 }}
+              className="mt-1 flex w-60 max-w-[70vw] flex-col gap-2.5"
+            >
+              <div className="h-px w-full overflow-hidden bg-white/10">
+                <motion.div style={{ width }} className="grad-accent-bg h-full" />
+              </div>
+              <div className="flex items-center justify-between font-mono text-[0.62rem] uppercase tracking-[0.25em] text-muted-foreground">
+                <span>Loading</span>
+                <span className="flex items-center text-foreground/80">
+                  <motion.span>{rounded}</motion.span>
+                  <span className="text-gradient">%</span>
+                </span>
+              </div>
+            </motion.div>
           </motion.div>
         </motion.div>
       )}

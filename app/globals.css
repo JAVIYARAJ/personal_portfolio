@@ -167,6 +167,12 @@
     border-radius: 6px;
   }
 
+  /* Hide the native cursor when the JS-driven custom cursor is active */
+  html.custom-cursor,
+  html.custom-cursor * {
+    cursor: none !important;
+  }
+
   section {
     scroll-margin-top: 7rem;
   }
