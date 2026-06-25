@@ -2,8 +2,8 @@
 
 import NextImage from 'next/image'
 import type { GitHubStats, Repo } from '@/lib/github'
-import type { ChangeEvent, FormEvent, ReactNode } from 'react'
-import { useEffect, useRef, useState } from 'react'
+import type { ChangeEvent, FormEvent, KeyboardEvent as ReactKeyboardEvent, ReactNode } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { AnimatePresence, animate, motion, useInView, useMotionTemplate, useMotionValue, useReducedMotion, useScroll, useSpring, useTransform } from 'framer-motion'
 import type { LucideIcon } from 'lucide-react'
 import {
@@ -17,12 +17,15 @@ import {
   ChevronLeft,
   ChevronRight,
   CircuitBoard,
+  Command,
   Copy,
+  CornerDownLeft,
   Database,
   Download,
   ExternalLink,
   GitBranch,
   Github,
+  Hash,
   Images,
   Layers3,
   Linkedin,
@@ -31,6 +34,7 @@ import {
   Play,
   Quote,
   Rocket,
+  Search,
   Send,
   ShieldCheck,
   Smartphone,
@@ -1095,6 +1099,250 @@ function HeroDevice() {
   )
 }
 
+type PaletteItem = {
+  id: string
+  label: string
+  hint?: string
+  group: string
+  icon: LucideIcon
+  keywords?: string
+  run: () => void
+}
+
+// ⌘K command palette — jump to sections, copy email, open links/booking/resume.
+function CommandPalette({ open, onOpenChange }: { open: boolean; onOpenChange: (value: boolean) => void }) {
+  const reduce = useReducedMotion()
+  const [query, setQuery] = useState('')
+  const [activeIndex, setActiveIndex] = useState(0)
+  const inputRef = useRef<HTMLInputElement>(null)
+
+  const items: PaletteItem[] = useMemo(() => {
+    const go = (href: string) => {
+      onOpenChange(false)
+      window.setTimeout(() => {
+        document.querySelector(href)?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+      }, 60)
+    }
+    const openExternal = (url: string) => {
+      onOpenChange(false)
+      window.open(url, '_blank', 'noopener,noreferrer')
+    }
+
+    const nav: PaletteItem[] = navigation.map((n) => ({
+      id: `nav-${n.href}`,
+      label: n.label,
+      hint: 'Jump to section',
+      group: 'Navigation',
+      icon: Hash,
+      keywords: 'section go to navigate',
+      run: () => go(n.href),
+    }))
+
+    const actions: PaletteItem[] = [
+      {
+        id: 'copy-email',
+        label: 'Copy email address',
+        hint: emailAddress,
+        group: 'Actions',
+        icon: Copy,
+        keywords: 'mail contact clipboard',
+        run: () => {
+          navigator.clipboard?.writeText(emailAddress)
+          onOpenChange(false)
+        },
+      },
+      {
+        id: 'email',
+        label: 'Send an email',
+        group: 'Actions',
+        icon: Mail,
+        keywords: 'mail contact message',
+        run: () => {
+          onOpenChange(false)
+          window.location.href = `mailto:${emailAddress}?subject=Project Inquiry`
+        },
+      },
+      {
+        id: 'book',
+        label: 'Book a call',
+        hint: 'Free 30 min',
+        group: 'Actions',
+        icon: CalendarDays,
+        keywords: 'schedule meeting calendly cal booking',
+        run: () => openExternal(bookingUrl),
+      },
+      {
+        id: 'resume',
+        label: 'Download résumé',
+        group: 'Actions',
+        icon: Download,
+        keywords: 'cv pdf resume',
+        run: () => openExternal('/resume.pdf'),
+      },
+    ]
+
+    const links: PaletteItem[] = [
+      ...socialLinks
+        .filter((s) => s.label !== 'Email')
+        .map((s) => ({
+          id: `link-${s.label}`,
+          label: s.label,
+          hint: 'Open profile',
+          group: 'Links',
+          icon: s.icon,
+          keywords: 'social profile external',
+          run: () => openExternal(s.href),
+        })),
+      {
+        id: 'orbit',
+        label: 'Visit ORBIT',
+        hint: 'Live project',
+        group: 'Links',
+        icon: Workflow,
+        keywords: 'project developer os live',
+        run: () => openExternal('https://orbit-sand-alpha.vercel.app/'),
+      },
+    ]
+
+    return [...nav, ...actions, ...links]
+  }, [onOpenChange])
+
+  const filtered = useMemo(() => {
+    const q = query.trim().toLowerCase()
+    if (!q) return items
+    return items.filter((it) =>
+      `${it.label} ${it.keywords ?? ''} ${it.hint ?? ''}`.toLowerCase().includes(q)
+    )
+  }, [items, query])
+
+  // Global ⌘K / Ctrl+K toggle.
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
+        e.preventDefault()
+        onOpenChange(!open)
+      }
+    }
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [open, onOpenChange])
+
+  // Reset + focus + scroll-lock while open.
+  useEffect(() => {
+    if (!open) return
+    setQuery('')
+    setActiveIndex(0)
+    const previousOverflow = document.body.style.overflow
+    document.body.style.overflow = 'hidden'
+    const t = window.setTimeout(() => inputRef.current?.focus(), 20)
+    return () => {
+      document.body.style.overflow = previousOverflow
+      window.clearTimeout(t)
+    }
+  }, [open])
+
+  useEffect(() => {
+    setActiveIndex(0)
+  }, [query])
+
+  const handleKeyDown = (e: ReactKeyboardEvent) => {
+    if (e.key === 'ArrowDown') {
+      e.preventDefault()
+      setActiveIndex((i) => Math.min(i + 1, filtered.length - 1))
+    } else if (e.key === 'ArrowUp') {
+      e.preventDefault()
+      setActiveIndex((i) => Math.max(i - 1, 0))
+    } else if (e.key === 'Enter') {
+      e.preventDefault()
+      filtered[activeIndex]?.run()
+    } else if (e.key === 'Escape') {
+      onOpenChange(false)
+    }
+  }
+
+  return (
+    <AnimatePresence>
+      {open && (
+        <motion.div
+          key="cmdk"
+          role="dialog"
+          aria-modal="true"
+          aria-label="Command menu"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: reduce ? 0 : 0.15 }}
+          className="fixed inset-0 z-[300] flex items-start justify-center bg-black/60 px-4 pt-[12vh] backdrop-blur-sm"
+          onClick={() => onOpenChange(false)}
+        >
+          <motion.div
+            onClick={(e) => e.stopPropagation()}
+            onKeyDown={handleKeyDown}
+            initial={reduce ? { opacity: 0 } : { opacity: 0, y: -12, scale: 0.98 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={reduce ? { opacity: 0 } : { opacity: 0, y: -12, scale: 0.98 }}
+            transition={{ duration: reduce ? 0 : 0.18, ease: [0.22, 1, 0.36, 1] }}
+            className="surface-card-strong w-full max-w-xl overflow-hidden"
+          >
+            <div className="flex items-center gap-3 border-b border-white/[0.08] px-4">
+              <Search size={18} className="shrink-0 text-muted-foreground" />
+              <input
+                ref={inputRef}
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+                placeholder="Search or jump to…"
+                className="h-14 w-full bg-transparent text-sm text-foreground outline-none placeholder:text-muted-foreground"
+              />
+              <kbd className="hidden shrink-0 rounded-md border border-white/[0.12] bg-white/[0.05] px-1.5 py-0.5 font-mono text-[0.6rem] text-muted-foreground sm:block">
+                ESC
+              </kbd>
+            </div>
+
+            <div className="max-h-[52vh] overflow-y-auto p-2">
+              {filtered.length === 0 ? (
+                <p className="px-3 py-8 text-center text-sm text-muted-foreground">No results.</p>
+              ) : (
+                filtered.map((it, i) => {
+                  const Icon = it.icon
+                  const isActive = i === activeIndex
+                  const showGroup = i === 0 || filtered[i - 1].group !== it.group
+
+                  return (
+                    <div key={it.id}>
+                      {showGroup && (
+                        <p className="px-3 pb-1 pt-3 font-mono text-[0.6rem] uppercase tracking-[0.2em] text-muted-foreground">
+                          {it.group}
+                        </p>
+                      )}
+                      <button
+                        type="button"
+                        onMouseEnter={() => setActiveIndex(i)}
+                        onClick={() => it.run()}
+                        className={`flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left text-sm transition ${isActive ? 'bg-white/[0.06] text-foreground' : 'text-foreground/80'}`}
+                      >
+                        <span
+                          className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border ${isActive ? 'grad-accent-bg border-transparent text-white' : 'border-white/[0.1] bg-white/[0.04] text-muted-foreground'}`}
+                        >
+                          <Icon size={15} />
+                        </span>
+                        <span className="flex-1 truncate">{it.label}</span>
+                        {it.hint && (
+                          <span className="hidden shrink-0 truncate text-xs text-muted-foreground sm:block">{it.hint}</span>
+                        )}
+                        {isActive && <CornerDownLeft size={14} className="shrink-0 text-muted-foreground" />}
+                      </button>
+                    </div>
+                  )
+                })
+              )}
+            </div>
+          </motion.div>
+        </motion.div>
+      )}
+    </AnimatePresence>
+  )
+}
+
 function SectionHeader({
   label,
   title,
@@ -1630,6 +1878,7 @@ export default function PortfolioHome({
   const reduceMotion = useReducedMotion()
   const [orbitBannerDismissed, setOrbitBannerDismissed] = useState(false)
   const [menuOpen, setMenuOpen] = useState(false)
+  const [paletteOpen, setPaletteOpen] = useState(false)
   const [activeSection, setActiveSection] = useState('')
   const [showChip, setShowChip] = useState(false)
 
@@ -1765,6 +2014,7 @@ export default function PortfolioHome({
       <IntroOverlay />
       <AmbientFX />
       <ScrollProgress />
+      <CommandPalette open={paletteOpen} onOpenChange={setPaletteOpen} />
 
       {/* ORBIT Launch Banner */}
       <AnimatePresence>
@@ -1888,26 +2138,41 @@ export default function PortfolioHome({
               ))}
             </nav>
 
-            <div className="hidden md:flex">
-              <a
-                href="/resume.pdf"
-                target="_blank"
-                rel="noreferrer"
-                className="inline-flex items-center gap-2 rounded-full grad-accent-bg px-5 py-3 text-sm font-medium text-white shadow-[0_10px_30px_rgba(124,92,255,0.3)] transition hover:-translate-y-0.5"
+            <div className="flex items-center gap-2.5">
+              <button
+                type="button"
+                aria-label="Open command menu"
+                onClick={() => setPaletteOpen(true)}
+                className="inline-flex items-center gap-2 rounded-full border border-white/[0.1] bg-white/[0.04] px-3 py-2.5 text-xs font-medium text-muted-foreground transition hover:text-foreground"
               >
-                Resume.pdf
-                <Download size={16} />
-              </a>
-            </div>
+                <Search size={15} />
+                <span className="hidden lg:inline">Search</span>
+                <kbd className="hidden items-center gap-0.5 rounded border border-white/[0.12] bg-white/[0.05] px-1.5 py-0.5 font-mono text-[0.62rem] lg:inline-flex">
+                  <Command size={9} />K
+                </kbd>
+              </button>
 
-            <button
-              type="button"
-              aria-label={menuOpen ? 'Close menu' : 'Open menu'}
-              onClick={() => setMenuOpen((open) => !open)}
-              className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-border bg-white/[0.05] text-foreground md:hidden"
-            >
-              {menuOpen ? <X size={18} /> : <Menu size={18} />}
-            </button>
+              <div className="hidden md:flex">
+                <a
+                  href="/resume.pdf"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="inline-flex items-center gap-2 rounded-full grad-accent-bg px-5 py-3 text-sm font-medium text-white shadow-[0_10px_30px_rgba(124,92,255,0.3)] transition hover:-translate-y-0.5"
+                >
+                  Resume.pdf
+                  <Download size={16} />
+                </a>
+              </div>
+
+              <button
+                type="button"
+                aria-label={menuOpen ? 'Close menu' : 'Open menu'}
+                onClick={() => setMenuOpen((open) => !open)}
+                className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-border bg-white/[0.05] text-foreground md:hidden"
+              >
+                {menuOpen ? <X size={18} /> : <Menu size={18} />}
+              </button>
+            </div>
           </div>
         </div>
       </header>
