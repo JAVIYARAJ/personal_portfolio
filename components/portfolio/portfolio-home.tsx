@@ -944,10 +944,12 @@ function IntroOverlay() {
   const width = useTransform(count, (v) => `${v}%`)
 
   useEffect(() => {
-    if (reduce) {
+    // Show the loader once per browser session, and never for reduced motion.
+    if (reduce || sessionStorage.getItem('intro-seen')) {
       setDone(true)
       return
     }
+    sessionStorage.setItem('intro-seen', '1')
     document.body.style.overflow = 'hidden'
     const controls = animate(count, 100, { duration: 1.5, ease: [0.45, 0, 0.1, 1] })
     const t = window.setTimeout(() => {
@@ -993,9 +995,9 @@ function IntroOverlay() {
               Flutter Engineer
             </motion.span>
 
-            {/* name — per-letter mask rise */}
-            <h1
-              aria-label={INTRO_NAME}
+            {/* name — per-letter mask rise (decorative; the real page heading lives in the hero) */}
+            <div
+              aria-hidden
               className="flex font-[family:var(--font-heading)] text-5xl tracking-[-0.05em] text-white sm:text-7xl"
             >
               {Array.from(INTRO_NAME).map((ch, i) => (
@@ -1010,7 +1012,7 @@ function IntroOverlay() {
                   </motion.span>
                 </span>
               ))}
-            </h1>
+            </div>
 
             {/* progress bar + live counter */}
             <motion.div
@@ -1050,6 +1052,13 @@ function HeroDevice() {
     return () => window.clearInterval(id)
   }, [reduce])
 
+  const currentShot = heroShots[index]
+  const shotAlt = currentShot.includes('split-ease')
+    ? 'SplitEase — Flutter expense-splitting app screenshot'
+    : currentShot.includes('pocket-score')
+      ? 'Pocket Score — Flutter cricket scoring app screenshot'
+      : 'Flutter cross-platform app screenshot'
+
   return (
     <div className="relative mx-auto w-full max-w-[20rem] lg:ml-auto lg:mr-0">
       {/* glow behind device */}
@@ -1072,8 +1081,8 @@ function HeroDevice() {
             className="absolute inset-0"
           >
             <NextImage
-              src={heroShots[index]}
-              alt="App screenshot from a shipped project"
+              src={currentShot}
+              alt={shotAlt}
               fill
               priority={index === 0}
               sizes="(max-width: 1024px) 80vw, 20rem"
@@ -1424,9 +1433,11 @@ function StatCard({ stat }: { stat: ImpactStat }) {
 function GalleryModal({
   images,
   onClose,
+  title,
 }: {
   images: string[]
   onClose: () => void
+  title: string
 }) {
   const [index, setIndex] = useState(0)
   const [loadedSet, setLoadedSet] = useState<Set<number>>(new Set())
@@ -1552,7 +1563,7 @@ function GalleryModal({
             <motion.img
               key={index}
               src={images[index]}
-              alt={`Screenshot ${index + 1}`}
+              alt={`${title} app screenshot ${index + 1}`}
               initial={{ opacity: 0, scale: reduceMotion ? 1 : 0.96 }}
               animate={{ opacity: isLoaded ? 1 : 0, scale: 1 }}
               exit={{ opacity: 0, scale: reduceMotion ? 1 : 0.96 }}
@@ -1580,7 +1591,7 @@ function GalleryModal({
           <button key={i} onClick={() => setIndex(i)} className="shrink-0">
             <img
               src={src}
-              alt={`Thumb ${i + 1}`}
+              alt={`${title} app thumbnail ${i + 1}`}
               className={`h-14 w-auto rounded-xl object-cover transition ${i === index ? 'ring-2 ring-white opacity-100' : 'opacity-40 hover:opacity-70'}`}
             />
           </button>
@@ -1617,7 +1628,7 @@ function ProjectCard({
     <>
     <AnimatePresence>
       {galleryOpen && project.mockups && (
-        <GalleryModal images={project.mockups} onClose={() => setGalleryOpen(false)} />
+        <GalleryModal images={project.mockups} title={project.name} onClose={() => setGalleryOpen(false)} />
       )}
     </AnimatePresence>
     <motion.article
@@ -2227,6 +2238,7 @@ export default function PortfolioHome({
             <div className="space-y-6">
               <h1 className="font-[family:var(--font-heading)] text-5xl tracking-[-0.075em] text-foreground sm:text-6xl lg:text-[5.5rem] lg:leading-[0.92]">
                 <LetterReveal text="JAVIYA RAJ." className="text-gradient" />
+                <span className="sr-only"> — Senior Flutter Developer</span>
               </h1>
               <p className="max-w-xl text-xl font-medium leading-8 text-foreground/82 sm:text-2xl">
                 Flutter developer building beautiful cross-platform apps.
@@ -2281,7 +2293,7 @@ export default function PortfolioHome({
             <Reveal>
               <SectionHeader
                 label="Professional Vision"
-                title="Modern Architecture."
+                title="Clean Flutter Architecture."
                 description="I believe in building software that is as beautiful under the hood as it is on the surface. My approach centers on modularity, testability, and deterministic state management."
               />
             </Reveal>
@@ -2368,7 +2380,7 @@ export default function PortfolioHome({
             <Reveal>
               <SectionHeader
                 label="Portfolio Showcase"
-                title="Featured Impact."
+                title="Featured Flutter Projects."
                 description="Real-world applications engineered for performance, used by thousands of active users."
               />
             </Reveal>
@@ -2392,7 +2404,7 @@ export default function PortfolioHome({
             <Reveal>
               <SectionHeader
                 label="Technical Ecosystem"
-                title="Hardware-Level Engineering."
+                title="Flutter & Cross-Platform Skills."
                 description="A battle-tested set of technologies designed for performance, stability, and extreme scale."
               />
             </Reveal>
@@ -2633,7 +2645,7 @@ export default function PortfolioHome({
             <Reveal>
               <SectionHeader
                 label="Work With Me"
-                title="How I Can Help."
+                title="Flutter Development Services."
                 description="Whether you're launching a new product, scaling an existing one, or untangling a legacy codebase — here's where I plug in."
               />
             </Reveal>
