@@ -49,6 +49,7 @@ const navigation = [
   { label: 'Projects', href: '#projects' },
   { label: 'Skills', href: '#skills' },
   { label: 'Experience', href: '#experience' },
+  { label: 'Services', href: '#services' },
   { label: 'Contact', href: '#contact' },
 ]
 
@@ -97,7 +98,9 @@ const socialLinks = [
   { label: 'Email', href: `mailto:${emailAddress}?subject=Portfolio Inquiry`, icon: Mail },
 ]
 
-const calendlyUrl = 'https://calendly.com/javiyaraj'
+// Free scheduling link. Create a free booking page on Cal.com (cal.com/signup)
+// or Google Calendar "Appointment schedules" and paste the public URL here.
+const bookingUrl = 'https://cal.com/raj-javiya-qkewzq/30min'
 
 type Testimonial = {
   text: string
@@ -155,6 +158,44 @@ const aboutFeatures = [
     title: 'CI/CD Automation',
     description: 'Robust deployment pipelines for reliable app deliveries.',
     icon: Workflow,
+  },
+]
+
+type Service = {
+  title: string
+  description: string
+  icon: LucideIcon
+  deliverables: string[]
+}
+
+const services: Service[] = [
+  {
+    title: 'Cross-Platform App Development',
+    description:
+      'End-to-end Flutter apps for iOS, Android & web — from architecture and UI to App Store / Play Store launch.',
+    icon: Smartphone,
+    deliverables: ['Production Flutter build', 'Pixel-perfect UI', 'Store submission'],
+  },
+  {
+    title: 'Architecture & Code Review',
+    description:
+      'Clean Architecture, state management and scalable foundations — plus audits and refactors of existing codebases.',
+    icon: ShieldCheck,
+    deliverables: ['Clean Architecture', 'State management', 'Codebase audit'],
+  },
+  {
+    title: 'Native → Flutter Migration',
+    description:
+      'Move legacy Android / iOS apps to a single, maintainable Flutter codebase without losing native performance.',
+    icon: Layers3,
+    deliverables: ['Migration roadmap', 'Native bridges', 'Zero-downtime rollout'],
+  },
+  {
+    title: 'MVP & Rapid Prototyping',
+    description:
+      'Validate your idea fast with a production-grade prototype — built to scale into the real product, not thrown away.',
+    icon: Rocket,
+    deliverables: ['Working MVP', 'Scalable base', 'Fast iteration'],
   },
 ]
 
@@ -2288,6 +2329,84 @@ export default function PortfolioHome({
           </div>
         </section>
 
+        <section id="services" className="section-shell">
+          <div className="shell space-y-10">
+            <Reveal>
+              <SectionHeader
+                label="Work With Me"
+                title="How I Can Help."
+                description="Whether you're launching a new product, scaling an existing one, or untangling a legacy codebase — here's where I plug in."
+              />
+            </Reveal>
+
+            <div className="grid gap-6 sm:grid-cols-2">
+              {services.map((service, index) => {
+                const Icon = service.icon
+
+                return (
+                  <Reveal key={service.title} delay={0.05 + index * 0.05}>
+                    <Spotlight className="surface-card h-full p-6 sm:p-8">
+                      <div className="flex h-12 w-12 items-center justify-center rounded-[1.25rem] grad-accent-bg text-white shadow-[0_10px_30px_rgba(124,92,255,0.32)]">
+                        <Icon size={20} />
+                      </div>
+                      <h3 className="mt-5 text-xl font-semibold tracking-[-0.02em] text-foreground sm:text-2xl">
+                        {service.title}
+                      </h3>
+                      <p className="mt-3 text-sm leading-7 text-muted-foreground sm:text-base">
+                        {service.description}
+                      </p>
+                      <div className="mt-5 flex flex-wrap gap-2">
+                        {service.deliverables.map((item) => (
+                          <span
+                            key={item}
+                            className="inline-flex items-center gap-1.5 rounded-full border border-white/[0.1] bg-white/[0.05] px-3 py-1.5 text-xs text-foreground/80"
+                          >
+                            <Check size={12} className="text-accent" />
+                            {item}
+                          </span>
+                        ))}
+                      </div>
+                    </Spotlight>
+                  </Reveal>
+                )
+              })}
+            </div>
+
+            <Reveal delay={0.1}>
+              <div className="surface-card-strong flex flex-col gap-6 p-6 sm:flex-row sm:items-center sm:justify-between sm:p-8">
+                <div className="space-y-2">
+                  <div className="section-kicker">
+                    <span className="eyebrow-dot" />
+                    Available for freelance
+                  </div>
+                  <h3 className="font-[family:var(--font-heading)] text-2xl tracking-[-0.04em] text-foreground sm:text-3xl">
+                    Have a project in mind? Let&apos;s scope it together.
+                  </h3>
+                </div>
+
+                <div className="flex flex-col gap-3 sm:flex-row">
+                  <a
+                    href={bookingUrl}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="inline-flex items-center justify-center gap-2 rounded-full grad-accent-bg px-6 py-3.5 text-sm font-medium text-white shadow-[0_12px_34px_rgba(124,92,255,0.3)] transition hover:-translate-y-0.5"
+                  >
+                    <CalendarDays size={16} />
+                    Book a call
+                  </a>
+                  <a
+                    href="#contact"
+                    className="inline-flex items-center justify-center gap-2 rounded-full border border-white/[0.12] bg-white/[0.06] px-6 py-3.5 text-sm font-medium text-foreground transition hover:-translate-y-0.5 hover:bg-white/[0.1]"
+                  >
+                    Send a message
+                    <ArrowRight size={16} />
+                  </a>
+                </div>
+              </div>
+            </Reveal>
+          </div>
+        </section>
+
         <section id="contact" className="section-shell">
           <div className="shell space-y-10">
             <Reveal>
@@ -2350,22 +2469,22 @@ export default function PortfolioHome({
                       </p>
                     </a>
 
-                    {/* <a
-                      href={calendlyUrl}
+                    <a
+                      href={bookingUrl}
                       target="_blank"
                       rel="noreferrer"
-                      className="rounded-[1.5rem] border border-border bg-foreground p-5 transition hover:-translate-y-0.5"
+                      className="grad-accent-bg rounded-[1.5rem] p-5 shadow-[0_18px_50px_rgba(124,92,255,0.3)] transition hover:-translate-y-0.5"
                     >
                       <div className="flex items-center justify-between gap-3">
-                        <p className="text-xs font-semibold uppercase tracking-[0.18em] text-background/60">
+                        <p className="text-xs font-semibold uppercase tracking-[0.18em] text-white/70">
                           Book a Call
                         </p>
-                        <CalendarDays size={16} className="text-background/60" />
+                        <CalendarDays size={16} className="text-white/70" />
                       </div>
-                      <p className="mt-2 text-lg font-semibold text-background">
-                        Schedule 30 min
+                      <p className="mt-2 text-lg font-semibold text-white">
+                        Schedule a free 30 min
                       </p>
-                    </a> */}
+                    </a>
                   </div>
 
                   <button
