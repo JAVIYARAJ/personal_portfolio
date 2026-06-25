@@ -665,6 +665,13 @@ const footerLinks = [
   },
 ]
 
+// Fire a Google Analytics (GA4) event if gtag is available. Safe no-op otherwise.
+function trackEvent(action: string, params?: Record<string, unknown>) {
+  if (typeof window === 'undefined') return
+  const w = window as unknown as { gtag?: (...args: unknown[]) => void }
+  w.gtag?.('event', action, params)
+}
+
 type RevealProps = {
   children: ReactNode
   className?: string
@@ -1181,7 +1188,10 @@ function CommandPalette({ open, onOpenChange }: { open: boolean; onOpenChange: (
         group: 'Actions',
         icon: CalendarDays,
         keywords: 'schedule meeting calendly cal booking',
-        run: () => openExternal(bookingUrl),
+        run: () => {
+          trackEvent('book_call_click', { location: 'command_palette' })
+          openExternal(bookingUrl)
+        },
       },
       {
         id: 'resume',
@@ -1189,7 +1199,10 @@ function CommandPalette({ open, onOpenChange }: { open: boolean; onOpenChange: (
         group: 'Actions',
         icon: Download,
         keywords: 'cv pdf resume',
-        run: () => openExternal('/resume.pdf'),
+        run: () => {
+          trackEvent('resume_click', { location: 'command_palette' })
+          openExternal('/resume.pdf')
+        },
       },
     ]
 
@@ -1998,6 +2011,7 @@ export default function PortfolioHome({
         throw new Error(payload.error || 'Something went wrong. Please try again.')
       }
 
+      trackEvent('contact_submit', { location: 'contact_form' })
       setSubmitted(true)
       setFormData({
         name: '',
@@ -2171,6 +2185,7 @@ export default function PortfolioHome({
                   href="/resume.pdf"
                   target="_blank"
                   rel="noreferrer"
+                  onClick={() => trackEvent('resume_click', { location: 'header' })}
                   className="inline-flex items-center gap-2 rounded-full grad-accent-bg px-5 py-3 text-sm font-medium text-white shadow-[0_10px_30px_rgba(124,92,255,0.3)] transition hover:-translate-y-0.5"
                 >
                   Resume.pdf
@@ -2216,6 +2231,10 @@ export default function PortfolioHome({
                   href="/resume.pdf"
                   target="_blank"
                   rel="noreferrer"
+                  onClick={() => {
+                    trackEvent('resume_click', { location: 'mobile_menu' })
+                    setMenuOpen(false)
+                  }}
                   className="inline-flex items-center justify-center gap-2 rounded-[1.25rem] grad-accent-bg px-4 py-4 text-sm font-medium text-white"
                 >
                   Resume.pdf
@@ -2700,6 +2719,7 @@ export default function PortfolioHome({
                     href={bookingUrl}
                     target="_blank"
                     rel="noreferrer"
+                    onClick={() => trackEvent('book_call_click', { location: 'services' })}
                     className="inline-flex items-center justify-center gap-2 rounded-full grad-accent-bg px-6 py-3.5 text-sm font-medium text-white shadow-[0_12px_34px_rgba(124,92,255,0.3)] transition hover:-translate-y-0.5"
                   >
                     <CalendarDays size={16} />
@@ -2784,6 +2804,7 @@ export default function PortfolioHome({
                       href={bookingUrl}
                       target="_blank"
                       rel="noreferrer"
+                      onClick={() => trackEvent('book_call_click', { location: 'contact' })}
                       className="grad-accent-bg rounded-[1.5rem] p-5 shadow-[0_18px_50px_rgba(124,92,255,0.3)] transition hover:-translate-y-0.5"
                     >
                       <div className="flex items-center justify-between gap-3">
