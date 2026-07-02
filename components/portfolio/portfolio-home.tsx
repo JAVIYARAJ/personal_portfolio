@@ -301,7 +301,7 @@ const projects: Project[] = [
   },
   {
     name: 'FEATURE GATE PRO',
-    category: 'Flutter SDK / Open Source',
+    category: 'Flutter SDK / Package',
     type: 'Open Source',
     description:
       'A high-performance, robust, and extensible Feature Flag SDK for Flutter. FeatureGate Pro is designed for enterprise and production scale, offering a unified Merge Engine that seamlessly cascades between Local JSON configs, Firebase Remote Config, and custom REST APIs.',
