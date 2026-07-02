@@ -12,6 +12,7 @@ import {
   ArrowRight,
   ArrowUp,
   ArrowUpRight,
+  Boxes,
   CalendarDays,
   Check,
   ChevronLeft,
@@ -237,6 +238,39 @@ const projects: Project[] = [
     span: 'lg:col-span-12',
     links: [],
     isActive: true,
+  },
+  {
+    name: 'FEATURE GATE PRO',
+    category: 'Flutter SDK / Open Source',
+    type: 'Open Source',
+    description:
+      'A high-performance, robust, and extensible Feature Flag SDK for Flutter. FeatureGate Pro is designed for enterprise and production scale, offering a unified Merge Engine that seamlessly cascades between Local JSON configs, Firebase Remote Config, and custom REST APIs.',
+    tags: [
+      'Flutter',
+      'Dart',
+      'SDK',
+      'Firebase Remote Config',
+      'REST API',
+      'Percentage Rollouts',
+      'Audience Targeting',
+      'Developer Dashboard',
+    ],
+    stats: [
+      { label: 'Platform', value: 'Flutter & Dart' },
+      { label: 'Distribution', value: 'pub.dev' },
+    ],
+    impact:
+      'Engineered an enterprise-grade Feature Flag SDK featuring a cascade Merge Engine, audience targeting, and analytics sampling.',
+    accent: '#02569B',
+    icon: Boxes,
+    span: 'lg:col-span-12',
+    links: [
+      {
+        label: 'pub.dev',
+        href: 'https://pub.dev/packages/feature_gate_pro',
+        icon: ExternalLink,
+      },
+    ],
   },
   {
     name: 'SPLITEASE',
