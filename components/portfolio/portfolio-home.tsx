@@ -53,6 +53,7 @@ const navigation = [
   { label: 'Projects', href: '#projects' },
   { label: 'Skills', href: '#skills' },
   { label: 'Experience', href: '#experience' },
+  { label: 'Achievements', href: '#achievements' },
   { label: 'Services', href: '#services' },
   { label: 'Contact', href: '#contact' },
 ]
@@ -678,6 +679,7 @@ const footerLinks = [
       { name: 'Prototypes', href: '#projects' },
       { name: 'Core Engine', href: '#skills' },
       { name: 'Stats', href: '#stats' },
+      { name: 'Achievements', href: '#achievements' },
     ],
   },
   {
@@ -2516,6 +2518,111 @@ export default function PortfolioHome({
                 />
               ))}
             </div>
+          </div>
+        </section>
+
+        <section id="achievements" className="section-shell">
+          <div className="shell space-y-10">
+            <Reveal>
+              <SectionHeader
+                label="Awards & Recognitions"
+                title="Milestones & Badges."
+                description="Recognitions and certifications earned through competitive coding, hackathons, and technological challenges."
+              />
+            </Reveal>
+
+            <Reveal delay={0.05}>
+              <Spotlight className="surface-card-strong overflow-hidden p-8 sm:p-10" glow="124,92,255">
+                <div className="grid gap-8 lg:grid-cols-[1fr_1.2fr] lg:items-center">
+                  
+                  {/* Image side with neon aura and subtle scaling hover effect */}
+                  <div className="relative flex items-center justify-center p-4">
+                    <div className="absolute inset-0 -z-10 bg-radial-gradient from-accent/20 to-transparent blur-2xl" />
+                    <div className="relative group overflow-hidden rounded-[2rem] border border-white/[0.08] bg-white/[0.02] p-6 shadow-2xl transition-all duration-500 hover:border-accent/40 hover:bg-white/[0.04]">
+                      <NextImage
+                        src="/copilot-badge.png"
+                        alt="GitHub Copilot Finish-Up-A-Thon Challenge Completion Badge"
+                        width={340}
+                        height={340}
+                        className="rounded-xl object-contain transition-transform duration-500 group-hover:scale-105"
+                        priority
+                      />
+                    </div>
+                  </div>
+
+                  {/* Text details side */}
+                  <div className="space-y-6">
+                    <div className="space-y-3">
+                      <div className="section-kicker">
+                        <span className="eyebrow-dot" />
+                        GitHub & DEV Community
+                      </div>
+                      <h3 className="font-[family:var(--font-heading)] text-3xl tracking-[-0.04em] text-foreground sm:text-4xl">
+                        GitHub Copilot "Finish-Up-A-Thon" Challenge
+                      </h3>
+                      <p className="text-sm font-semibold uppercase tracking-[0.16em] text-accent">
+                        Challenge Completion Badge
+                      </p>
+                    </div>
+
+                    <p className="text-base leading-7 text-muted-foreground sm:text-lg">
+                      Earned for successfully reviving and completing a side project using GitHub Copilot to optimize development productivity, code quality, and problem-solving velocity. This hackathon challenged developers globally to build high-quality software utilizing advanced AI-assisted engineering workflows.
+                    </p>
+
+                    {/* Bullet highlights */}
+                    <div className="grid gap-3 sm:grid-cols-2">
+                      <div className="flex items-start gap-2.5">
+                        <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-accent/10 text-accent">
+                          <Check size={12} />
+                        </span>
+                        <span className="text-sm text-foreground/80">AI-assisted software engineering</span>
+                      </div>
+                      <div className="flex items-start gap-2.5">
+                        <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-accent/10 text-accent">
+                          <Check size={12} />
+                        </span>
+                        <span className="text-sm text-foreground/80">Rapid side-project revival & MVP</span>
+                      </div>
+                      <div className="flex items-start gap-2.5">
+                        <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-accent/10 text-accent">
+                          <Check size={12} />
+                        </span>
+                        <span className="text-sm text-foreground/80">Enhanced workflow efficiency</span>
+                      </div>
+                      <div className="flex items-start gap-2.5">
+                        <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-accent/10 text-accent">
+                          <Check size={12} />
+                        </span>
+                        <span className="text-sm text-foreground/80">DEV Community published journey</span>
+                      </div>
+                    </div>
+
+                    {/* Action Buttons */}
+                    <div className="flex flex-wrap gap-4 pt-2">
+                      <a
+                        href="https://dev.to/raj_javiya"
+                        target="_blank"
+                        rel="noreferrer"
+                        className="inline-flex items-center gap-2 rounded-full grad-accent-bg px-5 py-3 text-sm font-medium text-white shadow-[0_8px_24px_rgba(124,92,255,0.25)] transition hover:-translate-y-0.5 hover:shadow-[0_12px_32px_rgba(124,92,255,0.35)]"
+                      >
+                        View Badge on DEV Profile
+                        <ArrowUpRight size={15} />
+                      </a>
+                      <a
+                        href="https://www.linkedin.com/feed/update/urn:li:activity:7479166408308711425/"
+                        target="_blank"
+                        rel="noreferrer"
+                        className="inline-flex items-center gap-2 rounded-full border border-white/[0.12] bg-white/[0.06] px-5 py-3 text-sm font-medium text-foreground transition hover:-translate-y-0.5 hover:border-white/25 hover:bg-white/[0.1]"
+                      >
+                        Read LinkedIn Post
+                        <Linkedin size={15} className="text-[#0077B5]" />
+                      </a>
+                    </div>
+                  </div>
+
+                </div>
+              </Spotlight>
+            </Reveal>
           </div>
         </section>
 
