@@ -2623,6 +2623,89 @@ export default function PortfolioHome({
                 </div>
               </Spotlight>
             </Reveal>
+
+            <Reveal delay={0.1}>
+              <Spotlight className="surface-card-strong overflow-hidden p-8 sm:p-10" glow="59,130,246">
+                <div className="grid gap-8 lg:grid-cols-[1fr_1.2fr] lg:items-center">
+                  
+                  {/* Image side with neon aura and subtle scaling hover effect */}
+                  <div className="relative flex items-center justify-center p-4">
+                    <div className="absolute inset-0 -z-10 bg-radial-gradient from-blue-500/20 to-transparent blur-2xl" />
+                    <div className="relative group overflow-hidden rounded-[2rem] border border-white/[0.08] bg-white/[0.02] p-6 shadow-2xl transition-all duration-500 hover:border-blue-500/40 hover:bg-white/[0.04]">
+                      <NextImage
+                        src="/dev-weekend-badge.png"
+                        alt="DEV Weekend Challenge Completion Badge"
+                        width={340}
+                        height={340}
+                        className="rounded-xl object-contain transition-transform duration-500 group-hover:scale-105"
+                      />
+                    </div>
+                  </div>
+
+                  {/* Text details side */}
+                  <div className="space-y-6">
+                    <div className="space-y-3">
+                      <div className="section-kicker">
+                        <span className="eyebrow-dot bg-blue-500" />
+                        DEV Community
+                      </div>
+                      <h3 className="font-[family:var(--font-heading)] text-3xl tracking-[-0.04em] text-foreground sm:text-4xl">
+                        DEV Weekend Challenge Completion
+                      </h3>
+                      <p className="text-sm font-semibold uppercase tracking-[0.16em] text-blue-400">
+                        Weekend Challenge Award
+                      </p>
+                    </div>
+
+                    <p className="text-base leading-7 text-muted-foreground sm:text-lg">
+                      Awarded for completing a Weekend Challenge. Thank you for participating! 💻
+                    </p>
+
+                    {/* Bullet highlights */}
+                    <div className="grid gap-3 sm:grid-cols-2">
+                      <div className="flex items-start gap-2.5">
+                        <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-blue-500/10 text-blue-400">
+                          <Check size={12} />
+                        </span>
+                        <span className="text-sm text-foreground/80">Weekend coding challenge</span>
+                      </div>
+                      <div className="flex items-start gap-2.5">
+                        <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-blue-500/10 text-blue-400">
+                          <Check size={12} />
+                        </span>
+                        <span className="text-sm text-foreground/80">DEV Community participant</span>
+                      </div>
+                      <div className="flex items-start gap-2.5">
+                        <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-blue-500/10 text-blue-400">
+                          <Check size={12} />
+                        </span>
+                        <span className="text-sm text-foreground/80">Rapid prototyping & implementation</span>
+                      </div>
+                      <div className="flex items-start gap-2.5">
+                        <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-blue-500/10 text-blue-400">
+                          <Check size={12} />
+                        </span>
+                        <span className="text-sm text-foreground/80">Active developer engagement</span>
+                      </div>
+                    </div>
+
+                    {/* Action Buttons */}
+                    <div className="flex flex-wrap gap-4 pt-2">
+                      <a
+                        href="https://dev.to/raj_javiya"
+                        target="_blank"
+                        rel="noreferrer"
+                        className="inline-flex items-center gap-2 rounded-full border border-blue-500/30 bg-blue-500/10 px-5 py-3 text-sm font-medium text-foreground transition hover:-translate-y-0.5 hover:border-blue-500/50 hover:bg-blue-500/20"
+                      >
+                        View Badge on DEV Profile
+                        <ArrowUpRight size={15} />
+                      </a>
+                    </div>
+                  </div>
+
+                </div>
+              </Spotlight>
+            </Reveal>
           </div>
         </section>
 
