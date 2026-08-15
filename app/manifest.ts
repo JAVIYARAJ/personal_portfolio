@@ -2,10 +2,10 @@ import type { MetadataRoute } from 'next'
 
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: 'Javiya Raj — Senior Flutter Developer',
+    name: 'Javiya Raj — Senior Mobile Developer',
     short_name: 'Javiya Raj',
     description:
-      'Senior Flutter developer shipping production-grade cross-platform mobile apps with Clean Architecture.',
+      'Senior Mobile Developer architecting & shipping production-grade Native Android (Kotlin, Jetpack Compose) and Flutter apps.',
     start_url: '/',
     display: 'standalone',
     background_color: '#08090c',

@@ -61,23 +61,23 @@ const navigation = [
 const heroFacts = [
   '15+ Production Apps',
   '4+ Years Experience',
-  'Freelance Available',
+  'Native & Cross-Platform',
 ]
 
 const marqueeTech = [
+  'Kotlin',
+  'Jetpack Compose',
   'Flutter',
   'Dart',
-  'Kotlin',
-  'Clean Architecture',
+  'Clean Architecture (MVVM)',
+  'Coroutines & StateFlow',
   'BLoC / Cubit',
-  'Riverpod',
+  'Hilt & Dagger',
+  'Retrofit & Room',
   'Supabase',
-  'Firebase',
-  'PostgreSQL',
-  'Jetpack Compose',
-  'CI/CD',
-  'Shorebird OTA',
-  'REST / GraphQL',
+  'Firebase FCM',
+  'CI/CD (Gradle & Actions)',
+  'Material Design 3',
   'GetIt',
 ]
 
@@ -93,7 +93,7 @@ const heroShots = [
 const experienceHighlights = [
   '15+ production applications',
   '95% on-time release rate',
-  'Native Android foundation',
+  'Native Android & Flutter mastery',
 ]
 
 const socialLinks = [
@@ -149,23 +149,23 @@ const proofPoints = [
 
 const aboutFeatures = [
   {
-    title: 'Performance Optimization',
-    description: 'Maximizing frame rates and minimizing resource overhead.',
+    title: 'Performance & Profiling',
+    description: 'Achieving 60fps smoothness with Baseline Profiles and Android Studio Profiler.',
     icon: Zap,
   },
   {
-    title: 'Clean Architecture',
-    description: 'Separating concerns for maintainable and scalable codebases.',
+    title: 'Clean Architecture (MVVM)',
+    description: 'Unidirectional data flows, decoupled layers, and feature-first modularization.',
     icon: ShieldCheck,
   },
   {
-    title: 'Cross-Platform Mastery',
-    description: 'Seamlessly targets iOS, Android, and Web with zero compromise.',
+    title: 'Native & Cross-Platform',
+    description: 'Dual-stack expertise across Native Android (Kotlin/Compose) and Flutter (Dart).',
     icon: Smartphone,
   },
   {
-    title: 'CI/CD Automation',
-    description: 'Robust deployment pipelines for reliable app deliveries.',
+    title: 'CI/CD & Delivery',
+    description: 'Automated release pipelines with Gradle, GitHub Actions, and store deployment.',
     icon: Workflow,
   },
 ]
@@ -179,32 +179,32 @@ type Service = {
 
 const services: Service[] = [
   {
-    title: 'Cross-Platform App Development',
+    title: 'Native & Cross-Platform App Dev',
     description:
-      'End-to-end Flutter apps for iOS, Android & web — from architecture and UI to App Store / Play Store launch.',
+      'End-to-end mobile apps built with Native Android (Kotlin, Jetpack Compose) or Flutter — from architecture to store launch.',
     icon: Smartphone,
-    deliverables: ['Production Flutter build', 'Pixel-perfect UI', 'Store submission'],
+    deliverables: ['Native Android (Kotlin)', 'Flutter iOS & Android', 'Store submissions'],
   },
   {
-    title: 'Architecture & Code Review',
+    title: 'Mobile Architecture & Code Audits',
     description:
-      'Clean Architecture, state management and scalable foundations — plus audits and refactors of existing codebases.',
+      'Clean Architecture (MVVM) implementation, state management refactoring, and quality audits for mobile applications.',
     icon: ShieldCheck,
-    deliverables: ['Clean Architecture', 'State management', 'Codebase audit'],
+    deliverables: ['Clean Architecture (MVVM)', 'StateFlow / BLoC audit', 'Codebase refactoring'],
   },
   {
-    title: 'Native → Flutter Migration',
+    title: 'Native Integration & Platform Bridges',
     description:
-      'Move legacy Android / iOS apps to a single, maintainable Flutter codebase without losing native performance.',
+      'Integrating native Android services (Retrofit, Room, FCM) with Flutter via Platform Channels, or native module integration.',
     icon: Layers3,
-    deliverables: ['Migration roadmap', 'Native bridges', 'Zero-downtime rollout'],
+    deliverables: ['Platform channel bridges', 'Native Android modules', 'Zero-downtime rollout'],
   },
   {
-    title: 'MVP & Rapid Prototyping',
+    title: 'MVP & Rapid Mobile Delivery',
     description:
-      'Validate your idea fast with a production-grade prototype — built to scale into the real product, not thrown away.',
+      'Validate your vision fast with a production-grade mobile prototype — built to scale seamlessly into your core product.',
     icon: Rocket,
-    deliverables: ['Working MVP', 'Scalable base', 'Fast iteration'],
+    deliverables: ['Production MVP', 'Scalable architecture', 'Fast iteration'],
   },
 ]
 
@@ -298,7 +298,6 @@ const projects: Project[] = [
     icon: Workflow,
     span: 'lg:col-span-12',
     links: [],
-    isActive: true,
   },
   {
     name: 'FEATURE GATE PRO',
@@ -430,23 +429,23 @@ const projects: Project[] = [
     category: 'Logistics / Consumer',
     type: 'Esparkbiz',
     description:
-      'Developed a scalable food delivery app with an intuitive UX and Supabase-powered backend. Features include real-time order handling and a custom Rewards system.',
+      'Full-stack mobile food delivery application with Supabase-powered backend (real-time orders, Postgres DB) and custom Rewards & Loyalty system — data layer directly reimplementable with Retrofit/Room and Supabase Kotlin client.',
     tags: [
       'Flutter',
-      'Supabase',
-      'Real-time SDK',
+      'Dart',
+      'Supabase (Postgres)',
+      'Retrofit / Room Pattern',
       'Clean Architecture',
-      'CI/CD',
+      'CI/CD Pipelines',
       'Sentry',
-      'Posthog',
-      'Clarity (Heatmap)',
+      'Clarity',
     ],
     stats: [
       { label: 'Scale', value: '10K+' },
       { label: 'Rating', value: '4.8' },
     ],
     impact:
-      'Engineered a 30% increase in repeat orders via modular loyalty logic.',
+      'Engineered a 30% increase in repeat orders via modular rewards and real-time ordering logic.',
     accent: '#d5a24a',
     icon: Smartphone,
     appIcon: '/projects/dyshez/icon.png',
@@ -476,21 +475,21 @@ const projects: Project[] = [
     category: 'Sales / Productivity',
     type: 'Esparkbiz',
     description:
-      'A dedicated productivity engine that boosted team efficiency by 40%. Engineered with high-performance custom calendar modules and reactive data flows.',
+      'Mobile sales productivity tool that boosted team efficiency by 40% and overall sales by 25%. Engineered with custom calendar modules, reusable Composables/UI components, and adaptive phone/tablet layouts.',
     tags: [
-      'Flutter',
-      'Responsive Design',
-      'Modular UI',
-      'Complex Logic',
-      'Reactive Dart',
+      'Flutter / Jetpack Compose',
+      'Modular UI Composables',
+      'Custom Calendar',
+      'Adaptive Layouts',
+      'Reactive Data Flow',
       'Sales Intelligence',
     ],
     stats: [
       { label: 'Efficiency', value: '+40%' },
-      { label: 'Lift', value: '25%' },
+      { label: 'Sales Lift', value: '25%' },
     ],
     impact:
-      'Transformed sales workflow into a mobile-first intelligent engine.',
+      'Transformed sales workflows into a mobile-first, component-driven intelligent engine.',
     accent: '#6d8262',
     icon: Activity,
     span: 'lg:col-span-6',
@@ -501,21 +500,21 @@ const projects: Project[] = [
     category: 'Native Android / CRM',
     type: 'Esparkbiz',
     description:
-      'High-scale CRM for goal tracking and incentive management. Reduced processing time by 25% through advanced async optimization and network caching.',
+      'High-scale CRM mobile app for goal tracking and incentive management driving a 30% increase in sales performance. Engineered with Kotlin, MVVM architecture, Retrofit network caching, Room, and Coroutines/Flow async handling.',
     tags: [
-      'Kotlin',
+      'Kotlin Core',
+      'Jetpack Compose',
       'MVVM Architecture',
-      'Retrofit',
-      'Glide',
-      'Firebase',
-      'Enterprise SDK',
+      'Coroutines & Flow',
+      'Retrofit & Room',
+      'Firebase FCM',
     ],
     stats: [
-      { label: 'Speed', value: '+25%' },
-      { label: 'Growth', value: '30%' },
+      { label: 'Processing', value: '-25% time' },
+      { label: 'Sales Lift', value: '+30%' },
     ],
     impact:
-      'Optimized network layer resulting in 30% faster data availability.',
+      'Optimized network and async operations (Coroutines/Flow, Isolates), cutting processing time by 25% and boosting FCM engagement by 15%.',
     accent: '#8b6d5c',
     icon: Database,
     appIcon: '/projects/goals/icon.svg',
@@ -544,104 +543,111 @@ type SkillGroup = {
 
 const skillGroups: SkillGroup[] = [
   {
-    title: 'Framework Core',
-    detail: 'Ecosystem',
-    description: 'Flutter ecosystem, adaptive UI systems, testing, and modular design for product-grade apps.',
+    title: 'Native Android',
+    detail: 'Android Framework',
+    description: 'Platform-level native Android architecture with Kotlin, Jetpack Compose, MVVM, ViewModel/StateFlow, and Android SDK.',
+    icon: Smartphone,
+    level: 'Expert',
+    skills: [
+      'Kotlin Core',
+      'Jetpack Compose',
+      'MVVM Architecture',
+      'ViewModel & StateFlow',
+      'Kotlin Coroutines',
+      'Navigation Compose',
+      'WorkManager',
+      'LiveData',
+      'Android SDK',
+      'Java Legacy',
+    ],
+  },
+  {
+    title: 'Cross-Platform (Flutter)',
+    detail: 'Flutter Ecosystem',
+    description: 'Production Flutter development, custom widget architecture, reactive state management, and platform channel bridges.',
     icon: CircuitBoard,
     level: 'Expert',
     skills: [
       'Flutter',
       'Dart',
-      'Modular Design',
-      'Material UI / Cupertino Widgets',
-      'Responsive UI / Adaptive Design',
-      'Solid principles',
-      'Custom Animation',
-      'Unit Testing',
-      'Widget Testing',
-      'Integration Testing',
+      'BLoC / Cubit',
+      'Riverpod',
+      'GetX / Provider',
+      'Shorebird (OTA)',
+      'Custom Animations',
+      'Adaptive / Responsive UI',
     ],
   },
   {
-    title: 'Logic Engine',
+    title: 'Architecture & System Design',
     detail: 'Enterprise Logic',
-    description: 'State management and architectural patterns built for maintainable, reactive application flow.',
+    description: 'Clean Architecture, feature-first modularization, dependency injection, and unidirectional reactive data flow.',
     icon: Layers3,
     level: 'Expert',
     skills: [
-      'BLoC / Cubit',
-      'GetX',
-      'Riverpod',
-      'State Hooks',
-      'Reactive Flows',
       'Clean Architecture',
-      'Dependency Injection (GetIt)',
+      'Feature-First Modularization',
+      'Hilt / Dagger',
+      'GetIt (DI)',
+      'Repository Pattern',
+      'SOLID Principles',
     ],
   },
   {
-    title: 'Data Systems',
-    detail: 'Real-time Persistence',
-    description: 'Data storage, backend integration, and synchronization across live mobile environments.',
+    title: 'APIs, Storage & DB',
+    detail: 'Data Layer',
+    description: 'Offline-resilient data layers, Room/SQLite local databases, GraphQL/REST clients, and real-time backend sync.',
     icon: Database,
     level: 'Proficient',
     skills: [
-      'Firebase / Supabase',
+      'Retrofit',
+      'Room DB',
+      'DataStore',
+      'GraphQL (Apollo)',
+      'Firebase (Auth, FCM)',
+      'Supabase / PostgreSQL',
       'Hive / SQLite',
-      'REST / GraphQL',
-      'PostgreSQL',
     ],
   },
   {
-    title: 'Native Android',
-    detail: 'Android Framework',
-    description: 'Platform-level Android work for native modules, bridges, background processing, and Compose.',
-    icon: Smartphone,
-    level: 'Proficient',
-    skills: [
-      'Android SDK',
-      'Kotlin Core',
-      'Jetpack Compose',
-      'Platform Bridges',
-      'Java Legacy',
-      'Background Services / WorkManager',
-    ],
-  },
-  {
-    title: 'AI Intelligence',
-    detail: 'Advanced Intelligence',
-    description: 'AI-assisted tooling and workflow support for faster implementation and decision-making.',
-    icon: Sparkles,
-    level: 'Familiar',
-    skills: ['Claude', 'Antigravity', 'Cursor', 'Gemini', 'ChatGPT'],
-  },
-  {
-    title: 'Automation & DevOps',
-    detail: 'Continuous Delivery',
-    description: 'Release automation, OTA delivery, build systems, and store deployment operations.',
+    title: 'Testing, DevOps & Quality',
+    detail: 'Testing & Delivery',
+    description: 'Automated testing discipline, performance profiling, baseline profiles, and automated CI/CD release pipelines.',
     icon: Zap,
     level: 'Proficient',
     skills: [
-      'Shorebird (OTA)',
-      'Codemagic',
-      'Fastlane',
-      'GitHub Actions',
-      'Play Store / App Store Deployment',
-      'Build Automation & Versioning',
+      'JUnit & Espresso',
+      'Compose UI Testing',
+      'Widget & Unit Testing',
+      'Android Studio Profiler',
+      'Layout Inspector & Baseline Profiles',
+      'GitHub Actions & Gradle',
+      'Play Store & App Store Deployment',
     ],
+  },
+  {
+    title: 'AI & Engineering Tools',
+    detail: 'Developer Velocity',
+    description: 'AI-assisted workflows, code generation, and modern developer tooling for accelerated delivery.',
+    icon: Sparkles,
+    level: 'Proficient',
+    skills: ['Claude', 'Antigravity', 'Cursor', 'Gemini', 'Figma to Compose', 'Git / GitHub Workflows'],
   },
 ]
 
 const experiences = [
   {
     company: 'Esparkbiz',
-    role: 'Flutter Developer',
+    role: 'Senior Mobile Developer (Android & Flutter)',
     duration: 'Sep 2023 - Present',
     summary:
-      'Leading scalable cross-platform architecture for 15+ production applications with a focus on long-term maintainability.',
+      'Architecting and shipping production mobile applications across Native Android (Kotlin, Jetpack Compose) and Flutter with Clean Architecture (MVVM).',
     bullets: [
-      'Leading scalable cross-platform architecture for 15+ production applications with a focus on long-term maintainability',
-      'Optimized feature delivery pipelines contributing to a 95% on-time release rate across multiple enterprise projects',
-      'Implemented refined modular design patterns reducing development time for new features by 20%',
+      'Architected and shipped multiple production apps using Clean Architecture (MVVM) and feature-first modularization, cutting dev time by 20% and sustaining a 95% on-time release rate',
+      'Drove adoption of unidirectional, reactive state management (ViewModel + StateFlow/Coroutines on Android & BLoC/Cubit in Flutter), improving testability and code review quality',
+      'Translated Figma mockups into pixel-perfect, responsive UIs with 60fps smoothness using Jetpack Compose and custom Flutter animations',
+      'Integrated REST/GraphQL APIs, Supabase, and Firebase (Auth, Firestore, FCM) behind a repository-layer abstraction for offline resilience (Retrofit + Room natively on Android)',
+      'Established GitHub Actions CI/CD pipelines for automated linting, unit/UI testing, and staged production releases across Gradle and Flutter build systems',
     ],
   },
   {
@@ -649,23 +655,23 @@ const experiences = [
     role: 'Software Developer Intern',
     duration: 'Jan 2023 - Sep 2023',
     summary:
-      'Contributed to core feature refactoring that improved codebase maintainability by 30% during high-growth phase.',
+      'Developed and refactored features across production mobile applications using Agile/Git workflows, boosting maintainability by 30%.',
     bullets: [
-      'Contributed to core feature refactoring that improved codebase maintainability by 30% during high-growth phase',
-      'Followed strict Agile methodologies and Git-based workflows, participating in 20+ successful sprint releases',
-      'Boosted user engagement by 25% through performance profiling and UI-pixel-perfect optimizations',
+      'Developed and refactored core features across production mobile applications using Agile/Git workflows, improving codebase maintainability by 30%',
+      'Optimized UI rendering pipelines and async operations, contributing to a 25% lift in user engagement within three months',
+      'Wrote comprehensive unit and UI tests (JUnit, Compose UI testing, Flutter widget tests) as part of the team\'s quality-first discipline',
     ],
   },
   {
-    company: 'Native Systems',
-    role: 'Independent Developer',
+    company: 'Native Systems / Freelance',
+    role: 'Independent Mobile Developer',
     duration: 'Jun 2021 - Dec 2022',
     summary:
-      'Developed native Android modules and components using Kotlin/Java, establishing a strong platform-level foundation.',
+      'Developed native Android modules using Kotlin/Java and built multi-platform mobile application components.',
     bullets: [
-      'Developed native Android modules and components using Kotlin/Java, establishing a strong platform-level foundation',
-      'Built multi-platform MVP modules for freelance clients, mastering the bridge between Flutter and Native environments',
-      'Researched and implemented modern UI patterns in Jetpack Compose to streamline cross-platform design consistency',
+      'Architected native Android modules and components using Kotlin/Java, establishing a strong platform-level foundation',
+      'Built multi-platform MVP modules for freelance clients, mastering native platform channel bridges and cross-platform integrations',
+      'Researched and implemented modern UI patterns in Jetpack Compose to streamline cross-platform UI consistency',
     ],
   },
 ]
@@ -685,10 +691,10 @@ const footerLinks = [
   {
     title: 'Expertise',
     links: [
+      { name: 'Native Android Dev', href: '#top' },
       { name: 'Flutter Dev', href: '#top' },
-      { name: 'Clean Architecture', href: '#about' },
-      { name: 'Cross-Platform', href: '#skills' },
-      { name: 'Performance Optimization', href: '#stats' },
+      { name: 'Clean Architecture (MVVM)', href: '#about' },
+      { name: 'Performance & Profiling', href: '#stats' },
     ],
   },
   {
@@ -1035,7 +1041,7 @@ function IntroOverlay() {
               transition={{ duration: 0.6, delay: 0.15, ease: [0.22, 1, 0.36, 1] }}
               className="text-gradient font-mono text-[0.7rem] uppercase tracking-[0.45em]"
             >
-              Flutter Engineer
+              Mobile Developer
             </motion.span>
 
             {/* name — per-letter mask rise (decorative; the real page heading lives in the hero) */}
@@ -1135,21 +1141,6 @@ function HeroDevice() {
         </AnimatePresence>
       </div>
 
-      {/* floating chips */}
-      <div className="float-slower absolute -left-4 top-20 hidden rounded-2xl border border-white/[0.1] bg-white/[0.06] px-4 py-3 backdrop-blur-xl sm:block">
-        <div className="flex items-center gap-2">
-          <span className="relative flex h-2 w-2">
-            <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[#6d8262] opacity-75" />
-            <span className="relative inline-flex h-2 w-2 rounded-full bg-[#6d8262]" />
-          </span>
-          <span className="text-xs font-medium text-foreground">Available for freelance</span>
-        </div>
-      </div>
-
-      <div className="absolute -right-3 bottom-24 hidden rounded-2xl border border-white/[0.1] bg-white/[0.06] px-4 py-3 backdrop-blur-xl sm:block">
-        <p className="text-[0.6rem] font-semibold uppercase tracking-[0.16em] text-muted-foreground">Currently building</p>
-        <p className="mt-0.5 font-[family:var(--font-heading)] text-sm tracking-[-0.02em] text-gradient">ORBIT</p>
-      </div>
     </div>
   )
 }
@@ -1164,7 +1155,7 @@ type PaletteItem = {
   run: () => void
 }
 
-// ⌘K command palette — jump to sections, copy email, open links/booking/resume.
+// ⌘K command palette — jump to sections, copy email, open links/booking.
 function CommandPalette({ open, onOpenChange }: { open: boolean; onOpenChange: (value: boolean) => void }) {
   const reduce = useReducedMotion()
   const [query, setQuery] = useState('')
@@ -1227,17 +1218,6 @@ function CommandPalette({ open, onOpenChange }: { open: boolean; onOpenChange: (
         run: () => {
           trackEvent('book_call_click', { location: 'command_palette' })
           openExternal(bookingUrl)
-        },
-      },
-      {
-        id: 'resume',
-        label: 'Download résumé',
-        group: 'Actions',
-        icon: Download,
-        keywords: 'cv pdf resume',
-        run: () => {
-          trackEvent('resume_click', { location: 'command_palette' })
-          openExternal('/resume.pdf')
         },
       },
     ]
@@ -1939,7 +1919,6 @@ export default function PortfolioHome({
   githubStats: GitHubStats
 }) {
   const reduceMotion = useReducedMotion()
-  const [orbitBannerDismissed, setOrbitBannerDismissed] = useState(false)
   const [menuOpen, setMenuOpen] = useState(false)
   const [paletteOpen, setPaletteOpen] = useState(false)
   const [activeSection, setActiveSection] = useState('')
@@ -2080,100 +2059,7 @@ export default function PortfolioHome({
       <ScrollProgress />
       <CommandPalette open={paletteOpen} onOpenChange={setPaletteOpen} />
 
-      {/* ORBIT Launch Banner */}
-      <AnimatePresence>
-        {!orbitBannerDismissed && (
-          <motion.div
-            key="orbit-banner"
-            initial={reduceMotion ? { opacity: 1 } : { y: -60, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            exit={reduceMotion ? { opacity: 0 } : { y: -60, opacity: 0 }}
-            transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
-            className="fixed inset-x-0 top-0 z-[60] h-[60px] overflow-hidden"
-            style={{ background: 'linear-gradient(100deg, #12304f 0%, #1e4d80 35%, #2563a8 60%, #1a3e6a 100%)' }}
-          >
-            {/* Shimmer sweep */}
-            <motion.div
-              className="pointer-events-none absolute inset-y-0 w-[30%]"
-              style={{ background: 'linear-gradient(to right, transparent, rgba(255,255,255,0.07), transparent)' }}
-              animate={{ x: ['-100%', '450%'] }}
-              transition={{ duration: 3, repeat: Infinity, ease: 'linear', repeatDelay: 2.5 }}
-            />
-
-            {/* ── Desktop layout (sm+): single row ── */}
-            <div className="relative hidden h-full items-center justify-center gap-3 px-12 sm:flex">
-              <span className="shrink-0 rounded-full bg-white/15 px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider text-white">
-                New
-              </span>
-              <span className="relative flex h-1.5 w-1.5 shrink-0">
-                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-sky-300 opacity-75" />
-                <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-sky-300" />
-              </span>
-              <p className="text-sm font-medium text-white/85">
-                <span className="font-bold text-white">ORBIT v1 is live</span>
-                <span className="mx-2 opacity-30">—</span>
-                Self-hosted dev OS: manage projects, tasks, notes &amp; encrypted secrets in one keyboard-first app.
-              </p>
-              <a
-                href="https://orbit-sand-alpha.vercel.app/"
-                target="_blank"
-                rel="noreferrer"
-                className="inline-flex shrink-0 items-center gap-1.5 rounded-full border border-white/20 bg-white/15 px-4 py-1.5 text-xs font-semibold text-white backdrop-blur-sm transition hover:border-white/35 hover:bg-white/25"
-              >
-                Visit Now <ArrowUpRight size={11} />
-              </a>
-              <button
-                type="button"
-                aria-label="Dismiss banner"
-                onClick={() => setOrbitBannerDismissed(true)}
-                className="absolute right-3 top-1/2 -translate-y-1/2 flex h-7 w-7 items-center justify-center rounded-full text-white/40 transition hover:bg-white/10 hover:text-white"
-              >
-                <X size={14} />
-              </button>
-            </div>
-
-            {/* ── Mobile layout: two-row stack ── */}
-            <div className="relative flex h-full flex-col items-start justify-center gap-0.5 pl-4 pr-10 sm:hidden">
-              {/* Row 1: title + badge + dot */}
-              <div className="flex items-center gap-2">
-                <span className="relative flex h-1.5 w-1.5 shrink-0">
-                  <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-sky-300 opacity-75" />
-                  <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-sky-300" />
-                </span>
-                <span className="text-sm font-bold text-white leading-tight">ORBIT v1 is live</span>
-                <span className="rounded-full bg-white/15 px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider text-white">
-                  New
-                </span>
-              </div>
-              {/* Row 2: description + CTA */}
-              <div className="flex items-center gap-2">
-                <p className="text-[11px] leading-tight text-white/70">
-                  Self-hosted dev workspace — projects, tasks, notes &amp; secrets vault.
-                </p>
-                <a
-                  href="https://orbit-sand-alpha.vercel.app/"
-                  target="_blank"
-                  rel="noreferrer"
-                  className="inline-flex shrink-0 items-center gap-1 rounded-full border border-white/20 bg-white/15 px-2.5 py-1 text-[10px] font-semibold text-white transition hover:bg-white/25"
-                >
-                  Visit <ArrowUpRight size={9} />
-                </a>
-              </div>
-              {/* Dismiss */}
-              <button
-                type="button"
-                aria-label="Dismiss banner"
-                onClick={() => setOrbitBannerDismissed(true)}
-                className="absolute right-2 top-1/2 -translate-y-1/2 flex h-7 w-7 items-center justify-center rounded-full text-white/40 transition hover:bg-white/10 hover:text-white"
-              >
-                <X size={14} />
-              </button>
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-
-      <header className={`fixed inset-x-0 z-50 px-4 py-4 sm:px-6 transition-[top] duration-300 ${orbitBannerDismissed ? 'top-0' : 'top-[60px]'}`}>
+      <header className="fixed inset-x-0 top-0 z-50 px-4 py-4 sm:px-6">
         <div className="shell">
           <div className="surface-card flex items-center justify-between px-5 py-4 sm:px-6">
             <a href="#top" className="flex items-center gap-2.5">
@@ -2218,14 +2104,11 @@ export default function PortfolioHome({
 
               <div className="hidden md:flex">
                 <a
-                  href="/resume.pdf"
-                  target="_blank"
-                  rel="noreferrer"
-                  onClick={() => trackEvent('resume_click', { location: 'header' })}
+                  href="#contact"
                   className="inline-flex items-center gap-2 rounded-full grad-accent-bg px-5 py-3 text-sm font-medium text-white shadow-[0_10px_30px_rgba(124,92,255,0.3)] transition hover:-translate-y-0.5"
                 >
-                  Resume.pdf
-                  <Download size={16} />
+                  Get in Touch
+                  <ArrowRight size={16} />
                 </a>
               </div>
 
@@ -2249,7 +2132,7 @@ export default function PortfolioHome({
             animate={reduceMotion ? { opacity: 1 } : { opacity: 1, y: 0 }}
             exit={reduceMotion ? { opacity: 0 } : { opacity: 0, y: -16 }}
             transition={{ duration: 0.25, ease: 'easeOut' }}
-            className={`fixed inset-x-4 z-40 md:hidden ${orbitBannerDismissed ? 'top-[5.25rem]' : 'top-[calc(5.25rem+60px)]'}`}
+            className="fixed inset-x-4 top-[5.25rem] z-40 md:hidden"
           >
             <div className="surface-card-strong p-6">
               <div className="flex flex-col gap-4">
@@ -2263,45 +2146,32 @@ export default function PortfolioHome({
                     {item.label}
                   </a>
                 ))}
-                <a
-                  href="/resume.pdf"
-                  target="_blank"
-                  rel="noreferrer"
-                  onClick={() => {
-                    trackEvent('resume_click', { location: 'mobile_menu' })
-                    setMenuOpen(false)
-                  }}
-                  className="inline-flex items-center justify-center gap-2 rounded-[1.25rem] grad-accent-bg px-4 py-4 text-sm font-medium text-white"
-                >
-                  Resume.pdf
-                  <Download size={16} />
-                </a>
               </div>
             </div>
           </motion.div>
         ) : null}
       </AnimatePresence>
 
-      <main id="main-content" className={`transition-[padding] duration-300 ${orbitBannerDismissed ? 'pt-28 sm:pt-32' : 'pt-[calc(7rem+60px)] sm:pt-[calc(8rem+60px)]'}`}>
+      <main id="main-content" className="pt-28 sm:pt-32">
         <section className="shell grid gap-10 pb-24 pt-8 lg:grid-cols-[minmax(0,0.98fr)_minmax(360px,0.82fr)] lg:items-center lg:gap-14 lg:pb-32 lg:pt-16">
           <Reveal className="max-w-[40rem] space-y-9">
             <div className="section-kicker">
               <span className="eyebrow-dot" />
-              Senior Flutter Developer
+              Senior Mobile Developer
             </div>
 
             <div className="space-y-6">
               <h1 className="font-[family:var(--font-heading)] text-5xl tracking-[-0.075em] text-foreground sm:text-6xl lg:text-[5.5rem] lg:leading-[0.92]">
                 <LetterReveal text="JAVIYA RAJ." className="text-gradient" />
-                <span className="sr-only"> — Senior Flutter Developer</span>
+                <span className="sr-only"> — Senior Mobile Developer</span>
               </h1>
               <p className="max-w-xl text-xl font-medium leading-8 text-foreground/82 sm:text-2xl">
-                Flutter developer building beautiful cross-platform apps.
+                Mobile developer building high-performance Native &amp; Cross-Platform apps.
               </p>
               <p className="max-w-xl text-base leading-8 text-muted-foreground sm:text-lg">
-                Developing high-performance, scalable mobile applications using
-                Flutter and Dart, leveraging Clean Architecture to ensure
-                maintainability and efficiency since 2021.
+                Architecting and shipping production-grade mobile applications across
+                Native Android (Kotlin, Jetpack Compose) and Cross-Platform (Flutter, Dart),
+                leveraging Clean Architecture (MVVM) since 2021.
               </p>
             </div>
 
@@ -2348,8 +2218,8 @@ export default function PortfolioHome({
             <Reveal>
               <SectionHeader
                 label="Professional Vision"
-                title="Clean Flutter Architecture."
-                description="I believe in building software that is as beautiful under the hood as it is on the surface. My approach centers on modularity, testability, and deterministic state management."
+                title="Mobile Clean Architecture."
+                description="I believe in building software that is as performant under the hood as it is responsive on the surface. My approach centers on modular Clean Architecture (MVVM), native platform optimization, and deterministic state management."
               />
             </Reveal>
 
@@ -2435,8 +2305,8 @@ export default function PortfolioHome({
             <Reveal>
               <SectionHeader
                 label="Portfolio Showcase"
-                title="Featured Flutter Projects."
-                description="Real-world applications engineered for performance, used by thousands of active users."
+                title="Featured Mobile Projects."
+                description="Production mobile applications engineered for performance across Native Android (Kotlin, Compose) and Flutter (Dart)."
               />
             </Reveal>
 
@@ -2459,8 +2329,8 @@ export default function PortfolioHome({
             <Reveal>
               <SectionHeader
                 label="Technical Ecosystem"
-                title="Flutter & Cross-Platform Skills."
-                description="A battle-tested set of technologies designed for performance, stability, and extreme scale."
+                title="Mobile Engineering Skills."
+                description="A battle-tested stack spanning Native Android development and Flutter cross-platform ecosystems."
               />
             </Reveal>
 
@@ -2479,8 +2349,8 @@ export default function PortfolioHome({
             <Reveal>
               <SectionHeader
                 label="Engineering Lifecycle"
-                title="Professional Path."
-                description="Production Flutter delivery, enterprise execution, and native Android foundations presented in a clearer timeline."
+                title="Professional Journey."
+                description="Production Android & Flutter delivery, enterprise execution, and platform-level engineering presented in a clear timeline."
               />
             </Reveal>
 
@@ -2491,7 +2361,7 @@ export default function PortfolioHome({
                     Career Focus
                   </p>
                   <h3 className="font-[family:var(--font-heading)] text-3xl tracking-[-0.04em] text-foreground sm:text-4xl">
-                    Flutter architecture, enterprise delivery, and native Android foundations.
+                    Native Android (Kotlin, Compose), Flutter architecture, and enterprise delivery.
                   </h3>
                 </div>
 
@@ -2888,8 +2758,8 @@ export default function PortfolioHome({
             <Reveal>
               <SectionHeader
                 label="Work With Me"
-                title="Flutter Development Services."
-                description="Whether you're launching a new product, scaling an existing one, or untangling a legacy codebase — here's where I plug in."
+                title="Mobile Engineering Services."
+                description="Whether launching a new mobile app, scaling an existing codebase, or integrating native platform modules — here is how I deliver."
               />
             </Reveal>
 
@@ -3160,14 +3030,12 @@ export default function PortfolioHome({
                   JAVIYA RAJ.
                 </h3>
                 <p className="text-[0.72rem] font-semibold uppercase tracking-[0.24em] text-muted-foreground">
-                  Flutter App Architect
+                  Mobile App Architect
                 </p>
               </div>
 
               <p className="max-w-md text-sm leading-7 text-muted-foreground">
-                Specialized in high-performance cross-platform development since
-                2021, with 4+ years of experience engineering scalable mobile
-                ecosystems with Clean Architecture.
+                Specialized in high-performance Native Android (Kotlin, Jetpack Compose) and Cross-Platform Flutter development since 2021, with 4+ years of experience engineering scalable mobile software with Clean Architecture.
               </p>
 
               <div className="flex flex-wrap gap-3">

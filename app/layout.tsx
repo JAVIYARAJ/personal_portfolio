@@ -11,16 +11,19 @@ export const viewport: Viewport = {
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://javiyaraj.dev'),
-  title: 'Javiya Raj — Senior Flutter Developer | Cross-Platform Mobile Apps',
+  title: 'Javiya Raj — Senior Mobile Developer | Native Android & Flutter',
   description:
-    'Senior Flutter developer with 4+ years experience shipping 15+ production apps. Expert in Flutter, Dart, Kotlin, Clean Architecture & BLoC. Available for freelance.',
+    'Senior Mobile Developer with 4+ years experience shipping 15+ production apps. Expert in Native Android (Kotlin, Jetpack Compose), Flutter, Dart & Clean Architecture. Available for freelance.',
   keywords: [
+    'Mobile developer',
+    'Android developer',
     'Flutter developer',
-    'Flutter freelancer',
-    'cross-platform mobile developer',
-    'Dart developer',
     'Kotlin developer',
+    'Jetpack Compose',
     'Clean Architecture',
+    'MVVM',
+    'Dart developer',
+    'cross-platform mobile developer',
     'Supabase',
     'BLoC',
     'mobile app development',
@@ -41,9 +44,9 @@ export const metadata: Metadata = {
     },
   },
   openGraph: {
-    title: 'Javiya Raj — Senior Flutter Developer',
+    title: 'Javiya Raj — Senior Mobile Developer (Android & Flutter)',
     description:
-      '4+ years · 15+ production apps · Flutter, Dart, Kotlin, Clean Architecture. Available for freelance.',
+      '4+ years · 15+ production apps · Native Android (Kotlin, Compose) & Cross-Platform (Flutter, Dart). Available for freelance.',
     url: 'https://javiyaraj.dev',
     siteName: 'Javiya Raj Portfolio',
     locale: 'en_US',
@@ -53,15 +56,15 @@ export const metadata: Metadata = {
         url: '/opengraph-image',
         width: 1200,
         height: 630,
-        alt: 'Javiya Raj — Senior Flutter Developer',
+        alt: 'Javiya Raj — Senior Mobile Developer (Android & Flutter)',
       },
     ],
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Javiya Raj — Senior Flutter Developer',
+    title: 'Javiya Raj — Senior Mobile Developer (Android & Flutter)',
     description:
-      '4+ years · 15+ production apps · Flutter, Dart, Kotlin. Available for freelance.',
+      '4+ years · 15+ production apps · Native Android (Kotlin/Compose) & Flutter. Available for freelance.',
     creator: '@Rjcoding',
     images: ['/opengraph-image'],
   },
@@ -99,15 +102,27 @@ export default function RootLayout({
             '@type': 'Person',
             name: 'Javiya Raj',
             url: 'https://javiyaraj.dev',
-            jobTitle: 'Senior Flutter Developer',
+            jobTitle: 'Senior Mobile Developer',
             description:
-              'Senior Flutter developer with 4+ years of experience shipping 15+ production-grade cross-platform mobile apps.',
+              'Senior Mobile Developer with 4+ years of experience architecting and shipping 15+ production-grade Native Android and Flutter apps.',
             sameAs: [
               'https://github.com/JAVIYARAJ',
               'https://linkedin.com/in/javiyaraj/',
               'https://x.com/Rjcoding',
             ],
-            knowsAbout: ['Flutter', 'Dart', 'Kotlin', 'Clean Architecture', 'Supabase', 'BLoC', 'Android SDK'],
+            knowsAbout: [
+              'Kotlin',
+              'Jetpack Compose',
+              'Android SDK',
+              'Flutter',
+              'Dart',
+              'Clean Architecture',
+              'MVVM',
+              'BLoC',
+              'Retrofit',
+              'Room',
+              'Supabase',
+            ],
             email: 'javiyaraj4@gmail.com',
           })}
         </Script>

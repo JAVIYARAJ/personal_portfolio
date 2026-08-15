@@ -1,11 +1,11 @@
 import { ImageResponse } from 'next/og'
 
 export const runtime = 'edge'
-export const alt = 'Javiya Raj — Flutter Developer'
+export const alt = 'Javiya Raj — Senior Mobile Developer (Android & Flutter)'
 export const size = { width: 1200, height: 630 }
 export const contentType = 'image/png'
 
-const stack = ['Flutter', 'Dart', 'Clean Architecture', 'Supabase', 'BLoC', 'Kotlin']
+const stack = ['Native Android', 'Kotlin', 'Jetpack Compose', 'Flutter', 'Dart', 'Clean Architecture']
 const stats = [
   { value: '15+', label: 'Apps' },
   { value: '4+', label: 'Years' },
@@ -97,7 +97,7 @@ export default async function Image() {
                   color: '#8b8f9a',
                 }}
               >
-                Senior Flutter Developer
+                Senior Mobile Developer
               </span>
             </div>
 
@@ -130,7 +130,7 @@ export default async function Image() {
                 display: 'flex',
               }}
             >
-              Building high-performance cross-platform apps with Clean Architecture since 2021.
+              Architecting Native Android & Cross-Platform mobile apps with Clean Architecture since 2021.
             </div>
           </div>
 
