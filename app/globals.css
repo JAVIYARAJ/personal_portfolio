@@ -4,48 +4,48 @@
 :root {
   --font-heading: 'Iowan Old Style', 'Palatino Linotype', 'Book Antiqua', 'Georgia', serif;
 
-  /* Dark base */
-  --background: #08090c;
-  --foreground: #e7e9ee;
-  --card: #0e1016;
-  --card-foreground: #e7e9ee;
-  --popover: #0e1016;
-  --popover-foreground: #e7e9ee;
-  --primary: #e7e9ee;
-  --primary-foreground: #08090c;
-  --secondary: #15171f;
-  --secondary-foreground: #e7e9ee;
-  --muted: #8b8f9a;
-  --muted-foreground: #8b8f9a;
+  /* Minimalist Zinc & Emerald */
+  --background: #09090b;
+  --foreground: #fafafa;
+  --card: #18181b;
+  --card-foreground: #fafafa;
+  --popover: #18181b;
+  --popover-foreground: #fafafa;
+  --primary: #fafafa;
+  --primary-foreground: #09090b;
+  --secondary: #27272a;
+  --secondary-foreground: #fafafa;
+  --muted: #a1a1aa;
+  --muted-foreground: #a1a1aa;
 
-  /* Accent: violet -> cyan */
-  --accent: #7c5cff;
-  --accent-2: #22d3ee;
+  /* Accent: Emerald */
+  --accent: #10b981;
+  --accent-2: #059669;
   --accent-foreground: #ffffff;
-  --grad-accent: linear-gradient(100deg, #7c5cff 0%, #22d3ee 100%);
+  --grad-accent: linear-gradient(100deg, #10b981 0%, #059669 100%);
 
-  --destructive: #f4633a;
+  --destructive: #ef4444;
   --destructive-foreground: #ffffff;
   --border: rgba(255, 255, 255, 0.08);
   --input: rgba(255, 255, 255, 0.04);
-  --ring: #7c5cff;
-  --chart-1: #7c5cff;
-  --chart-2: #22d3ee;
+  --ring: #10b981;
+  --chart-1: #10b981;
+  --chart-2: #059669;
   --chart-3: #d5a24a;
   --chart-4: #f4633a;
   --chart-5: #6d8262;
   --radius: 1rem;
-  --sidebar: #0e1016;
-  --sidebar-foreground: #e7e9ee;
-  --sidebar-primary: #e7e9ee;
-  --sidebar-primary-foreground: #08090c;
-  --sidebar-accent: #15171f;
-  --sidebar-accent-foreground: #e7e9ee;
+  --sidebar: #18181b;
+  --sidebar-foreground: #fafafa;
+  --sidebar-primary: #fafafa;
+  --sidebar-primary-foreground: #09090b;
+  --sidebar-accent: #27272a;
+  --sidebar-accent-foreground: #fafafa;
   --sidebar-border: rgba(255, 255, 255, 0.08);
-  --sidebar-ring: #7c5cff;
-  --accent-blue: #7c5cff;
-  --accent-cyan: #22d3ee;
-  --accent-purple: #a855f7;
+  --sidebar-ring: #10b981;
+  --accent-blue: #3b82f6;
+  --accent-cyan: #06b6d4;
+  --accent-purple: #8b5cf6;
   --glass-border: rgba(255, 255, 255, 0.08);
 }
 
