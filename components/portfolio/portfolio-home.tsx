@@ -2,171 +2,517 @@
 
 import NextImage from 'next/image'
 import type { GitHubStats, Repo } from '@/lib/github'
-import type { ChangeEvent, FormEvent, KeyboardEvent as ReactKeyboardEvent, ReactNode } from 'react'
-import { useEffect, useMemo, useRef, useState } from 'react'
-import { AnimatePresence, animate, motion, useInView, useMotionTemplate, useMotionValue, useReducedMotion, useScroll, useSpring, useTransform } from 'framer-motion'
+import type { ChangeEvent, FormEvent, ReactNode } from 'react'
+import { useEffect, useRef, useState } from 'react'
+import { createPortal } from 'react-dom'
+import { AnimatePresence, motion, useReducedMotion } from 'framer-motion'
 import type { LucideIcon } from 'lucide-react'
 import {
   Activity,
+  Anvil,
   Apple,
   ArrowRight,
   ArrowUp,
   ArrowUpRight,
+  BatteryFull,
   Boxes,
   CalendarDays,
   Check,
   ChevronLeft,
   ChevronRight,
   CircuitBoard,
-  Command,
   Copy,
-  CornerDownLeft,
+  Cpu,
   Database,
   Download,
   ExternalLink,
+  FileText,
   GitBranch,
   Github,
-  Hash,
-  Images,
+  Globe,
+  History,
+  House,
+  LayoutGrid,
   Layers3,
   Linkedin,
   Mail,
-  Menu,
+  MessageCircle,
   Play,
   Rocket,
-  Search,
   Send,
+  Server,
   ShieldCheck,
+  SignalHigh,
   Smartphone,
   Sparkles,
   Star,
+  Trophy,
   Twitter,
+  Wifi,
   Workflow,
   X,
   Zap,
 } from 'lucide-react'
 
 const emailAddress = 'javiyaraj4@gmail.com'
+const resumeUrl = '/resume.pdf'
 
-const navigation = [
-  { label: 'About', href: '#about' },
-  { label: 'Projects', href: '#projects' },
-  { label: 'Skills', href: '#skills' },
-  { label: 'Experience', href: '#experience' },
-  { label: 'Achievements', href: '#achievements' },
-  { label: 'Services', href: '#services' },
-  { label: 'Contact', href: '#contact' },
-]
-
-const heroFacts = [
-  '15+ Production Apps',
-  '4+ Years Experience',
-  'Native & Cross-Platform',
-]
-
-const marqueeTech = [
-  'Kotlin',
-  'Jetpack Compose',
-  'Flutter',
-  'Dart',
-  'Clean Architecture (MVVM)',
-  'Coroutines & StateFlow',
-  'BLoC / Cubit',
-  'Hilt & Dagger',
-  'Retrofit & Room',
-  'Supabase',
-  'Firebase FCM',
-  'CI/CD (Gradle & Actions)',
-  'Material Design 3',
-  'GetIt',
-]
-
-// Only tilted/framed mockups here — Dyshez shots are straight-vertical and would
-// look inconsistent in the floating hero device.
-const heroShots = [
-  '/projects/split-ease/mockup-1.webp',
-  '/projects/pocket-score/mockup-1.webp',
-  '/projects/split-ease/mockup-3.webp',
-  '/projects/pocket-score/mockup-3.webp',
-]
-
-const experienceHighlights = [
-  '15+ production applications',
-  '95% on-time release rate',
-  'Native Android & Flutter mastery',
-]
-
-const socialLinks = [
-  { label: 'GitHub', href: 'https://github.com/JAVIYARAJ', icon: Github },
-  { label: 'LinkedIn', href: 'https://linkedin.com/in/javiyaraj/', icon: Linkedin },
-  { label: 'Twitter', href: 'https://x.com/Rjcoding', icon: Twitter },
-  { label: 'Email', href: `mailto:${emailAddress}?subject=Portfolio Inquiry`, icon: Mail },
-]
-
-// Free scheduling link. Create a free booking page on Cal.com (cal.com/signup)
-// or Google Calendar "Appointment schedules" and paste the public URL here.
+// Free scheduling link (Cal.com).
 const bookingUrl = 'https://cal.com/raj-javiya-qkewzq/30min'
 
-type StoreLink = {
-  app: string
-  sub: string
-  rating: string | null
-  href: string
-  icon: LucideIcon
-}
-
-// Real, publicly verifiable listings (no placeholder testimonials).
-const storeLinks: StoreLink[] = [
-  {
-    app: 'Dyshez',
-    sub: 'Download on the App Store',
-    rating: '4.8',
-    href: 'https://apps.apple.com/in/app/dyshez/id6474236767',
-    icon: Apple,
-  },
-  {
-    app: 'Dyshez',
-    sub: 'Get it on Google Play',
-    rating: '4.8',
-    href: 'https://play.google.com/store/apps/details?id=com.dyshez.app',
-    icon: Play,
-  },
-  {
-    app: 'Goals.com',
-    sub: 'Visit the live website',
-    rating: null,
-    href: 'https://www.goals.com/',
-    icon: ExternalLink,
-  },
+const socialLinks = [
+  { label: 'GitHub', href: 'https://github.com/JAVIYARAJ', icon: Github, tile: '#101114' },
+  { label: 'LinkedIn', href: 'https://linkedin.com/in/javiyaraj/', icon: Linkedin, tile: '#0a66c2' },
+  { label: 'Email', href: `mailto:${emailAddress}?subject=Portfolio Inquiry`, icon: Mail, tile: '#2f5bff' },
+  { label: 'X / Twitter', href: 'https://x.com/Rjcoding', icon: Twitter, tile: '#101114' },
 ]
 
-const proofPoints = [
-  { value: '4.8★', label: 'App Store rating' },
-  { value: '10K+', label: 'Active users' },
+// Bottom tab bar. Every section on the page maps to one tab so the active
+// state stays meaningful while scrolling through the in-between sections.
+const tabs = [
+  { id: 'home', label: 'Home', icon: House },
+  { id: 'projects', label: 'Apps', icon: LayoutGrid },
+  { id: 'skills', label: 'Skills', icon: Layers3 },
+  { id: 'experience', label: 'Journey', icon: History },
+  { id: 'contact', label: 'Contact', icon: MessageCircle },
+]
+
+const sectionToTab: Record<string, string> = {
+  home: 'home',
+  about: 'home',
+  projects: 'projects',
+  'open-source': 'projects',
+  skills: 'skills',
+  experience: 'experience',
+  achievements: 'experience',
+  services: 'contact',
+  contact: 'contact',
+}
+
+const heroStats = [
+  { value: '4+', label: 'Years building apps' },
   { value: '15+', label: 'Apps shipped' },
-  { value: '2', label: 'App stores live' },
+  { value: '10K+', label: 'Active users' },
+  { value: '4.8★', label: 'App Store rating' },
 ]
 
 const aboutFeatures = [
   {
-    title: 'Performance & Profiling',
-    description: 'Achieving 60fps smoothness with Baseline Profiles and Android Studio Profiler.',
+    title: 'Smooth performance',
+    description: '60fps UIs, tuned with Baseline Profiles and the Android Studio Profiler.',
     icon: Zap,
   },
   {
-    title: 'Clean Architecture (MVVM)',
-    description: 'Unidirectional data flows, decoupled layers, and feature-first modularization.',
+    title: 'Clean Architecture',
+    description: 'MVVM, unidirectional data flow, and feature-first modules that stay easy to change.',
     icon: ShieldCheck,
   },
   {
-    title: 'Native & Cross-Platform',
-    description: 'Dual-stack expertise across Native Android (Kotlin/Compose) and Flutter (Dart).',
+    title: 'Native & cross-platform',
+    description: 'Native Android with Kotlin & Compose, and Flutter for iOS + Android from one codebase.',
     icon: Smartphone,
   },
   {
-    title: 'CI/CD & Delivery',
-    description: 'Automated release pipelines with Gradle, GitHub Actions, and store deployment.',
+    title: 'Reliable delivery',
+    description: 'Automated CI/CD with Gradle and GitHub Actions, all the way to the stores.',
     icon: Workflow,
+  },
+]
+
+type ProjectLink = {
+  label: string
+  href: string
+  icon: LucideIcon
+}
+
+type Project = {
+  slug: string
+  name: string
+  homeLabel: string
+  category: string
+  type: string
+  platform: string
+  description: string
+  tags: string[]
+  stats: { label: string; value: string }[]
+  impact: string
+  accent: string
+  icon: LucideIcon
+  links: ProjectLink[]
+  appIcon?: string
+  appIconWide?: boolean
+  mockups?: string[]
+  // One caption per mockup, shown as numbered workflow steps.
+  mockupCaptions?: string[]
+  // Desktop/web screenshots (wide) rather than phone screens (tall).
+  landscapeMockups?: boolean
+  inProgress?: boolean
+}
+
+const shots = (dir: string, count: number) =>
+  Array.from({ length: count }, (_, i) => `/projects/${dir}/mockup-${i + 1}.webp`)
+
+const projects: Project[] = [
+  {
+    slug: 'dyshez',
+    name: 'Dyshez',
+    homeLabel: 'Dyshez',
+    category: 'Food delivery',
+    type: 'Esparkbiz',
+    platform: 'Flutter',
+    description:
+      'A full-stack food delivery app with a Supabase backend (real-time orders on Postgres) and a custom rewards & loyalty system. Live on both the App Store and Google Play.',
+    tags: ['Flutter', 'Dart', 'Supabase (Postgres)', 'Clean Architecture', 'CI/CD', 'Sentry', 'Clarity'],
+    stats: [
+      { label: 'Users', value: '10K+' },
+      { label: 'Rating', value: '4.8★' },
+    ],
+    impact: 'Drove a 30% increase in repeat orders with modular rewards and real-time ordering.',
+    accent: '#d5a24a',
+    icon: Smartphone,
+    appIcon: '/projects/dyshez/icon.png',
+    mockups: shots('dyshez', 5),
+    links: [
+      { label: 'App Store', href: 'https://apps.apple.com/in/app/dyshez/id6474236767', icon: Apple },
+      { label: 'Google Play', href: 'https://play.google.com/store/apps/details?id=com.dyshez.app', icon: Play },
+    ],
+  },
+  {
+    slug: 'splitease',
+    name: 'SplitEase',
+    homeLabel: 'SplitEase',
+    category: 'Finance · Group expenses',
+    type: 'Personal',
+    platform: 'Flutter',
+    description:
+      'Split expenses with friends and groups. Invite people, track who owes what, and keep everything in sync in real time — with Owner, Admin, and Member roles for fine-grained permissions.',
+    tags: ['Flutter', 'Supabase', 'Edge Functions', 'Real-time Sync', 'Custom Animations', 'Clean Architecture', 'GetIt'],
+    stats: [
+      { label: 'Tracking', value: '+50%' },
+      { label: 'Sync', value: 'Real-time' },
+    ],
+    impact: 'Designed a scalable group system with multi-level role permissions and instant sync.',
+    accent: '#d98f6b',
+    icon: Layers3,
+    appIcon: '/projects/split-ease/icon.png',
+    mockups: shots('split-ease', 17),
+    links: [],
+  },
+  {
+    slug: 'pocket-score',
+    name: 'Pocket Score',
+    homeLabel: 'Pocket Score',
+    category: 'Sports · Cricket',
+    type: 'Personal',
+    platform: 'Flutter',
+    description:
+      'Live cricket scoring for gully matches. Ball-by-ball scoring with animated FOUR/SIX celebrations, squads, coin toss, wickets, and player rankings — and it all works fully offline.',
+    tags: ['Flutter', 'Dart', 'Hive', 'Offline-first', 'Custom Animations', 'Clean Architecture'],
+    stats: [
+      { label: 'Screens', value: '16+' },
+      { label: 'Offline', value: '100%' },
+    ],
+    impact: 'Built the full match lifecycle — setup, live scoring, scorecard — offline, with smooth animated feedback.',
+    accent: '#7c6fcf',
+    icon: Sparkles,
+    appIcon: '/projects/pocket-score/icon.png',
+    mockups: shots('pocket-score', 16),
+    links: [],
+  },
+  {
+    slug: 'goals',
+    name: 'Goals.com',
+    homeLabel: 'Goals',
+    category: 'CRM · Sales goals',
+    type: 'Esparkbiz',
+    platform: 'Android',
+    description:
+      'A high-scale CRM app for goal tracking and incentive management. Built natively with Kotlin and MVVM, with Retrofit caching, Room, and Coroutines/Flow for async work.',
+    tags: ['Kotlin', 'Jetpack Compose', 'MVVM', 'Coroutines & Flow', 'Retrofit & Room', 'Firebase FCM'],
+    stats: [
+      { label: 'Processing', value: '−25%' },
+      { label: 'Sales', value: '+30%' },
+    ],
+    impact: 'Cut processing time by 25% through optimized networking and async work, and lifted FCM engagement by 15%.',
+    accent: '#8b6d5c',
+    icon: Database,
+    appIcon: '/projects/goals/icon.svg',
+    appIconWide: true,
+    links: [{ label: 'Website', href: 'https://www.goals.com/', icon: ExternalLink }],
+  },
+  {
+    slug: 'smackdab',
+    name: 'Smackdab',
+    homeLabel: 'Smackdab',
+    category: 'Sales productivity',
+    type: 'Esparkbiz',
+    platform: 'Flutter',
+    description:
+      'A mobile sales tool with a custom calendar, reusable UI components, and adaptive layouts for phones and tablets.',
+    tags: ['Flutter', 'Custom Calendar', 'Adaptive Layouts', 'Reactive Data Flow'],
+    stats: [
+      { label: 'Efficiency', value: '+40%' },
+      { label: 'Sales', value: '+25%' },
+    ],
+    impact: 'Raised team efficiency by 40% and overall sales by 25% with a mobile-first, component-driven workflow.',
+    accent: '#6d8262',
+    icon: Activity,
+    appIcon: '/projects/smackdab/icon.svg',
+    appIconWide: true,
+    links: [],
+  },
+  {
+    slug: 'krushna-forge',
+    name: 'Krushna Forge Admin',
+    homeLabel: 'Krushna',
+    category: 'Admin panel · Billing & stock',
+    type: 'Client',
+    platform: 'Web',
+    description:
+      'A private admin panel and billing system for a forging company in Rajkot. It brings stock, production, GST billing, payments, purchases, expenses, staff salary, and monthly profit into one app that works in any browser — on a computer or a phone.',
+    tags: ['Next.js', 'Role-based Access', 'GST Invoicing', 'Stock Tracking', 'P&L Reports', 'Audit Log', 'Responsive'],
+    stats: [
+      { label: 'Modules', value: '9' },
+      { label: 'User roles', value: '3' },
+    ],
+    impact:
+      'Designed the full system: owner-controlled users and permissions, stock that balances itself (inward − outward − rejection), GST invoices in the client’s own format, and a monthly P&L built automatically.',
+    accent: '#d9662c',
+    icon: Anvil,
+    appIcon: '/projects/krushna-forge/icon.png',
+    appIconWide: true,
+    inProgress: true,
+    landscapeMockups: true,
+    mockups: [
+      'login',
+      'home',
+      'orders',
+      'order-detail',
+      'production',
+      'production-days',
+      'daily-entry',
+      'billing',
+      'payments',
+      'pl-report',
+      'pl-month',
+      'pl-year',
+      'products',
+      'staff',
+      'audit-log',
+    ].map((name, i) => `/projects/krushna-forge/${String(i + 1).padStart(2, '0')}-${name}.webp`),
+    mockupCaptions: [
+      'Private login — no public sign-up',
+      'Home: today’s work at a glance',
+      'Orders from raw material to completion',
+      'Order detail with production progress',
+      'Daily production for the month',
+      'Day-wise earnings and production days',
+      'Daily entry: one row per order',
+      'GST bills made from completed orders',
+      'Payments received against bills',
+      'P&L report, built automatically',
+      'Month breakdown: turnover, expenses, salary',
+      'Month-wise P&L for the financial year',
+      'Products with HSN/SAC and GST rate',
+      'Staff and monthly salary',
+      'Audit log: who changed what, and when',
+    ],
+    links: [{ label: 'Company website', href: 'https://www.krushnaforge.com/', icon: ExternalLink }],
+  },
+  {
+    slug: 'feature-gate-pro',
+    name: 'FeatureGate Pro',
+    homeLabel: 'FeatureGate',
+    category: 'Flutter SDK · Open source',
+    type: 'Open Source',
+    platform: 'Flutter',
+    description:
+      'A production-ready feature flag SDK for Flutter. Its merge engine combines local JSON, Firebase Remote Config, and custom REST APIs — with percentage rollouts and audience targeting.',
+    tags: ['Flutter', 'Dart', 'SDK', 'Firebase Remote Config', 'REST API', 'Audience Targeting'],
+    stats: [
+      { label: 'Package', value: 'pub.dev' },
+      { label: 'License', value: 'Open' },
+    ],
+    impact: 'Built an enterprise-grade flag SDK with a cascading merge engine, targeting, and analytics sampling.',
+    accent: '#02569B',
+    icon: Boxes,
+    links: [{ label: 'pub.dev', href: 'https://pub.dev/packages/feature_gate_pro', icon: ExternalLink }],
+  },
+  {
+    slug: 'orbit',
+    name: 'ORBIT',
+    homeLabel: 'Orbit',
+    category: 'Developer productivity',
+    type: 'Personal',
+    platform: 'Web',
+    description:
+      'A self-hosted workspace for developers that replaces six everyday tools: projects, tasks, notes, secrets, time tracking, and dev utilities — in one fast, keyboard-first app.',
+    tags: ['React 19', 'Vite', 'Supabase', 'PostgreSQL', 'AES-256', 'Keyboard-first'],
+    stats: [
+      { label: 'Modules', value: '10+' },
+      { label: 'Replaces', value: '6 tools' },
+    ],
+    impact: 'Combined 6+ tools into one app, with a client-side encrypted secrets vault and a real-time backend.',
+    accent: '#5b7fa6',
+    icon: Workflow,
+    links: [{ label: 'Live site', href: 'https://orbit-sand-alpha.vercel.app/', icon: ExternalLink }],
+  },
+]
+
+type SkillLevel = 'Expert' | 'Proficient' | 'Familiar'
+
+type SkillGroup = {
+  title: string
+  description: string
+  icon: LucideIcon
+  color: string
+  skills: string[]
+  level: SkillLevel
+}
+
+const skillGroups: SkillGroup[] = [
+  {
+    title: 'Native Android',
+    description: 'Kotlin, Jetpack Compose, and the Android SDK.',
+    icon: Smartphone,
+    color: '#16a34a',
+    level: 'Expert',
+    skills: [
+      'Kotlin',
+      'Jetpack Compose',
+      'MVVM',
+      'ViewModel & StateFlow',
+      'Coroutines',
+      'Navigation Compose',
+      'WorkManager',
+      'LiveData',
+      'Android SDK',
+      'Java',
+    ],
+  },
+  {
+    title: 'Flutter',
+    description: 'Cross-platform apps, custom widgets, and platform channels.',
+    icon: CircuitBoard,
+    color: '#0284c7',
+    level: 'Expert',
+    skills: ['Flutter', 'Dart', 'BLoC / Cubit', 'Riverpod', 'GetX / Provider', 'Shorebird (OTA)', 'Custom Animations', 'Responsive UI'],
+  },
+  {
+    title: 'Web',
+    description: 'Web platforms and admin panels with React, Next.js and Node.js.',
+    icon: Globe,
+    color: '#0d9488',
+    level: 'Proficient',
+    skills: ['React', 'Next.js', 'Node.js', 'TypeScript', 'Tailwind CSS', 'Vite', 'Framer Motion', 'Vercel'],
+  },
+  {
+    title: 'Architecture',
+    description: 'Code that stays easy to test and change as the app grows.',
+    icon: Layers3,
+    color: '#7c3aed',
+    level: 'Expert',
+    skills: ['Clean Architecture', 'Feature-first Modules', 'Hilt / Dagger', 'GetIt', 'Repository Pattern', 'SOLID'],
+  },
+  {
+    title: 'Data & APIs',
+    description: 'Databases, APIs, offline-first data layers and real-time sync.',
+    icon: Database,
+    color: '#ea580c',
+    level: 'Proficient',
+    skills: ['Retrofit', 'Room', 'DataStore', 'GraphQL (Apollo)', 'Firebase', 'Supabase / PostgreSQL', 'MySQL', 'MongoDB', 'Hive / SQLite'],
+  },
+  {
+    title: 'Testing & Delivery',
+    description: 'Automated tests, profiling, and CI/CD release pipelines.',
+    icon: ShieldCheck,
+    color: '#db2777',
+    level: 'Proficient',
+    skills: [
+      'JUnit & Espresso',
+      'Compose UI Testing',
+      'Flutter Widget Tests',
+      'Android Studio Profiler',
+      'Baseline Profiles',
+      'GitHub Actions & Gradle',
+      'Play Store & App Store',
+    ],
+  },
+  {
+    title: 'AI & Tools',
+    description: 'AI-assisted workflows for faster, higher-quality delivery.',
+    icon: Sparkles,
+    color: '#4f46e5',
+    level: 'Proficient',
+    skills: ['Claude', 'Cursor', 'Antigravity', 'Gemini', 'Figma to Compose', 'Git / GitHub'],
+  },
+]
+
+const experiences = [
+  {
+    company: 'Esparkbiz',
+    role: 'Senior Mobile Developer',
+    duration: 'Sep 2023 – Present',
+    summary:
+      'Building and shipping production apps for Android and iOS with Flutter — and going native with Kotlin and Jetpack Compose when a feature needs the platform.',
+    bullets: [
+      'Built and shipped production Flutter apps with Clean Architecture, MVVM and feature-first modules — easier to maintain and faster to ship new features.',
+      'Brought BLoC/Cubit state management to the team, improving testability and cutting state-related bugs caught in code review.',
+      'Built native Android features in Kotlin, Java and Jetpack Compose wherever the app needed platform-specific capabilities.',
+      'Turned Figma designs into responsive, pixel-accurate UIs with custom animations that run smoothly on Android and iOS.',
+      'Integrated REST and GraphQL APIs, Supabase and Firebase (Auth, Firestore, FCM) behind a repository layer for offline resilience.',
+      'Owned App Store and Play Store releases end to end — versioning, staged rollouts and release notes — on GitHub Actions CI/CD.',
+      'Led architecture and code-quality reviews, joined client requirement discussions, and mentored two junior developers.',
+    ],
+  },
+  {
+    company: 'Esparkbiz',
+    role: 'Software Developer Intern',
+    duration: 'Jan 2023 – Sep 2023',
+    summary: 'Built and refactored features across production mobile apps in an Agile team.',
+    bullets: [
+      'Refactored core features across production apps, improving maintainability by 30%.',
+      'Optimized UI rendering and async work, contributing to a 25% lift in user engagement in three months.',
+      'Wrote unit and UI tests (JUnit, Compose UI testing, Flutter widget tests).',
+    ],
+  },
+  {
+    company: 'Freelance',
+    role: 'Independent Mobile Developer',
+    duration: 'Jun 2021 – Dec 2022',
+    summary: 'Built native Android modules and cross-platform app features for clients.',
+    bullets: [
+      'Built native Android modules and components with Kotlin and Java.',
+      'Delivered MVP modules for clients, including native platform-channel bridges.',
+      'Adopted Jetpack Compose early to keep UI consistent across platforms.',
+    ],
+  },
+]
+
+const achievements = [
+  {
+    title: 'GitHub Copilot “Finish-Up-A-Thon”',
+    source: 'GitHub & DEV Community',
+    label: 'Challenge completion badge',
+    image: '/copilot-badge.png',
+    imageAlt: 'GitHub Copilot Finish-Up-A-Thon Challenge Completion Badge',
+    description:
+      'Revived and finished a side project using GitHub Copilot, as part of a global challenge on AI-assisted engineering.',
+    highlights: ['AI-assisted engineering', 'Side-project revival', 'Published on DEV'],
+    links: [
+      { label: 'View on DEV', href: 'https://dev.to/raj_javiya' },
+      { label: 'LinkedIn post', href: 'https://www.linkedin.com/feed/update/urn:li:activity:7479166408308711425/' },
+    ],
+  },
+  {
+    title: 'DEV Weekend Challenge',
+    source: 'DEV Community',
+    label: 'Weekend challenge award',
+    image: '/dev-weekend-badge.png',
+    imageAlt: 'DEV Weekend Challenge Completion Badge',
+    description: 'Awarded for completing a DEV Weekend Challenge — planning, building, and shipping in a single weekend.',
+    highlights: ['Rapid prototyping', 'Shipped in a weekend', 'Community participant'],
+    links: [{ label: 'View on DEV', href: 'https://dev.to/raj_javiya' }],
   },
 ]
 
@@ -179,533 +525,53 @@ type Service = {
 
 const services: Service[] = [
   {
-    title: 'Native & Cross-Platform App Dev',
+    title: 'Flutter app development',
     description:
-      'End-to-end mobile apps built with Native Android (Kotlin, Jetpack Compose) or Flutter — from architecture to store launch.',
+      'One codebase for iOS and Android — from Figma designs to a store-ready app, or a fast MVP that can grow into the full product.',
     icon: Smartphone,
-    deliverables: ['Native Android (Kotlin)', 'Flutter iOS & Android', 'Store submissions'],
+    deliverables: ['iOS & Android from one codebase', 'Clean Architecture + BLoC/Cubit', 'MVP to full product'],
   },
   {
-    title: 'Mobile Architecture & Code Audits',
+    title: 'Native Android development',
     description:
-      'Clean Architecture (MVVM) implementation, state management refactoring, and quality audits for mobile applications.',
+      'Kotlin and Jetpack Compose apps with MVVM — or native modules when a Flutter app needs platform-specific features.',
+    icon: Cpu,
+    deliverables: ['Kotlin & Jetpack Compose', 'Native modules for Flutter apps', 'Retrofit, Room & FCM'],
+  },
+  {
+    title: 'Web platforms & admin panels',
+    description:
+      'Dashboards and back-office tools with React and Next.js: billing, stock, reports, and role-based access for your team.',
+    icon: Globe,
+    deliverables: ['Next.js / React', 'Role-based access & audit logs', 'Reports, billing & exports'],
+  },
+  {
+    title: 'Backend & API integration',
+    description:
+      'Connect your app to REST or GraphQL APIs, Supabase or Firebase — with login, real-time updates and push notifications.',
+    icon: Server,
+    deliverables: ['REST & GraphQL APIs', 'Supabase / Firebase / Node.js', 'Auth, real-time & push (FCM)'],
+  },
+  {
+    title: 'Architecture & code review',
+    description:
+      'A review of your existing app: structure, state management and performance — with a clear plan to fix what slows your team down.',
     icon: ShieldCheck,
-    deliverables: ['Clean Architecture (MVVM)', 'StateFlow / BLoC audit', 'Codebase refactoring'],
+    deliverables: ['Codebase & architecture audit', 'State management refactor', 'Performance fixes'],
   },
   {
-    title: 'Native Integration & Platform Bridges',
+    title: 'App Store & Play Store release',
     description:
-      'Integrating native Android services (Retrofit, Room, FCM) with Flutter via Platform Channels, or native module integration.',
-    icon: Layers3,
-    deliverables: ['Platform channel bridges', 'Native Android modules', 'Zero-downtime rollout'],
-  },
-  {
-    title: 'MVP & Rapid Mobile Delivery',
-    description:
-      'Validate your vision fast with a production-grade mobile prototype — built to scale seamlessly into your core product.',
+      'Get your app published and keep releases smooth: store listings, versioning, staged rollouts and automated CI/CD builds.',
     icon: Rocket,
-    deliverables: ['Production MVP', 'Scalable architecture', 'Fast iteration'],
+    deliverables: ['Store submission & review', 'Staged rollouts & versioning', 'CI/CD (GitHub Actions, Codemagic)'],
   },
 ]
 
-type ImpactStat = {
-  numericValue: number
-  suffix: string
-  label: string
-  sublabel: string
-  icon: LucideIcon
-}
-
-const impactStats: ImpactStat[] = [
-  {
-    numericValue: 15,
-    suffix: '+',
-    label: 'DEPLOYED APPS',
-    sublabel: 'Production Grade',
-    icon: Smartphone,
-  },
-  {
-    numericValue: 40,
-    suffix: '%',
-    label: 'DEV VELOCITY',
-    sublabel: 'Efficiency Lift',
-    icon: Zap,
-  },
-  {
-    numericValue: 99.9,
-    suffix: '%',
-    label: 'CRASH-FREE',
-    sublabel: 'Stability Index',
-    icon: ShieldCheck,
-  },
-  {
-    numericValue: 4,
-    suffix: '+',
-    label: 'YEARS EXP',
-    sublabel: 'Industrial Tenure',
-    icon: Rocket,
-  },
-]
-
-type ProjectLink = {
-  label: string
-  href: string
-  icon: LucideIcon
-}
-
-type Project = {
-  name: string
-  category: string
-  type: string
-  description: string
-  tags: string[]
-  stats: { label: string; value: string }[]
-  impact: string
-  accent: string
-  icon: LucideIcon
-  span: string
-  links: ProjectLink[]
-  appIcon?: string
-  appIconWide?: boolean
-  mockups?: string[]
-  isActive?: boolean
-}
-
-const projects: Project[] = [
-  {
-    name: 'ORBIT',
-    category: 'Developer OS / Productivity',
-    type: 'Personal',
-    description:
-      'A private, self-hosted operating system for developers — built to replace the 6+ tools a typical developer juggles daily. Projects, tasks, notes, secrets, time tracking, email templates, and developer utilities — all in one fast, keyboard-first interface.',
-    tags: [
-      'React 19',
-      'Vite',
-      'Supabase',
-      'PostgreSQL',
-      'AES-256 Encryption',
-      'Self-hosted',
-      'Keyboard-first',
-      'Vercel',
-    ],
-    stats: [
-      { label: 'Modules', value: '10+' },
-      { label: 'Tools replaced', value: '6+' },
-    ],
-    impact:
-      'Collapsed 6+ developer tools into one self-hosted, keyboard-first OS — with client-side encrypted secrets vault and a real-time Supabase backend.',
-    accent: '#5b7fa6',
-    icon: Workflow,
-    span: 'lg:col-span-12',
-    links: [],
-  },
-  {
-    name: 'FEATURE GATE PRO',
-    category: 'Flutter SDK / Package',
-    type: 'Open Source',
-    description:
-      'A high-performance, robust, and extensible Feature Flag SDK for Flutter. FeatureGate Pro is designed for enterprise and production scale, offering a unified Merge Engine that seamlessly cascades between Local JSON configs, Firebase Remote Config, and custom REST APIs.',
-    tags: [
-      'Flutter',
-      'Dart',
-      'SDK',
-      'Firebase Remote Config',
-      'REST API',
-      'Percentage Rollouts',
-      'Audience Targeting',
-      'Developer Dashboard',
-    ],
-    stats: [
-      { label: 'Platform', value: 'Flutter & Dart' },
-      { label: 'Distribution', value: 'pub.dev' },
-    ],
-    impact:
-      'Engineered an enterprise-grade Feature Flag SDK featuring a cascade Merge Engine, audience targeting, and analytics sampling.',
-    accent: '#02569B',
-    icon: Boxes,
-    span: 'lg:col-span-12',
-    links: [
-      {
-        label: 'pub.dev',
-        href: 'https://pub.dev/packages/feature_gate_pro',
-        icon: ExternalLink,
-      },
-    ],
-  },
-  {
-    name: 'SPLITEASE',
-    category: 'FinTech / Social Expense',
-    type: 'Personal',
-    description:
-      'A comprehensive expense management engine facilitating group orchestration, peer invitations, and automated split synchronization. Features multi-tier role management (Owner, Admin, Member) with granular permission control.',
-    tags: [
-      'Flutter',
-      'Supabase',
-      'Edge Functions',
-      'Custom Animations',
-      'Real-time Sync',
-      'Complex Logic',
-      'Clean Architecture',
-      'Dependency Injection (GetIt)',
-    ],
-    stats: [
-      { label: 'Tracking', value: '+50%' },
-      { label: 'Scale', value: 'Real-time' },
-    ],
-    impact:
-      'Architected a scalable group-logic system with multi-tier role permissions and instant synchronization.',
-    accent: '#d98f6b',
-    icon: Layers3,
-    appIcon: '/projects/split-ease/icon.png',
-    mockups: [
-      '/projects/split-ease/mockup-1.webp',
-      '/projects/split-ease/mockup-2.webp',
-      '/projects/split-ease/mockup-3.webp',
-      '/projects/split-ease/mockup-4.webp',
-      '/projects/split-ease/mockup-5.webp',
-      '/projects/split-ease/mockup-6.webp',
-      '/projects/split-ease/mockup-7.webp',
-      '/projects/split-ease/mockup-8.webp',
-      '/projects/split-ease/mockup-9.webp',
-      '/projects/split-ease/mockup-10.webp',
-      '/projects/split-ease/mockup-11.webp',
-      '/projects/split-ease/mockup-12.webp',
-      '/projects/split-ease/mockup-13.webp',
-      '/projects/split-ease/mockup-14.webp',
-      '/projects/split-ease/mockup-15.webp',
-      '/projects/split-ease/mockup-16.webp',
-      '/projects/split-ease/mockup-17.webp',
-    ],
-    span: 'lg:col-span-7',
-    links: [],
-  },
-  {
-    name: 'POCKET SCORE',
-    category: 'Sports / Cricket',
-    type: 'Personal',
-    description:
-      'A real-time cricket scoring app built for gully cricket. Features live ball-by-ball scoring with animated FOUR/SIX celebrations, squad management, match setup with coin toss, wicket tracking, and player rankings — all offline-first.',
-    tags: [
-      'Flutter',
-      'Dart',
-      'Hive (Local DB)',
-      'Custom Animations',
-      'Offline First',
-      'Clean Architecture',
-      'State Management',
-    ],
-    stats: [
-      { label: 'Screens', value: '16+' },
-      { label: 'Offline', value: '100%' },
-    ],
-    impact:
-      'Crafted a full cricket match lifecycle — from squad setup to live scoring to scorecard — entirely offline with smooth animated feedback.',
-    accent: '#7c6fcf',
-    icon: Sparkles,
-    span: 'lg:col-span-5',
-    links: [],
-    appIcon: '/projects/pocket-score/icon.png',
-    mockups: [
-      '/projects/pocket-score/mockup-1.webp',
-      '/projects/pocket-score/mockup-2.webp',
-      '/projects/pocket-score/mockup-3.webp',
-      '/projects/pocket-score/mockup-4.webp',
-      '/projects/pocket-score/mockup-5.webp',
-      '/projects/pocket-score/mockup-6.webp',
-      '/projects/pocket-score/mockup-7.webp',
-      '/projects/pocket-score/mockup-8.webp',
-      '/projects/pocket-score/mockup-9.webp',
-      '/projects/pocket-score/mockup-10.webp',
-      '/projects/pocket-score/mockup-11.webp',
-      '/projects/pocket-score/mockup-12.webp',
-      '/projects/pocket-score/mockup-13.webp',
-      '/projects/pocket-score/mockup-14.webp',
-      '/projects/pocket-score/mockup-15.webp',
-      '/projects/pocket-score/mockup-16.webp',
-    ],
-  },
-  {
-    name: 'DYSHEZ',
-    category: 'Logistics / Consumer',
-    type: 'Esparkbiz',
-    description:
-      'Full-stack mobile food delivery application with Supabase-powered backend (real-time orders, Postgres DB) and custom Rewards & Loyalty system — data layer directly reimplementable with Retrofit/Room and Supabase Kotlin client.',
-    tags: [
-      'Flutter',
-      'Dart',
-      'Supabase (Postgres)',
-      'Retrofit / Room Pattern',
-      'Clean Architecture',
-      'CI/CD Pipelines',
-      'Sentry',
-      'Clarity',
-    ],
-    stats: [
-      { label: 'Scale', value: '10K+' },
-      { label: 'Rating', value: '4.8' },
-    ],
-    impact:
-      'Engineered a 30% increase in repeat orders via modular rewards and real-time ordering logic.',
-    accent: '#d5a24a',
-    icon: Smartphone,
-    appIcon: '/projects/dyshez/icon.png',
-    mockups: [
-      '/projects/dyshez/mockup-1.webp',
-      '/projects/dyshez/mockup-2.webp',
-      '/projects/dyshez/mockup-3.webp',
-      '/projects/dyshez/mockup-4.webp',
-      '/projects/dyshez/mockup-5.webp',
-    ],
-    span: 'lg:col-span-6',
-    links: [
-      {
-        label: 'App Store',
-        href: 'https://apps.apple.com/in/app/dyshez/id6474236767',
-        icon: Apple,
-      },
-      {
-        label: 'Play Store',
-        href: 'https://play.google.com/store/apps/details?id=com.dyshez.app',
-        icon: Play,
-      },
-    ],
-  },
-  {
-    name: 'SMACKDAB',
-    category: 'Sales / Productivity',
-    type: 'Esparkbiz',
-    description:
-      'Mobile sales productivity tool that boosted team efficiency by 40% and overall sales by 25%. Engineered with custom calendar modules, reusable Composables/UI components, and adaptive phone/tablet layouts.',
-    tags: [
-      'Flutter / Jetpack Compose',
-      'Modular UI Composables',
-      'Custom Calendar',
-      'Adaptive Layouts',
-      'Reactive Data Flow',
-      'Sales Intelligence',
-    ],
-    stats: [
-      { label: 'Efficiency', value: '+40%' },
-      { label: 'Sales Lift', value: '25%' },
-    ],
-    impact:
-      'Transformed sales workflows into a mobile-first, component-driven intelligent engine.',
-    accent: '#6d8262',
-    icon: Activity,
-    span: 'lg:col-span-6',
-    links: [],
-  },
-  {
-    name: 'GOALS.COM',
-    category: 'Native Android / CRM',
-    type: 'Esparkbiz',
-    description:
-      'High-scale CRM mobile app for goal tracking and incentive management driving a 30% increase in sales performance. Engineered with Kotlin, MVVM architecture, Retrofit network caching, Room, and Coroutines/Flow async handling.',
-    tags: [
-      'Kotlin Core',
-      'Jetpack Compose',
-      'MVVM Architecture',
-      'Coroutines & Flow',
-      'Retrofit & Room',
-      'Firebase FCM',
-    ],
-    stats: [
-      { label: 'Processing', value: '-25% time' },
-      { label: 'Sales Lift', value: '+30%' },
-    ],
-    impact:
-      'Optimized network and async operations (Coroutines/Flow, Isolates), cutting processing time by 25% and boosting FCM engagement by 15%.',
-    accent: '#8b6d5c',
-    icon: Database,
-    appIcon: '/projects/goals/icon.svg',
-    appIconWide: true,
-    span: 'lg:col-span-12',
-    links: [
-      {
-        label: 'Website',
-        href: 'https://www.goals.com/',
-        icon: ExternalLink,
-      },
-    ],
-  },
-]
-
-type SkillLevel = 'Expert' | 'Proficient' | 'Familiar'
-
-type SkillGroup = {
-  title: string
-  detail: string
-  description: string
-  icon: LucideIcon
-  skills: string[]
-  level: SkillLevel
-}
-
-const skillGroups: SkillGroup[] = [
-  {
-    title: 'Native Android',
-    detail: 'Android Framework',
-    description: 'Platform-level native Android architecture with Kotlin, Jetpack Compose, MVVM, ViewModel/StateFlow, and Android SDK.',
-    icon: Smartphone,
-    level: 'Expert',
-    skills: [
-      'Kotlin Core',
-      'Jetpack Compose',
-      'MVVM Architecture',
-      'ViewModel & StateFlow',
-      'Kotlin Coroutines',
-      'Navigation Compose',
-      'WorkManager',
-      'LiveData',
-      'Android SDK',
-      'Java Legacy',
-    ],
-  },
-  {
-    title: 'Cross-Platform (Flutter)',
-    detail: 'Flutter Ecosystem',
-    description: 'Production Flutter development, custom widget architecture, reactive state management, and platform channel bridges.',
-    icon: CircuitBoard,
-    level: 'Expert',
-    skills: [
-      'Flutter',
-      'Dart',
-      'BLoC / Cubit',
-      'Riverpod',
-      'GetX / Provider',
-      'Shorebird (OTA)',
-      'Custom Animations',
-      'Adaptive / Responsive UI',
-    ],
-  },
-  {
-    title: 'Architecture & System Design',
-    detail: 'Enterprise Logic',
-    description: 'Clean Architecture, feature-first modularization, dependency injection, and unidirectional reactive data flow.',
-    icon: Layers3,
-    level: 'Expert',
-    skills: [
-      'Clean Architecture',
-      'Feature-First Modularization',
-      'Hilt / Dagger',
-      'GetIt (DI)',
-      'Repository Pattern',
-      'SOLID Principles',
-    ],
-  },
-  {
-    title: 'APIs, Storage & DB',
-    detail: 'Data Layer',
-    description: 'Offline-resilient data layers, Room/SQLite local databases, GraphQL/REST clients, and real-time backend sync.',
-    icon: Database,
-    level: 'Proficient',
-    skills: [
-      'Retrofit',
-      'Room DB',
-      'DataStore',
-      'GraphQL (Apollo)',
-      'Firebase (Auth, FCM)',
-      'Supabase / PostgreSQL',
-      'Hive / SQLite',
-    ],
-  },
-  {
-    title: 'Testing, DevOps & Quality',
-    detail: 'Testing & Delivery',
-    description: 'Automated testing discipline, performance profiling, baseline profiles, and automated CI/CD release pipelines.',
-    icon: Zap,
-    level: 'Proficient',
-    skills: [
-      'JUnit & Espresso',
-      'Compose UI Testing',
-      'Widget & Unit Testing',
-      'Android Studio Profiler',
-      'Layout Inspector & Baseline Profiles',
-      'GitHub Actions & Gradle',
-      'Play Store & App Store Deployment',
-    ],
-  },
-  {
-    title: 'AI & Engineering Tools',
-    detail: 'Developer Velocity',
-    description: 'AI-assisted workflows, code generation, and modern developer tooling for accelerated delivery.',
-    icon: Sparkles,
-    level: 'Proficient',
-    skills: ['Claude', 'Antigravity', 'Cursor', 'Gemini', 'Figma to Compose', 'Git / GitHub Workflows'],
-  },
-]
-
-const experiences = [
-  {
-    company: 'Esparkbiz',
-    role: 'Senior Mobile Developer (Android & Flutter)',
-    duration: 'Sep 2023 - Present',
-    summary:
-      'Architecting and shipping production mobile applications across Native Android (Kotlin, Jetpack Compose) and Flutter with Clean Architecture (MVVM).',
-    bullets: [
-      'Architected and shipped multiple production apps using Clean Architecture (MVVM) and feature-first modularization, cutting dev time by 20% and sustaining a 95% on-time release rate',
-      'Drove adoption of unidirectional, reactive state management (ViewModel + StateFlow/Coroutines on Android & BLoC/Cubit in Flutter), improving testability and code review quality',
-      'Translated Figma mockups into pixel-perfect, responsive UIs with 60fps smoothness using Jetpack Compose and custom Flutter animations',
-      'Integrated REST/GraphQL APIs, Supabase, and Firebase (Auth, Firestore, FCM) behind a repository-layer abstraction for offline resilience (Retrofit + Room natively on Android)',
-      'Established GitHub Actions CI/CD pipelines for automated linting, unit/UI testing, and staged production releases across Gradle and Flutter build systems',
-    ],
-  },
-  {
-    company: 'Esparkbiz',
-    role: 'Software Developer Intern',
-    duration: 'Jan 2023 - Sep 2023',
-    summary:
-      'Developed and refactored features across production mobile applications using Agile/Git workflows, boosting maintainability by 30%.',
-    bullets: [
-      'Developed and refactored core features across production mobile applications using Agile/Git workflows, improving codebase maintainability by 30%',
-      'Optimized UI rendering pipelines and async operations, contributing to a 25% lift in user engagement within three months',
-      'Wrote comprehensive unit and UI tests (JUnit, Compose UI testing, Flutter widget tests) as part of the team\'s quality-first discipline',
-    ],
-  },
-  {
-    company: 'Native Systems / Freelance',
-    role: 'Independent Mobile Developer',
-    duration: 'Jun 2021 - Dec 2022',
-    summary:
-      'Developed native Android modules using Kotlin/Java and built multi-platform mobile application components.',
-    bullets: [
-      'Architected native Android modules and components using Kotlin/Java, establishing a strong platform-level foundation',
-      'Built multi-platform MVP modules for freelance clients, mastering native platform channel bridges and cross-platform integrations',
-      'Researched and implemented modern UI patterns in Jetpack Compose to streamline cross-platform UI consistency',
-    ],
-  },
-]
-
-
-const footerLinks = [
-  {
-    title: 'Navigation',
-    links: [
-      { name: 'Architecture', href: '#about' },
-      { name: 'Prototypes', href: '#projects' },
-      { name: 'Core Engine', href: '#skills' },
-      { name: 'Stats', href: '#stats' },
-      { name: 'Achievements', href: '#achievements' },
-    ],
-  },
-  {
-    title: 'Expertise',
-    links: [
-      { name: 'Native Android Dev', href: '#top' },
-      { name: 'Flutter Dev', href: '#top' },
-      { name: 'Clean Architecture (MVVM)', href: '#about' },
-      { name: 'Performance & Profiling', href: '#stats' },
-    ],
-  },
-  {
-    title: 'Contact',
-    links: [
-      { name: 'javiyaraj4@gmail.com', href: 'mailto:javiyaraj4@gmail.com?subject=Project Inquiry' },
-      { name: 'GitHub', href: 'https://github.com/JAVIYARAJ' },
-      { name: 'LinkedIn', href: 'https://linkedin.com/in/javiyaraj/' },
-    ],
-  },
-]
+const btnPrimary =
+  'inline-flex items-center justify-center gap-2 rounded-full bg-foreground px-5 py-3 text-sm font-semibold text-background transition hover:bg-foreground/85'
+const btnSecondary =
+  'inline-flex items-center justify-center gap-2 rounded-full border border-border bg-card px-5 py-3 text-sm font-semibold text-foreground transition hover:bg-secondary'
 
 // Fire a Google Analytics (GA4) event if gtag is available. Safe no-op otherwise.
 function trackEvent(action: string, params?: Record<string, unknown>) {
@@ -726,522 +592,17 @@ function Reveal({ children, className = '', delay = 0 }: RevealProps) {
   return (
     <motion.div
       className={className}
-      initial={reduceMotion ? { opacity: 1 } : { opacity: 0, y: 24 }}
+      initial={reduceMotion ? { opacity: 1 } : { opacity: 0, y: 20 }}
       whileInView={reduceMotion ? { opacity: 1 } : { opacity: 1, y: 0 }}
-      viewport={{ once: true, amount: 0.2 }}
+      viewport={{ once: true, amount: 0.15 }}
       transition={{
-        duration: reduceMotion ? 0 : 0.65,
-        delay,
+        duration: reduceMotion ? 0 : 0.6,
+        delay: reduceMotion ? 0 : delay,
         ease: [0.22, 1, 0.36, 1],
       }}
     >
       {children}
     </motion.div>
-  )
-}
-
-function ScrollProgress() {
-  const { scrollYProgress } = useScroll()
-  const scaleX = useSpring(scrollYProgress, { stiffness: 120, damping: 30, mass: 0.3 })
-
-  return (
-    <motion.div
-      style={{ scaleX }}
-      className="grad-accent-bg fixed inset-x-0 top-0 z-[80] h-0.5 origin-left"
-    />
-  )
-}
-
-type SpotlightProps = {
-  children: ReactNode
-  className?: string
-  glow?: string
-  tilt?: boolean
-}
-
-// Card wrapper: pointer-following radial glow + subtle 3D tilt. Becomes the card surface.
-function Spotlight({ children, className = '', glow = '124,92,255', tilt = true }: SpotlightProps) {
-  const reduce = useReducedMotion()
-  const ref = useRef<HTMLDivElement>(null)
-  const px = useMotionValue(0.5)
-  const py = useMotionValue(0.5)
-  const rotateX = useSpring(useTransform(py, [0, 1], [tilt ? 5 : 0, tilt ? -5 : 0]), { stiffness: 150, damping: 18 })
-  const rotateY = useSpring(useTransform(px, [0, 1], [tilt ? -5 : 0, tilt ? 5 : 0]), { stiffness: 150, damping: 18 })
-  const gx = useTransform(px, (v) => `${v * 100}%`)
-  const gy = useTransform(py, (v) => `${v * 100}%`)
-  const background = useMotionTemplate`radial-gradient(420px circle at ${gx} ${gy}, rgba(${glow}, 0.16), transparent 60%)`
-
-  if (reduce) {
-    return <div className={className}>{children}</div>
-  }
-
-  return (
-    <motion.div
-      ref={ref}
-      onMouseMove={(e) => {
-        const el = ref.current
-        if (!el) return
-        const r = el.getBoundingClientRect()
-        px.set((e.clientX - r.left) / r.width)
-        py.set((e.clientY - r.top) / r.height)
-      }}
-      onMouseLeave={() => {
-        px.set(0.5)
-        py.set(0.5)
-      }}
-      style={{ rotateX, rotateY, transformPerspective: 1000 }}
-      className={`group/spot relative overflow-hidden ${className}`}
-    >
-      <motion.span
-        aria-hidden
-        style={{ background }}
-        className="pointer-events-none absolute inset-0 z-[1] opacity-0 transition-opacity duration-300 group-hover/spot:opacity-100"
-      />
-      <div className="relative z-[2] flex h-full flex-col">{children}</div>
-    </motion.div>
-  )
-}
-
-type MagneticButtonProps = {
-  children: ReactNode
-  className?: string
-  href: string
-  target?: string
-  rel?: string
-}
-
-// Anchor CTA that gently pulls toward the cursor.
-function MagneticButton({ children, className = '', href, target, rel }: MagneticButtonProps) {
-  const reduce = useReducedMotion()
-  const ref = useRef<HTMLAnchorElement>(null)
-  const x = useMotionValue(0)
-  const y = useMotionValue(0)
-  const sx = useSpring(x, { stiffness: 220, damping: 16 })
-  const sy = useSpring(y, { stiffness: 220, damping: 16 })
-
-  return (
-    <motion.a
-      ref={ref}
-      href={href}
-      target={target}
-      rel={rel}
-      style={reduce ? undefined : { x: sx, y: sy }}
-      onMouseMove={(e) => {
-        if (reduce) return
-        const el = ref.current
-        if (!el) return
-        const r = el.getBoundingClientRect()
-        x.set((e.clientX - (r.left + r.width / 2)) * 0.3)
-        y.set((e.clientY - (r.top + r.height / 2)) * 0.3)
-      }}
-      onMouseLeave={() => {
-        x.set(0)
-        y.set(0)
-      }}
-      className={className}
-    >
-      {children}
-    </motion.a>
-  )
-}
-
-// Infinite horizontal tech strip.
-function Marquee({ items }: { items: string[] }) {
-  const loop = [...items, ...items]
-
-  return (
-    <div className="marquee-mask overflow-hidden py-1">
-      <div className="marquee-track">
-        {loop.map((item, i) => (
-          <span
-            key={i}
-            className="mx-1.5 inline-flex shrink-0 items-center gap-2 rounded-full border border-white/[0.1] bg-white/[0.04] px-4 py-2 text-sm text-foreground/80"
-          >
-            <span className="grad-accent-bg h-1.5 w-1.5 rounded-full" />
-            {item}
-          </span>
-        ))}
-      </div>
-    </div>
-  )
-}
-
-// Pointer-following cursor glow + a slow reactive aurora blob behind content.
-function AmbientFX() {
-  const reduce = useReducedMotion()
-  const [enabled, setEnabled] = useState(false)
-  const [visible, setVisible] = useState(false)
-  const [active, setActive] = useState(false)
-  const gx = useMotionValue(-300)
-  const gy = useMotionValue(-300)
-  const cursorX = useSpring(gx, { stiffness: 500, damping: 40, mass: 0.4 })
-  const cursorY = useSpring(gy, { stiffness: 500, damping: 40, mass: 0.4 })
-  const auroraX = useSpring(gx, { stiffness: 40, damping: 25, mass: 1 })
-  const auroraY = useSpring(gy, { stiffness: 40, damping: 25, mass: 1 })
-
-  useEffect(() => {
-    if (reduce) return
-    const fine = window.matchMedia('(hover: hover) and (pointer: fine)')
-    if (!fine.matches) return
-    setEnabled(true)
-
-    const onMove = (e: MouseEvent) => {
-      gx.set(e.clientX)
-      gy.set(e.clientY)
-      setVisible(true)
-      const el = e.target as HTMLElement | null
-      setActive(!!el?.closest('a, button, [role="button"], input, textarea, label, [data-cursor]'))
-    }
-    const onLeave = () => setVisible(false)
-
-    window.addEventListener('mousemove', onMove)
-    document.addEventListener('mouseleave', onLeave)
-    // Hide the native cursor while the custom one is active.
-    document.documentElement.classList.add('custom-cursor')
-    return () => {
-      window.removeEventListener('mousemove', onMove)
-      document.removeEventListener('mouseleave', onLeave)
-      document.documentElement.classList.remove('custom-cursor')
-    }
-  }, [reduce, gx, gy])
-
-  if (reduce || !enabled) return null
-
-  return (
-    <>
-      <motion.div
-        aria-hidden
-        style={{ left: auroraX, top: auroraY, zIndex: -1 }}
-        className="pointer-events-none fixed hidden -translate-x-1/2 -translate-y-1/2 lg:block"
-      >
-        <div
-          className="h-[440px] w-[440px] rounded-full opacity-[0.16] blur-[90px]"
-          style={{ background: 'radial-gradient(circle, rgba(124,92,255,0.9), rgba(34,211,238,0.4) 50%, transparent 70%)' }}
-        />
-      </motion.div>
-
-      {/* Trailing glow ring */}
-      <motion.div
-        aria-hidden
-        style={{ left: cursorX, top: cursorY }}
-        animate={{ opacity: visible ? 1 : 0, scale: active ? 2.1 : 1 }}
-        transition={{ opacity: { duration: 0.2 }, scale: { duration: 0.18, ease: 'easeOut' } }}
-        className="pointer-events-none fixed z-[1000] -translate-x-1/2 -translate-y-1/2 mix-blend-screen"
-      >
-        <div
-          className="h-6 w-6 rounded-full"
-          style={{
-            background: 'radial-gradient(circle, rgba(124,92,255,0.6), rgba(34,211,238,0.28) 60%, transparent 75%)',
-            boxShadow: '0 0 24px 6px rgba(124,92,255,0.35)',
-          }}
-        />
-      </motion.div>
-
-      {/* Precise center dot — follows the pointer exactly so click targeting stays accurate */}
-      <motion.div
-        aria-hidden
-        style={{ left: gx, top: gy }}
-        animate={{ opacity: visible ? 1 : 0, scale: active ? 0 : 1 }}
-        transition={{ opacity: { duration: 0.15 }, scale: { duration: 0.15, ease: 'easeOut' } }}
-        className="pointer-events-none fixed z-[1001] h-1.5 w-1.5 -translate-x-1/2 -translate-y-1/2 rounded-full bg-white"
-      />
-    </>
-  )
-}
-
-// Tilted phone showcase that cycles through real app screenshots.
-function HeroDevice() {
-  const reduce = useReducedMotion()
-  const [index, setIndex] = useState(0)
-
-  useEffect(() => {
-    if (reduce) return
-    const id = window.setInterval(() => {
-      setIndex((p) => (p + 1) % heroShots.length)
-    }, 2800)
-    return () => window.clearInterval(id)
-  }, [reduce])
-
-  const currentShot = heroShots[index]
-  const shotAlt = currentShot.includes('split-ease')
-    ? 'SplitEase — Flutter expense-splitting app screenshot'
-    : currentShot.includes('pocket-score')
-      ? 'Pocket Score — Flutter cricket scoring app screenshot'
-      : 'Flutter cross-platform app screenshot'
-
-  return (
-    <div className="relative mx-auto w-full max-w-[20rem] lg:ml-auto lg:mr-0">
-      {/* glow behind device */}
-      <div
-        aria-hidden
-        className="pointer-events-none absolute -inset-10 rounded-full opacity-70 blur-3xl"
-        style={{ background: 'radial-gradient(circle, rgba(124,92,255,0.35), rgba(34,211,238,0.12) 55%, transparent 70%)' }}
-      />
-
-      {/* The mockups are already rendered inside a phone frame, so we float the
-          image directly (no extra device frame / tilt) to avoid a phone-in-phone look. */}
-      <div className="float-slow relative aspect-[3/5] w-full">
-        <AnimatePresence mode="wait">
-          <motion.div
-            key={index}
-            initial={reduce ? { opacity: 1 } : { opacity: 0, scale: 0.97 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={reduce ? { opacity: 0 } : { opacity: 0, scale: 0.97 }}
-            transition={{ duration: reduce ? 0 : 0.55, ease: [0.22, 1, 0.36, 1] }}
-            className="absolute inset-0"
-          >
-            <NextImage
-              src={currentShot}
-              alt={shotAlt}
-              fill
-              priority={index === 0}
-              sizes="(max-width: 1024px) 80vw, 20rem"
-              className="object-contain drop-shadow-[0_30px_55px_rgba(0,0,0,0.55)]"
-            />
-          </motion.div>
-        </AnimatePresence>
-      </div>
-
-    </div>
-  )
-}
-
-type PaletteItem = {
-  id: string
-  label: string
-  hint?: string
-  group: string
-  icon: LucideIcon
-  keywords?: string
-  run: () => void
-}
-
-// ⌘K command palette — jump to sections, copy email, open links/booking.
-function CommandPalette({ open, onOpenChange }: { open: boolean; onOpenChange: (value: boolean) => void }) {
-  const reduce = useReducedMotion()
-  const [query, setQuery] = useState('')
-  const [activeIndex, setActiveIndex] = useState(0)
-  const inputRef = useRef<HTMLInputElement>(null)
-
-  const items: PaletteItem[] = useMemo(() => {
-    const go = (href: string) => {
-      onOpenChange(false)
-      window.setTimeout(() => {
-        document.querySelector(href)?.scrollIntoView({ behavior: 'smooth', block: 'start' })
-      }, 60)
-    }
-    const openExternal = (url: string) => {
-      onOpenChange(false)
-      window.open(url, '_blank', 'noopener,noreferrer')
-    }
-
-    const nav: PaletteItem[] = navigation.map((n) => ({
-      id: `nav-${n.href}`,
-      label: n.label,
-      hint: 'Jump to section',
-      group: 'Navigation',
-      icon: Hash,
-      keywords: 'section go to navigate',
-      run: () => go(n.href),
-    }))
-
-    const actions: PaletteItem[] = [
-      {
-        id: 'copy-email',
-        label: 'Copy email address',
-        hint: emailAddress,
-        group: 'Actions',
-        icon: Copy,
-        keywords: 'mail contact clipboard',
-        run: () => {
-          navigator.clipboard?.writeText(emailAddress)
-          onOpenChange(false)
-        },
-      },
-      {
-        id: 'email',
-        label: 'Send an email',
-        group: 'Actions',
-        icon: Mail,
-        keywords: 'mail contact message',
-        run: () => {
-          onOpenChange(false)
-          window.location.href = `mailto:${emailAddress}?subject=Project Inquiry`
-        },
-      },
-      {
-        id: 'book',
-        label: 'Book a call',
-        hint: 'Free 30 min',
-        group: 'Actions',
-        icon: CalendarDays,
-        keywords: 'schedule meeting calendly cal booking',
-        run: () => {
-          trackEvent('book_call_click', { location: 'command_palette' })
-          openExternal(bookingUrl)
-        },
-      },
-    ]
-
-    const links: PaletteItem[] = [
-      ...socialLinks
-        .filter((s) => s.label !== 'Email')
-        .map((s) => ({
-          id: `link-${s.label}`,
-          label: s.label,
-          hint: 'Open profile',
-          group: 'Links',
-          icon: s.icon,
-          keywords: 'social profile external',
-          run: () => openExternal(s.href),
-        })),
-      {
-        id: 'orbit',
-        label: 'Visit ORBIT',
-        hint: 'Live project',
-        group: 'Links',
-        icon: Workflow,
-        keywords: 'project developer os live',
-        run: () => openExternal('https://orbit-sand-alpha.vercel.app/'),
-      },
-    ]
-
-    return [...nav, ...actions, ...links]
-  }, [onOpenChange])
-
-  const filtered = useMemo(() => {
-    const q = query.trim().toLowerCase()
-    if (!q) return items
-    return items.filter((it) =>
-      `${it.label} ${it.keywords ?? ''} ${it.hint ?? ''}`.toLowerCase().includes(q)
-    )
-  }, [items, query])
-
-  // Global ⌘K / Ctrl+K toggle.
-  useEffect(() => {
-    const onKey = (e: KeyboardEvent) => {
-      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
-        e.preventDefault()
-        onOpenChange(!open)
-      }
-    }
-    window.addEventListener('keydown', onKey)
-    return () => window.removeEventListener('keydown', onKey)
-  }, [open, onOpenChange])
-
-  // Reset + focus + scroll-lock while open.
-  useEffect(() => {
-    if (!open) return
-    setQuery('')
-    setActiveIndex(0)
-    const previousOverflow = document.body.style.overflow
-    document.body.style.overflow = 'hidden'
-    const t = window.setTimeout(() => inputRef.current?.focus(), 20)
-    return () => {
-      document.body.style.overflow = previousOverflow
-      window.clearTimeout(t)
-    }
-  }, [open])
-
-  useEffect(() => {
-    setActiveIndex(0)
-  }, [query])
-
-  const handleKeyDown = (e: ReactKeyboardEvent) => {
-    if (e.key === 'ArrowDown') {
-      e.preventDefault()
-      setActiveIndex((i) => Math.min(i + 1, filtered.length - 1))
-    } else if (e.key === 'ArrowUp') {
-      e.preventDefault()
-      setActiveIndex((i) => Math.max(i - 1, 0))
-    } else if (e.key === 'Enter') {
-      e.preventDefault()
-      filtered[activeIndex]?.run()
-    } else if (e.key === 'Escape') {
-      onOpenChange(false)
-    }
-  }
-
-  return (
-    <AnimatePresence>
-      {open && (
-        <motion.div
-          key="cmdk"
-          role="dialog"
-          aria-modal="true"
-          aria-label="Command menu"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          transition={{ duration: reduce ? 0 : 0.15 }}
-          className="fixed inset-0 z-[300] flex items-start justify-center bg-black/60 px-4 pt-[12vh] backdrop-blur-sm"
-          onClick={() => onOpenChange(false)}
-        >
-          <motion.div
-            onClick={(e) => e.stopPropagation()}
-            onKeyDown={handleKeyDown}
-            initial={reduce ? { opacity: 0 } : { opacity: 0, y: -12, scale: 0.98 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={reduce ? { opacity: 0 } : { opacity: 0, y: -12, scale: 0.98 }}
-            transition={{ duration: reduce ? 0 : 0.18, ease: [0.22, 1, 0.36, 1] }}
-            className="surface-card-strong w-full max-w-xl overflow-hidden"
-          >
-            <div className="flex items-center gap-3 border-b border-white/[0.08] px-4">
-              <Search size={18} className="shrink-0 text-muted-foreground" />
-              <input
-                ref={inputRef}
-                value={query}
-                onChange={(e) => setQuery(e.target.value)}
-                placeholder="Search or jump to…"
-                className="h-14 w-full bg-transparent text-sm text-foreground outline-none placeholder:text-muted-foreground"
-              />
-              <kbd className="hidden shrink-0 rounded-md border border-white/[0.12] bg-white/[0.05] px-1.5 py-0.5 font-mono text-[0.6rem] text-muted-foreground sm:block">
-                ESC
-              </kbd>
-            </div>
-
-            <div className="max-h-[52vh] overflow-y-auto p-2">
-              {filtered.length === 0 ? (
-                <p className="px-3 py-8 text-center text-sm text-muted-foreground">No results.</p>
-              ) : (
-                filtered.map((it, i) => {
-                  const Icon = it.icon
-                  const isActive = i === activeIndex
-                  const showGroup = i === 0 || filtered[i - 1].group !== it.group
-
-                  return (
-                    <div key={it.id}>
-                      {showGroup && (
-                        <p className="px-3 pb-1 pt-3 font-mono text-[0.6rem] uppercase tracking-[0.2em] text-muted-foreground">
-                          {it.group}
-                        </p>
-                      )}
-                      <button
-                        type="button"
-                        onMouseEnter={() => setActiveIndex(i)}
-                        onClick={() => it.run()}
-                        className={`flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left text-sm transition ${isActive ? 'bg-white/[0.06] text-foreground' : 'text-foreground/80'}`}
-                      >
-                        <span
-                          className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border ${isActive ? 'grad-accent-bg border-transparent text-white' : 'border-white/[0.1] bg-white/[0.04] text-muted-foreground'}`}
-                        >
-                          <Icon size={15} />
-                        </span>
-                        <span className="flex-1 truncate">{it.label}</span>
-                        {it.hint && (
-                          <span className="hidden shrink-0 truncate text-xs text-muted-foreground sm:block">{it.hint}</span>
-                        )}
-                        {isActive && <CornerDownLeft size={14} className="shrink-0 text-muted-foreground" />}
-                      </button>
-                    </div>
-                  )
-                })
-              )}
-            </div>
-          </motion.div>
-        </motion.div>
-      )}
-    </AnimatePresence>
   )
 }
 
@@ -1255,218 +616,279 @@ function SectionHeader({
   description?: string
 }) {
   return (
-    <div className="max-w-3xl space-y-5">
-      <div className="section-kicker">
+    <div className="max-w-2xl space-y-4">
+      <p className="section-kicker">
         <span className="eyebrow-dot" />
         {label}
-      </div>
+      </p>
       <h2 className="section-title">{title}</h2>
       {description ? (
-        <p className="text-base leading-8 text-muted-foreground sm:text-lg">
-          {description}
-        </p>
+        <p className="text-base leading-7 text-muted-foreground sm:text-lg sm:leading-8">{description}</p>
       ) : null}
     </div>
   )
 }
 
-function AnimatedNumber({ to, suffix }: { to: number; suffix: string }) {
-  const ref = useRef<HTMLSpanElement>(null)
-  const inView = useInView(ref, { once: true, margin: '-60px' })
-  const count = useMotionValue(0)
-  const display = useTransform(count, (v) =>
-    to % 1 !== 0 ? v.toFixed(1) : String(Math.round(v))
-  )
-  const reduceMotion = useReducedMotion()
+// Rounded-square app icon: real icon image when we have one, otherwise a tinted tile.
+function AppIcon({ project, className }: { project: Project; className: string }) {
+  const Icon = project.icon
 
-  useEffect(() => {
-    if (!inView) return
-    if (reduceMotion) { count.set(to); return }
-    const ctrl = animate(count, to, { duration: 1.5, ease: [0.22, 1, 0.36, 1] })
-    return () => ctrl.stop()
-  }, [inView, to, count, reduceMotion])
+  if (project.appIcon && project.appIconWide) {
+    return (
+      <span aria-hidden className={`flex items-center justify-center bg-white p-1.5 ring-1 ring-black/5 ${className}`}>
+        <img src={project.appIcon} alt="" className="h-auto w-full object-contain" />
+      </span>
+    )
+  }
+
+  if (project.appIcon) {
+    return (
+      <span aria-hidden className={`relative overflow-hidden ring-1 ring-black/5 ${className}`}>
+        <NextImage src={project.appIcon} alt="" fill sizes="80px" className="object-cover" />
+      </span>
+    )
+  }
 
   return (
-    <span ref={ref}>
-      <motion.span>{display}</motion.span>
-      {suffix}
+    <span
+      aria-hidden
+      className={`flex items-center justify-center text-white ${className}`}
+      style={{ background: `linear-gradient(145deg, ${project.accent}, ${project.accent}cc)` }}
+    >
+      <Icon className="h-[46%] w-[46%]" strokeWidth={2} />
     </span>
   )
 }
 
-function StatCard({ stat }: { stat: ImpactStat }) {
-  const Icon = stat.icon
+// The hero: a phone home screen where every app icon is a real project.
+function HeroPhone() {
+  const reduce = useReducedMotion()
+
+  const pop = (i: number) => ({
+    initial: reduce ? { opacity: 1 } : { opacity: 0, scale: 0.6 },
+    animate: { opacity: 1, scale: 1 },
+    transition: reduce
+      ? { duration: 0 }
+      : { delay: 0.35 + i * 0.05, type: 'spring' as const, stiffness: 420, damping: 22 },
+  })
 
   return (
-    <Spotlight className="surface-card h-full p-6 sm:p-7" glow="34,211,238">
-      <div className="flex items-center gap-3">
-        <div className="flex h-12 w-12 items-center justify-center rounded-[1.25rem] grad-accent-bg text-white shadow-[0_10px_30px_rgba(124,92,255,0.32)]">
-          <Icon size={20} />
+    <div className="relative mx-auto w-full max-w-[18.5rem] sm:max-w-[19.5rem]">
+      <div aria-hidden className="absolute -inset-10 rounded-[5rem] bg-accent/15 blur-3xl" />
+
+      <div className="float-slow relative">
+        <div className="rounded-[3.1rem] bg-[#101114] p-2.5 shadow-[0_40px_80px_-30px_rgba(16,17,20,0.55),inset_0_0_0_1.5px_rgba(255,255,255,0.08)]">
+          <div className="phone-wallpaper relative aspect-[9/18] overflow-hidden rounded-[2.5rem]">
+            {/* Status bar */}
+            <div className="flex items-center justify-between px-7 pt-3.5 text-[0.72rem] font-semibold text-white">
+              <span>9:41</span>
+              <span className="flex items-center gap-1">
+                <SignalHigh size={13} strokeWidth={2.6} />
+                <Wifi size={13} strokeWidth={2.6} />
+                <BatteryFull size={16} strokeWidth={2} />
+              </span>
+            </div>
+            <div aria-hidden className="absolute left-1/2 top-2.5 h-[1.4rem] w-[5.5rem] -translate-x-1/2 rounded-full bg-black" />
+
+            {/* Widget */}
+            <motion.div
+              {...pop(0)}
+              className="mx-4 mt-6 rounded-[1.4rem] bg-white/20 p-3.5 text-white ring-1 ring-white/25 backdrop-blur-md"
+            >
+              <p className="text-[0.62rem] font-semibold uppercase tracking-[0.12em] text-white/75">Status</p>
+              <p className="mt-1 text-[0.95rem] font-semibold leading-tight">Raj Javiya</p>
+              <p className="text-[0.72rem] text-white/85">Android & Flutter developer</p>
+              <p className="mt-2 inline-flex items-center gap-1.5 rounded-full bg-white/90 px-2 py-0.5 text-[0.62rem] font-semibold text-[#101114]">
+                <span className="h-1.5 w-1.5 rounded-full bg-online" />
+                Open to new projects
+              </p>
+            </motion.div>
+
+            {/* App grid — each icon jumps to that project */}
+            <div className="mt-5 grid grid-cols-4 gap-x-2 gap-y-4 px-4">
+              {projects.map((project, i) => (
+                <motion.a
+                  key={project.slug}
+                  href={`#app-${project.slug}`}
+                  aria-label={`Jump to ${project.name}`}
+                  {...pop(i + 1)}
+                  whileTap={reduce ? undefined : { scale: 0.88 }}
+                  className="group flex flex-col items-center gap-1"
+                >
+                  <AppIcon
+                    project={project}
+                    className="h-[3.1rem] w-[3.1rem] rounded-[0.9rem] shadow-[0_4px_10px_rgba(0,0,0,0.18)] transition group-hover:-translate-y-0.5"
+                  />
+                  <span className="w-full truncate text-center text-[0.6rem] font-medium text-white [text-shadow:0_1px_2px_rgba(0,0,0,0.35)]">
+                    {project.homeLabel}
+                  </span>
+                </motion.a>
+              ))}
+              <motion.a
+                href={resumeUrl}
+                target="_blank"
+                rel="noreferrer"
+                aria-label="Open resume (PDF)"
+                onClick={() => trackEvent('resume_open', { location: 'hero_phone' })}
+                {...pop(projects.length + 1)}
+                whileTap={reduce ? undefined : { scale: 0.88 }}
+                className="group flex flex-col items-center gap-1"
+              >
+                <span className="flex h-[3.1rem] w-[3.1rem] items-center justify-center rounded-[0.9rem] bg-white text-[#101114] shadow-[0_4px_10px_rgba(0,0,0,0.18)] transition group-hover:-translate-y-0.5">
+                  <FileText size={22} />
+                </span>
+                <span className="text-[0.6rem] font-medium text-white [text-shadow:0_1px_2px_rgba(0,0,0,0.35)]">
+                  Resume
+                </span>
+              </motion.a>
+            </div>
+
+            {/* Dock */}
+            <div className="absolute inset-x-3 bottom-5 grid grid-cols-4 gap-2 rounded-[1.6rem] bg-white/25 p-2.5 ring-1 ring-white/25 backdrop-blur-md">
+              {socialLinks.map((item) => {
+                const Icon = item.icon
+                const external = !item.href.startsWith('mailto:')
+                return (
+                  <a
+                    key={item.label}
+                    href={item.href}
+                    target={external ? '_blank' : undefined}
+                    rel={external ? 'noreferrer' : undefined}
+                    aria-label={item.label}
+                    className="mx-auto flex h-[2.9rem] w-[2.9rem] items-center justify-center rounded-[0.85rem] text-white shadow-[0_4px_10px_rgba(0,0,0,0.18)] transition hover:-translate-y-0.5"
+                    style={{ background: item.tile }}
+                  >
+                    <Icon size={20} />
+                  </a>
+                )
+              })}
+            </div>
+            <div aria-hidden className="absolute bottom-1.5 left-1/2 h-1 w-24 -translate-x-1/2 rounded-full bg-white/80" />
+          </div>
         </div>
-        <span className="text-[0.72rem] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
-          {stat.sublabel}
-        </span>
       </div>
 
-      <p className="mt-6 font-[family:var(--font-heading)] text-4xl tracking-[-0.05em] text-foreground">
-        <span className="text-gradient">
-          <AnimatedNumber to={stat.numericValue} suffix={stat.suffix} />
-        </span>
-      </p>
-      <p className="mt-3 text-sm font-semibold uppercase tracking-[0.18em] text-muted-foreground">
-        {stat.label}
-      </p>
-    </Spotlight>
+      <p className="mt-5 text-center text-xs text-muted-foreground">Tap an app to jump to it</p>
+    </div>
   )
 }
 
 function GalleryModal({
   images,
+  startIndex,
   onClose,
   title,
+  captions,
+  landscape = false,
 }: {
   images: string[]
+  startIndex: number
   onClose: () => void
   title: string
+  captions?: string[]
+  landscape?: boolean
 }) {
-  const [index, setIndex] = useState(0)
-  const [loadedSet, setLoadedSet] = useState<Set<number>>(new Set())
+  const [index, setIndex] = useState(startIndex)
   const reduceMotion = useReducedMotion()
   const thumbsRef = useRef<HTMLDivElement>(null)
   const dialogRef = useRef<HTMLDivElement>(null)
   const touchStartX = useRef(0)
 
-  const markLoaded = (i: number) => setLoadedSet((prev) => { const s = new Set(prev); s.add(i); return s })
-
   const prev = () => setIndex((i) => (i - 1 + images.length) % images.length)
   const next = () => setIndex((i) => (i + 1) % images.length)
-
-  // Eagerly preload the first 3 images on mount; preload the rest lazily behind the scenes
-  useEffect(() => {
-    const preload = (i: number) => {
-      if (i >= images.length) return
-      const img = new window.Image()
-      img.onload = () => markLoaded(i)
-      img.src = images[i]
-    }
-    preload(0); preload(1); preload(2)
-    const id = window.setTimeout(() => {
-      for (let i = 3; i < images.length; i++) preload(i)
-    }, 800)
-    return () => window.clearTimeout(id)
-  }, [images])
-
-  // Preload adjacent slides when the user navigates
-  useEffect(() => {
-    const preloadAdjacent = (i: number) => {
-      if (!loadedSet.has(i)) {
-        const img = new window.Image()
-        img.onload = () => markLoaded(i)
-        img.src = images[i]
-      }
-    }
-    preloadAdjacent((index + 1) % images.length)
-    preloadAdjacent((index - 1 + images.length) % images.length)
-  }, [index, images])
 
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
       if (e.key === 'Escape') onClose()
-      if (e.key === 'ArrowRight') next()
-      if (e.key === 'ArrowLeft') prev()
+      if (e.key === 'ArrowRight') setIndex((i) => (i + 1) % images.length)
+      if (e.key === 'ArrowLeft') setIndex((i) => (i - 1 + images.length) % images.length)
     }
     window.addEventListener('keydown', handler)
     return () => window.removeEventListener('keydown', handler)
-  }, [onClose])
+  }, [onClose, images.length])
 
-  // Move focus into the dialog on open, restore it to the opener on close (a11y).
+  // Move focus into the dialog on open, restore it to the opener on close (a11y),
+  // and lock page scroll while it is open.
   useEffect(() => {
     const opener = document.activeElement as HTMLElement | null
+    const previousOverflow = document.body.style.overflow
+    document.body.style.overflow = 'hidden'
     dialogRef.current?.focus()
-    return () => opener?.focus?.()
+    return () => {
+      document.body.style.overflow = previousOverflow
+      opener?.focus?.()
+    }
   }, [])
 
   useEffect(() => {
-    const el = thumbsRef.current
-    if (!el) return
-    const thumb = el.children[index] as HTMLElement
+    const thumb = thumbsRef.current?.children[index] as HTMLElement | undefined
     thumb?.scrollIntoView({ inline: 'center', behavior: 'smooth', block: 'nearest' })
   }, [index])
-
-  const isLoaded = loadedSet.has(index)
 
   return (
     <motion.div
       ref={dialogRef}
       role="dialog"
       aria-modal="true"
-      aria-label="Project screenshots"
+      aria-label={`${title} screenshots`}
       tabIndex={-1}
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
       transition={{ duration: reduceMotion ? 0 : 0.2 }}
-      className="fixed inset-0 z-[999] flex flex-col items-center justify-center bg-black/85 backdrop-blur-md focus:outline-none"
+      className="fixed inset-0 z-[999] flex flex-col items-center justify-center bg-[#0b0c0f]/90 backdrop-blur-md focus:outline-none"
       onClick={onClose}
     >
       <button
+        type="button"
         onClick={onClose}
-        className="absolute right-4 top-4 z-10 flex h-11 w-11 items-center justify-center rounded-full bg-white/25 text-white transition hover:bg-white/40"
+        aria-label="Close screenshots"
+        className="absolute right-4 top-4 z-10 flex h-11 w-11 items-center justify-center rounded-full bg-white/15 text-white transition hover:bg-white/30"
       >
         <X size={20} />
       </button>
 
       <div
-        className="relative flex h-[75vh] w-full items-center justify-center px-12 sm:max-w-[340px] sm:px-0"
+        className={`relative flex w-full items-center justify-center px-12 ${landscape ? 'max-h-[72vh] sm:max-w-5xl sm:px-16' : 'h-[72vh] sm:max-w-[360px] sm:px-0'}`}
         onClick={(e) => e.stopPropagation()}
-        onTouchStart={(e) => { touchStartX.current = e.touches[0].clientX }}
+        onTouchStart={(e) => {
+          touchStartX.current = e.touches[0].clientX
+        }}
         onTouchEnd={(e) => {
           const diff = touchStartX.current - e.changedTouches[0].clientX
-          if (Math.abs(diff) > 50) diff > 0 ? next() : prev()
+          if (Math.abs(diff) > 50) {
+            if (diff > 0) next()
+            else prev()
+          }
         }}
       >
         <button
+          type="button"
           onClick={prev}
-          className="absolute left-2 flex h-10 w-10 items-center justify-center rounded-full bg-white/10 text-white transition hover:bg-white/20 sm:-left-14"
+          aria-label="Previous screenshot"
+          className="absolute left-2 z-10 flex h-10 w-10 items-center justify-center rounded-full bg-white/15 text-white transition hover:bg-white/30 sm:-left-14"
         >
           <ChevronLeft size={20} />
         </button>
 
-        <div className="relative flex h-full w-full items-center justify-center">
-          {/* Spinner shown while the current image hasn't loaded yet */}
-          <AnimatePresence>
-            {!isLoaded && (
-              <motion.div
-                key="spinner"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                transition={{ duration: 0.15 }}
-                className="absolute inset-0 flex items-center justify-center"
-              >
-                <div className="h-10 w-10 animate-spin rounded-full border-2 border-white/20 border-t-white" />
-              </motion.div>
-            )}
-          </AnimatePresence>
-
-          <AnimatePresence mode="wait">
-            <motion.img
-              key={index}
-              src={images[index]}
-              alt={`${title} app screenshot ${index + 1}`}
-              initial={{ opacity: 0, scale: reduceMotion ? 1 : 0.96 }}
-              animate={{ opacity: isLoaded ? 1 : 0, scale: 1 }}
-              exit={{ opacity: 0, scale: reduceMotion ? 1 : 0.96 }}
-              transition={{ duration: reduceMotion ? 0 : 0.2 }}
-              className="h-full w-auto rounded-[2rem] object-contain shadow-2xl"
-              onLoad={() => markLoaded(index)}
-            />
-          </AnimatePresence>
-        </div>
+        <AnimatePresence mode="wait">
+          <motion.img
+            key={index}
+            src={images[index]}
+            alt={`${title} screenshot ${index + 1}`}
+            initial={{ opacity: 0, scale: reduceMotion ? 1 : 0.97 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: reduceMotion ? 1 : 0.97 }}
+            transition={{ duration: reduceMotion ? 0 : 0.2 }}
+            className={landscape ? 'max-h-[72vh] w-full rounded-xl object-contain' : 'h-full w-auto rounded-[1.5rem] object-contain'}
+          />
+        </AnimatePresence>
 
         <button
+          type="button"
           onClick={next}
-          className="absolute right-2 flex h-10 w-10 items-center justify-center rounded-full bg-white/10 text-white transition hover:bg-white/20 sm:-right-14"
+          aria-label="Next screenshot"
+          className="absolute right-2 z-10 flex h-10 w-10 items-center justify-center rounded-full bg-white/15 text-white transition hover:bg-white/30 sm:-right-14"
         >
           <ChevronRight size={20} />
         </button>
@@ -1474,301 +896,269 @@ function GalleryModal({
 
       <div
         ref={thumbsRef}
-        className="mt-6 flex gap-3 overflow-x-auto px-4 pb-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+        className="no-scrollbar mt-6 flex max-w-full gap-2.5 overflow-x-auto px-4 pb-2"
         onClick={(e) => e.stopPropagation()}
       >
         {images.map((src, i) => (
-          <button key={i} onClick={() => setIndex(i)} className="shrink-0">
+          <button
+            key={src}
+            type="button"
+            onClick={() => setIndex(i)}
+            aria-label={`Show screenshot ${i + 1}`}
+            className="shrink-0"
+          >
             <img
               src={src}
-              alt={`${title} app thumbnail ${i + 1}`}
-              className={`h-14 w-auto rounded-xl object-cover transition ${i === index ? 'ring-2 ring-white opacity-100' : 'opacity-40 hover:opacity-70'}`}
+              alt=""
+              loading="lazy"
+              className={`h-14 w-auto rounded-lg object-cover transition ${i === index ? 'opacity-100 ring-2 ring-white' : 'opacity-40 hover:opacity-70'}`}
             />
           </button>
         ))}
       </div>
 
-      <p className="mt-4 text-sm text-white/40">
-        {index + 1} / {images.length} · Press ← → to navigate, Esc to close
+      <p className="mt-3 px-4 text-center text-sm text-white/50">
+        {index + 1} / {images.length}
+        {captions?.[index] ? <span className="text-white/85"> · {captions[index]}</span> : null}
       </p>
     </motion.div>
   )
 }
 
-function ProjectCard({
-  project,
-  index,
-}: {
-  project: Project
-  index: number
-}) {
-  const reduceMotion = useReducedMotion()
-  const Icon = project.icon
-  const [galleryOpen, setGalleryOpen] = useState(false)
-  const cardRef = useRef<HTMLDivElement>(null)
-  const px = useMotionValue(0.5)
-  const py = useMotionValue(0.5)
-  const rotateX = useSpring(useTransform(py, [0, 1], [4, -4]), { stiffness: 150, damping: 18 })
-  const rotateY = useSpring(useTransform(px, [0, 1], [-4, 4]), { stiffness: 150, damping: 18 })
-  const gx = useTransform(px, (v) => `${v * 100}%`)
-  const gy = useTransform(py, (v) => `${v * 100}%`)
-  const pointerGlow = useMotionTemplate`radial-gradient(460px circle at ${gx} ${gy}, ${project.accent}38, transparent 60%)`
+// App Store–style listing: icon + name, info row, swipeable screenshots, details.
+function AppListing({ project }: { project: Project }) {
+  const [galleryIndex, setGalleryIndex] = useState<number | null>(null)
+  const [mounted, setMounted] = useState(false)
+
+  useEffect(() => setMounted(true), [])
+
+  const info = [
+    ...project.stats,
+    { label: 'Platform', value: project.platform },
+    { label: 'Built for', value: project.type },
+  ]
 
   return (
     <>
-    <AnimatePresence>
-      {galleryOpen && project.mockups && (
-        <GalleryModal images={project.mockups} title={project.name} onClose={() => setGalleryOpen(false)} />
-      )}
-    </AnimatePresence>
-    <motion.article
-      ref={cardRef}
-      whileHover={reduceMotion ? undefined : { y: -6 }}
-      onMouseMove={(e) => {
-        if (reduceMotion) return
-        const el = cardRef.current
-        if (!el) return
-        const r = el.getBoundingClientRect()
-        px.set((e.clientX - r.left) / r.width)
-        py.set((e.clientY - r.top) / r.height)
-      }}
-      onMouseLeave={() => {
-        px.set(0.5)
-        py.set(0.5)
-      }}
-      style={reduceMotion ? undefined : { rotateX, rotateY, transformPerspective: 1200 }}
-      transition={{ duration: 0.25, ease: 'easeOut' }}
-      className="surface-card-strong group/proj relative h-full overflow-hidden p-6 sm:p-8"
-    >
-      <div
-        className="pointer-events-none absolute inset-0 opacity-80"
-        style={{
-          background: `radial-gradient(circle at top right, ${project.accent}22 0%, transparent 55%)`,
-        }}
-      />
+      {/* Portal to <body>: the Reveal wrapper's transform would otherwise trap the fixed overlay inside this card. */}
+      {mounted
+        ? createPortal(
+            <AnimatePresence>
+              {galleryIndex !== null && project.mockups ? (
+                <GalleryModal
+                  images={project.mockups}
+                  startIndex={galleryIndex}
+                  title={project.name}
+                  captions={project.mockupCaptions}
+                  landscape={project.landscapeMockups}
+                  onClose={() => setGalleryIndex(null)}
+                />
+              ) : null}
+            </AnimatePresence>,
+            document.body
+          )
+        : null}
 
-      {!reduceMotion && (
-        <motion.div
-          aria-hidden
-          style={{ background: pointerGlow }}
-          className="pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-300 group-hover/proj:opacity-100"
-        />
-      )}
-
-      <div className="relative z-10 flex h-full flex-col gap-6">
-        <div className="flex items-start justify-between gap-3">
-          <div className="min-w-0 space-y-3">
-            <div className="flex flex-wrap items-center gap-2 text-[0.72rem] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
-              <span className="rounded-full border border-border bg-white/[0.06] px-3 py-1">
-                {project.category}
-              </span>
-              <span>{project.type}</span>
-              {project.isActive && (
-                <span className="inline-flex items-center gap-1.5 rounded-full bg-[rgba(109,130,98,0.14)] px-3 py-1 text-[0.65rem] font-semibold uppercase tracking-[0.14em] text-[#6d8262]">
-                  <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-[#6d8262]" />
-                  In Development
-                </span>
-              )}
-            </div>
-            <h3 className="font-[family:var(--font-heading)] text-2xl tracking-[-0.04em] sm:text-3xl lg:text-4xl">
-              {project.name}
-            </h3>
-          </div>
-
-          <div className={`flex shrink-0 items-center justify-center rounded-[1.4rem] border border-border bg-white/[0.05] text-foreground shadow-[0_18px_40px_rgba(0,0,0,0.4)] ${project.appIconWide ? 'w-24 p-2 sm:w-32 sm:p-3' : 'h-12 w-12 sm:h-14 sm:w-14'}`}>
-            {project.appIcon ? (
-              project.appIconWide ? (
-                <img src={project.appIcon} alt={project.name} className="h-auto w-full object-contain" loading="lazy" />
-              ) : (
-                <NextImage src={project.appIcon} alt={project.name} width={56} height={56} className="h-full w-full rounded-[1.3rem] object-cover" />
-              )
-            ) : (
-              <Icon size={22} />
-            )}
-          </div>
-        </div>
-
-        <p className="text-sm leading-7 text-muted-foreground sm:text-base">
-          {project.description}
-        </p>
-
-        <div className="flex flex-wrap gap-2">
-          {project.tags.map((tag) => (
-            <span
-              key={tag}
-              className="rounded-full border border-border bg-white/[0.05] px-3 py-1.5 text-sm text-foreground/80"
-            >
-              {tag}
-            </span>
-          ))}
-        </div>
-
-        <div className="grid gap-4 sm:grid-cols-[1.1fr_0.9fr]">
-          <div className="rounded-[1.5rem] border border-border bg-white/[0.05] p-4">
-            <p className="text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">
-              Engineering Impact
-            </p>
-            <p className="mt-2 text-sm leading-7 text-foreground/85">{project.impact}</p>
-          </div>
-
-          <div className="grid gap-3">
-            {project.stats.map((item) => (
-              <div
-                key={item.label}
-                className="rounded-[1.5rem] border border-border bg-white/[0.05] p-4"
-              >
-                <p className="text-[0.72rem] font-semibold uppercase tracking-[0.16em] text-muted-foreground">
-                  {item.label}
+      <article id={`app-${project.slug}`} className="surface-card-strong scroll-mt-24 overflow-hidden">
+        <div className="p-5 sm:p-8">
+          {/* Header */}
+          <div className="flex flex-wrap items-center gap-x-4 gap-y-3 sm:flex-nowrap sm:gap-5">
+            <AppIcon
+              project={project}
+              className="h-16 w-16 shrink-0 rounded-[1.1rem] shadow-sm sm:h-20 sm:w-20 sm:rounded-[1.35rem]"
+            />
+            <div className="min-w-0 flex-1">
+              <h3 className="text-xl font-bold tracking-[-0.02em] text-foreground sm:text-2xl">{project.name}</h3>
+              <p className="mt-0.5 text-sm text-muted-foreground sm:text-base">{project.category}</p>
+              {project.inProgress ? (
+                <p className="mt-1.5 inline-flex items-center gap-1.5 rounded-full bg-[#d97706]/10 px-2.5 py-0.5 text-xs font-semibold text-[#b45309]">
+                  <span className="h-1.5 w-1.5 rounded-full bg-[#d97706]" />
+                  In development
                 </p>
-                <p className="mt-1 text-lg font-semibold text-foreground">{item.value}</p>
+              ) : null}
+            </div>
+            {/* Store / project links, together in the top-right */}
+            {project.links.length > 0 ? (
+              <div className="flex w-full flex-wrap gap-2 sm:w-auto sm:shrink-0 sm:justify-end">
+                {project.links.map((link) => {
+                  const LinkIcon = link.icon
+                  return (
+                    <a
+                      key={link.label}
+                      href={link.href}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="inline-flex items-center gap-1.5 rounded-full bg-accent/10 px-4 py-2 text-sm font-bold text-accent transition hover:bg-accent/15"
+                    >
+                      <LinkIcon size={15} />
+                      {link.label}
+                      <ArrowUpRight size={14} />
+                    </a>
+                  )
+                })}
+              </div>
+            ) : null}
+          </div>
+
+          {/* Info row */}
+          <dl className="mt-6 grid grid-cols-2 gap-y-4 border-y border-border py-4 sm:grid-cols-4 sm:gap-y-0 sm:divide-x sm:divide-border sm:py-3.5">
+            {info.map((item) => (
+              <div key={item.label} className="min-w-0 px-2 text-center">
+                <dt className="truncate text-[0.68rem] font-medium uppercase tracking-[0.08em] text-muted-foreground">
+                  {item.label}
+                </dt>
+                <dd className="mt-1 truncate text-[0.95rem] font-semibold text-foreground sm:text-lg">{item.value}</dd>
               </div>
             ))}
-          </div>
+          </dl>
         </div>
 
-        {(project.links.length > 0 || project.mockups) ? (
-          <div className="mt-auto flex flex-wrap gap-3">
-            {project.links.map((link) => {
-              const LinkIcon = link.icon
-
-              return (
-                <a
-                  key={link.label}
-                  href={link.href}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="inline-flex items-center gap-2 rounded-full border border-border bg-white/[0.06] px-4 py-2.5 text-sm font-medium text-foreground transition hover:-translate-y-0.5 hover:bg-white/[0.12]"
+        {/* Screenshots */}
+        {project.mockups ? (
+          <div className="border-y border-border bg-[#efefea] py-5">
+            <p className="px-5 pb-3 text-sm font-semibold text-foreground sm:px-8">
+              {project.mockupCaptions ? 'Workflow' : 'Screenshots'}
+              <span className="ml-2 font-normal text-muted-foreground">· swipe or tap to enlarge</span>
+            </p>
+            <div className="no-scrollbar flex snap-x snap-mandatory gap-3 overflow-x-auto scroll-px-5 px-5 sm:scroll-px-8 sm:px-8">
+              {project.mockups.map((src, i) => (
+                <button
+                  key={src}
+                  type="button"
+                  onClick={() => setGalleryIndex(i)}
+                  aria-label={`Enlarge ${project.name} screenshot ${i + 1}`}
+                  className={`shrink-0 snap-start text-left transition hover:-translate-y-1 ${project.landscapeMockups ? 'w-[82vw] max-w-[34rem] sm:w-[34rem]' : ''}`}
                 >
-                  <LinkIcon size={16} />
-                  {link.label}
-                  <ArrowUpRight size={14} />
-                </a>
-              )
-            })}
-            {project.mockups && (
-              <button
-                onClick={() => setGalleryOpen(true)}
-                onMouseEnter={() => {
-                  project.mockups!.forEach((src) => { const img = new window.Image(); img.src = src })
-                }}
-                className="inline-flex items-center gap-2 rounded-full border border-border bg-white/[0.06] px-4 py-2.5 text-sm font-medium text-foreground transition hover:-translate-y-0.5 hover:bg-white/[0.12]"
-              >
-                <Images size={16} />
-                Screenshots
-              </button>
-            )}
+                  <img
+                    src={src}
+                    alt={project.mockupCaptions?.[i] ?? `${project.name} screenshot ${i + 1}`}
+                    loading="lazy"
+                    className={
+                      project.landscapeMockups
+                        ? 'aspect-[16/9] w-full rounded-xl border border-black/5 object-cover shadow-[0_8px_24px_-12px_rgba(16,17,20,0.35)]'
+                        : 'h-[320px] w-auto rounded-[1.25rem] object-contain sm:h-[400px]'
+                    }
+                  />
+                  {project.mockupCaptions?.[i] ? (
+                    <p className="mt-2.5 flex items-start gap-2 text-sm text-foreground/80">
+                      <span className="mt-px flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-foreground text-[0.65rem] font-bold text-background">
+                        {i + 1}
+                      </span>
+                      {project.mockupCaptions[i]}
+                    </p>
+                  ) : null}
+                </button>
+              ))}
+            </div>
           </div>
         ) : null}
-      </div>
-    </motion.article>
+
+        {/* Details */}
+        <div className={`grid gap-6 p-5 sm:p-8 lg:grid-cols-[1.4fr_1fr] lg:gap-10 ${project.mockups ? '' : 'pt-0 sm:pt-0'}`}>
+          <div className="space-y-5">
+            <p className="text-[0.975rem] leading-7 text-foreground/80 sm:text-[1.05rem] sm:leading-8">
+              {project.description}
+            </p>
+            <ul className="flex flex-wrap gap-2" aria-label="Tech stack">
+              {project.tags.map((tag) => (
+                <li key={tag} className="rounded-full bg-secondary px-3 py-1 text-[0.8rem] font-medium text-foreground/80">
+                  {tag}
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          <div className="space-y-4">
+            <div className="rounded-2xl bg-accent/[0.06] p-4 ring-1 ring-accent/10">
+              <p className="text-xs font-semibold uppercase tracking-[0.1em] text-accent">What I did</p>
+              <p className="mt-1.5 text-[0.95rem] leading-7 text-foreground/85">{project.impact}</p>
+            </div>
+
+          </div>
+        </div>
+      </article>
     </>
   )
 }
 
-const skillLevelStyles: Record<SkillLevel, string> = {
-  Expert: 'bg-[rgba(124,92,255,0.16)] text-[#b9a6ff] border border-[rgba(124,92,255,0.3)]',
-  Proficient: 'bg-[rgba(34,211,238,0.14)] text-[#7fe3f2] border border-[rgba(34,211,238,0.28)]',
-  Familiar: 'bg-white/[0.06] text-muted-foreground border border-white/[0.1]',
+const skillLevelBars: Record<SkillLevel, number> = {
+  Expert: 4,
+  Proficient: 3,
+  Familiar: 2,
 }
 
-function SkillCard({ group }: { group: SkillGroup }) {
-  const Icon = group.icon
+// Proficiency drawn as phone signal bars.
+function SignalMeter({ level, color }: { level: SkillLevel; color: string }) {
+  const filled = skillLevelBars[level]
 
   return (
-    <Spotlight className="surface-card h-full p-6 sm:p-7">
-      <div className="flex items-start justify-between gap-4">
-        <div className="space-y-3">
-          <div className="flex h-12 w-12 items-center justify-center rounded-[1.25rem] grad-accent-bg text-white shadow-[0_10px_30px_rgba(124,92,255,0.32)]">
-            <Icon size={20} />
-          </div>
-          <div>
-            <h3 className="text-2xl font-semibold tracking-[-0.03em] text-foreground">
-              {group.title}
-            </h3>
-            <p className="mt-1 text-[0.72rem] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
-              {group.detail}
-            </p>
-          </div>
-        </div>
-        <span className={`mt-1 shrink-0 rounded-full px-3 py-1.5 text-[0.65rem] font-semibold uppercase tracking-[0.16em] ${skillLevelStyles[group.level]}`}>
-          {group.level}
-        </span>
-      </div>
-
-      <p className="mt-4 text-sm leading-7 text-muted-foreground sm:text-base">
-        {group.description}
-      </p>
-
-      <div className="mt-6 flex flex-wrap gap-2">
-        {group.skills.map((skill) => (
+    <span className="inline-flex items-center gap-2 rounded-full border border-border bg-card/80 py-1 pl-2.5 pr-3 text-xs font-semibold text-foreground">
+      <span aria-hidden className="flex h-3.5 items-end gap-[2px]">
+        {[1, 2, 3, 4].map((bar) => (
           <span
-            key={skill}
-            className="rounded-full border border-border bg-white/[0.05] px-3 py-1.5 text-sm text-foreground/80"
-          >
-            {skill}
-          </span>
+            key={bar}
+            className="w-[3px] rounded-full"
+            style={{ height: `${bar * 25}%`, background: bar <= filled ? color : 'rgba(16,17,20,0.14)' }}
+          />
         ))}
-      </div>
-    </Spotlight>
+      </span>
+      {level}
+    </span>
   )
 }
 
-function ExperienceCard({
-  item,
-  delay,
-  index,
-}: {
-  item: (typeof experiences)[number]
-  delay: number
-  index: number
-}) {
+type SkillCardVariant = 'featured' | 'compact'
+
+function SkillCard({ group, variant }: { group: SkillGroup; variant: SkillCardVariant }) {
+  const Icon = group.icon
+  const featured = variant === 'featured'
+
   return (
-    <Reveal delay={delay}>
-      <article className="surface-card-strong overflow-hidden">
-        {/* Header zone */}
-        <div className="relative border-b border-border bg-[rgba(124,92,255,0.07)] px-6 pb-7 pt-6 sm:px-8 sm:pb-8 sm:pt-7">
-          <div className="pointer-events-none absolute bottom-4 right-6 font-[family:var(--font-heading)] text-[5.5rem] font-black leading-none tracking-tighter text-foreground/[0.045] sm:right-8 sm:text-[8rem]">
-            0{index + 1}
-          </div>
+    <div
+      className="group/skill relative flex h-full flex-col overflow-hidden rounded-[1.75rem] border border-border bg-card p-5 transition duration-300 hover:-translate-y-1 hover:shadow-[0_18px_40px_-18px_rgba(16,17,20,0.25)] sm:p-7"
+      style={{ backgroundImage: `linear-gradient(160deg, ${group.color}${featured ? '17' : '0d'} 0%, transparent ${featured ? '60%' : '45%'})` }}
+    >
+      {/* Oversized watermark icon */}
+      <Icon
+        aria-hidden
+        strokeWidth={1.25}
+        className={`pointer-events-none absolute transition duration-500 group-hover/skill:rotate-[-8deg] group-hover/skill:scale-110 ${featured ? '-bottom-10 -right-8 h-48 w-48 sm:h-56 sm:w-56' : '-bottom-6 -right-6 h-32 w-32'}`}
+        style={{ color: group.color, opacity: featured ? 0.08 : 0.06 }}
+      />
 
-          <div className="relative z-10 space-y-5">
-            <div className="flex flex-wrap items-center gap-3">
-              <span className="inline-flex items-center gap-2 rounded-full bg-foreground px-3.5 py-1.5 text-[0.65rem] font-semibold uppercase tracking-[0.18em] text-background">
-                <span className="h-1.5 w-1.5 rounded-full bg-accent" />
-                Stage 0{index + 1}
-              </span>
-              <span className="text-[0.72rem] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
-                {item.duration}
-              </span>
-            </div>
-
-            <div className="flex flex-wrap items-end justify-between gap-4">
-              <h3 className="font-[family:var(--font-heading)] text-3xl tracking-[-0.05em] text-foreground sm:text-4xl">
-                {item.role}
-              </h3>
-              <span className="rounded-full border border-border bg-white/[0.05] px-4 py-2 text-[0.72rem] font-semibold uppercase tracking-[0.2em] text-muted-foreground">
-                {item.company}
-              </span>
-            </div>
-          </div>
-        </div>
-
-        {/* Bullet grid */}
-        <div className="grid gap-4 p-6 sm:grid-cols-3 sm:p-8">
-          {item.bullets.map((bullet) => (
-            <div
-              key={bullet}
-              className="rounded-[1.25rem] border border-border bg-white/[0.04] p-5"
+      <div className="relative flex h-full flex-col">
+        <div>
+          <div className="flex items-start justify-between gap-3">
+            <span
+              className={`flex shrink-0 items-center justify-center text-white ${featured ? 'h-14 w-14 rounded-[1.1rem]' : 'h-11 w-11 rounded-[0.8rem]'}`}
+              style={{ background: group.color, boxShadow: `0 10px 24px -8px ${group.color}99` }}
             >
-              <span className="mb-4 flex h-7 w-7 items-center justify-center rounded-full grad-accent-bg text-white">
-                <Check size={13} />
-              </span>
-              <p className="text-sm leading-7 text-foreground/80">{bullet}</p>
-            </div>
-          ))}
+              <Icon size={featured ? 26 : 20} />
+            </span>
+            <SignalMeter level={group.level} color={group.color} />
+          </div>
+
+          <h3 className={`mt-5 font-bold tracking-[-0.02em] text-foreground ${featured ? 'text-2xl sm:text-[1.75rem]' : 'text-xl'}`}>
+            {group.title}
+          </h3>
+          <p className={`mt-1.5 text-muted-foreground ${featured ? 'text-base leading-7' : 'text-[0.95rem] leading-6'}`}>
+            {group.description}
+          </p>
         </div>
-      </article>
-    </Reveal>
+
+        <ul className="mt-5 flex flex-wrap gap-2">
+          {group.skills.map((skill) => (
+            <li
+              key={skill}
+              className={`rounded-full border font-medium text-foreground/90 ${featured ? 'px-3.5 py-1.5 text-[0.9rem]' : 'px-3 py-1 text-[0.85rem]'}`}
+              style={{ background: `${group.color}0f`, borderColor: `${group.color}2e` }}
+            >
+              {skill}
+            </li>
+          ))}
+        </ul>
+      </div>
+    </div>
   )
 }
 
@@ -1780,15 +1170,7 @@ export default function PortfolioHome({
   githubStats: GitHubStats
 }) {
   const reduceMotion = useReducedMotion()
-  const [menuOpen, setMenuOpen] = useState(false)
-  const [paletteOpen, setPaletteOpen] = useState(false)
-  const [activeSection, setActiveSection] = useState('')
-  const [showChip, setShowChip] = useState(false)
-
-  useEffect(() => {
-    const id = window.setTimeout(() => setShowChip(true), 3000)
-    return () => window.clearTimeout(id)
-  }, [])
+  const [activeTab, setActiveTab] = useState('home')
   const [copiedEmail, setCopiedEmail] = useState(false)
   const [submitting, setSubmitting] = useState(false)
   const [submitted, setSubmitted] = useState(false)
@@ -1802,13 +1184,14 @@ export default function PortfolioHome({
   })
 
   useEffect(() => {
-    const sectionIds = navigation.map((n) => n.href.replace('#', ''))
-    const observers = sectionIds.map((id) => {
+    const observers = Object.keys(sectionToTab).map((id) => {
       const el = document.getElementById(id)
       if (!el) return null
       const observer = new IntersectionObserver(
-        ([entry]) => { if (entry.isIntersecting) setActiveSection(id) },
-        { rootMargin: '-40% 0px -55% 0px', threshold: 0 }
+        ([entry]) => {
+          if (entry.isIntersecting) setActiveTab(sectionToTab[id])
+        },
+        { rootMargin: '-45% 0px -50% 0px', threshold: 0 }
       )
       observer.observe(el)
       return observer
@@ -1816,30 +1199,16 @@ export default function PortfolioHome({
     return () => observers.forEach((o) => o?.disconnect())
   }, [])
 
-  useEffect(() => {
-    const previousOverflow = document.body.style.overflow
-    document.body.style.overflow = menuOpen ? 'hidden' : ''
-
-    return () => {
-      document.body.style.overflow = previousOverflow
-    }
-  }, [menuOpen])
-
-  const handleInputChange = (
-    event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-  ) => {
+  const handleInputChange = (event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = event.target
-
-    setFormData((current) => ({
-      ...current,
-      [name]: value,
-    }))
+    setFormData((current) => ({ ...current, [name]: value }))
+    if (name in formErrors) {
+      setFormErrors((current) => ({ ...current, [name]: undefined }))
+    }
   }
 
   const handleCopyEmail = async () => {
-    if (typeof navigator === 'undefined' || !navigator.clipboard) {
-      return
-    }
+    if (typeof navigator === 'undefined' || !navigator.clipboard) return
 
     try {
       await navigator.clipboard.writeText(emailAddress)
@@ -1889,215 +1258,187 @@ export default function PortfolioHome({
 
       trackEvent('contact_submit', { location: 'contact_form' })
       setSubmitted(true)
-      setFormData({
-        name: '',
-        email: '',
-        message: '',
-        website: '',
-      })
-      window.setTimeout(() => setSubmitted(false), 3000)
+      setFormData({ name: '', email: '', message: '', website: '' })
+      window.setTimeout(() => setSubmitted(false), 4000)
     } catch (error) {
-      setErrorMessage(
-        error instanceof Error ? error.message : 'Something went wrong.'
-      )
+      setErrorMessage(error instanceof Error ? error.message : 'Something went wrong.')
     } finally {
       setSubmitting(false)
     }
   }
 
-  return (
-    <div id="top" className="relative overflow-x-hidden">
+  const inputClass = (hasError?: string) =>
+    `w-full rounded-xl border bg-background px-4 text-[0.95rem] text-foreground outline-none transition placeholder:text-muted-foreground/70 focus:bg-card focus:ring-4 ${
+      hasError ? 'border-destructive focus:ring-destructive/10' : 'border-border focus:border-accent focus:ring-accent/10'
+    }`
 
+  const chatBubbles = [
+    'Hey 👋 thanks for stopping by!',
+    'Got an app idea, a codebase that needs help, or want a second opinion on architecture?',
+    'Send me a message — I usually reply within a day.',
+  ]
+
+  return (
+    <div className="relative overflow-x-hidden">
       <a
         href="#main-content"
-        className="sr-only z-[210] rounded-full grad-accent-bg px-5 py-3 text-sm font-medium text-white focus:not-sr-only focus:fixed focus:left-4 focus:top-4"
+        className="sr-only z-[210] rounded-full bg-foreground px-5 py-3 text-sm font-medium text-background focus:not-sr-only focus:fixed focus:left-4 focus:top-4"
       >
         Skip to content
       </a>
 
-      <AmbientFX />
-      <ScrollProgress />
-      <CommandPalette open={paletteOpen} onOpenChange={setPaletteOpen} />
+      {/* Top bar */}
+      <header className="fixed inset-x-0 top-0 z-50 border-b border-border/70 bg-background/80 backdrop-blur-xl">
+        <div className="shell flex h-16 items-center justify-between">
+          <a href="#home" className="flex items-center gap-2.5">
+            <span className="flex h-9 w-9 items-center justify-center rounded-[0.7rem] bg-foreground text-sm font-bold text-background">
+              RJ
+            </span>
+            <span className="leading-tight">
+              <span className="block text-[0.95rem] font-bold tracking-[-0.01em] text-foreground">Raj Javiya</span>
+              <span className="block text-xs text-muted-foreground">Mobile Developer</span>
+            </span>
+          </a>
 
-      <header className="fixed inset-x-0 top-0 z-50 px-4 py-4 sm:px-6">
-        <div className="shell">
-          <div className="surface-card flex items-center justify-between px-5 py-4 sm:px-6">
-            <a href="#top" className="flex items-center gap-2.5">
-              <span className="flex h-9 w-9 items-center justify-center rounded-[0.65rem] grad-accent-bg shadow-[0_6px_18px_rgba(124,92,255,0.4)]">
-                <span className="font-[family:var(--font-heading)] text-sm font-bold leading-none text-white">
-                  JR
-                </span>
-              </span>
-              <span className="hidden font-[family:var(--font-heading)] text-lg tracking-[-0.04em] text-foreground sm:block">
-                Javiya Raj
-              </span>
+          <div className="flex items-center gap-2">
+            <a
+              href={resumeUrl}
+              target="_blank"
+              rel="noreferrer"
+              onClick={() => trackEvent('resume_open', { location: 'header' })}
+              aria-label="Resume (PDF)"
+              className="inline-flex h-10 items-center gap-2 rounded-full px-3 text-sm font-semibold text-foreground transition hover:bg-secondary"
+            >
+              <Download size={16} />
+              <span className="hidden sm:inline">Resume</span>
             </a>
-
-            <nav className="hidden items-center gap-8 md:flex">
-              {navigation.map((item) => (
-                <a
-                  key={item.label}
-                  href={item.href}
-                  className={`text-sm font-medium transition hover:text-foreground ${activeSection === item.href.replace('#', '') ? 'text-foreground' : 'text-muted-foreground'}`}
-                >
-                  {item.label}
-                  {activeSection === item.href.replace('#', '') && (
-                    <span className="mt-0.5 block h-0.5 w-full rounded-full bg-accent" />
-                  )}
-                </a>
-              ))}
-            </nav>
-
-            <div className="flex items-center gap-2.5">
-              <button
-                type="button"
-                aria-label="Open command menu"
-                onClick={() => setPaletteOpen(true)}
-                className="inline-flex items-center gap-2 rounded-full border border-white/[0.1] bg-white/[0.04] px-3 py-2.5 text-xs font-medium text-muted-foreground transition hover:text-foreground"
-              >
-                <Search size={15} />
-                <span className="hidden lg:inline">Search</span>
-                <kbd className="hidden items-center gap-0.5 rounded border border-white/[0.12] bg-white/[0.05] px-1.5 py-0.5 font-mono text-[0.62rem] lg:inline-flex">
-                  <Command size={9} />K
-                </kbd>
-              </button>
-
-              <div className="hidden md:flex">
-                <a
-                  href="#contact"
-                  className="inline-flex items-center gap-2 rounded-full grad-accent-bg px-5 py-3 text-sm font-medium text-white shadow-[0_10px_30px_rgba(124,92,255,0.3)] transition hover:-translate-y-0.5"
-                >
-                  Get in Touch
-                  <ArrowRight size={16} />
-                </a>
-              </div>
-
-              <button
-                type="button"
-                aria-label={menuOpen ? 'Close menu' : 'Open menu'}
-                onClick={() => setMenuOpen((open) => !open)}
-                className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-border bg-white/[0.05] text-foreground md:hidden"
-              >
-                {menuOpen ? <X size={18} /> : <Menu size={18} />}
-              </button>
-            </div>
+            <a href="#contact" className={`${btnPrimary} h-10 py-0`}>
+              Let&apos;s talk
+            </a>
           </div>
         </div>
       </header>
 
-      <AnimatePresence>
-        {menuOpen ? (
-          <motion.div
-            initial={reduceMotion ? { opacity: 1 } : { opacity: 0, y: -16 }}
-            animate={reduceMotion ? { opacity: 1 } : { opacity: 1, y: 0 }}
-            exit={reduceMotion ? { opacity: 0 } : { opacity: 0, y: -16 }}
-            transition={{ duration: 0.25, ease: 'easeOut' }}
-            className="fixed inset-x-4 top-[5.25rem] z-40 md:hidden"
-          >
-            <div className="surface-card-strong p-6">
-              <div className="flex flex-col gap-4">
-                {navigation.map((item) => (
-                  <a
-                    key={item.label}
-                    href={item.href}
-                    onClick={() => setMenuOpen(false)}
-                    className="rounded-[1.25rem] border border-border bg-white/[0.05] px-4 py-4 text-sm font-medium text-foreground"
-                  >
-                    {item.label}
-                  </a>
+      {/* Bottom tab bar — the site's main navigation, like a real app */}
+      <nav
+        aria-label="Sections"
+        className="fixed inset-x-0 bottom-3 z-50 flex justify-center px-3 pb-[env(safe-area-inset-bottom)] sm:bottom-5"
+      >
+        <div className="flex items-center gap-0.5 rounded-full border border-border bg-white/85 p-1.5 shadow-[0_12px_32px_-10px_rgba(16,17,20,0.3)] backdrop-blur-xl">
+          {tabs.map((tab) => {
+            const Icon = tab.icon
+            const active = activeTab === tab.id
+            return (
+              <a
+                key={tab.id}
+                href={`#${tab.id}`}
+                aria-current={active ? 'true' : undefined}
+                className={`relative flex w-[3.85rem] flex-col items-center gap-0.5 rounded-full py-1.5 text-[0.65rem] font-semibold transition-colors sm:w-auto sm:flex-row sm:gap-2 sm:px-4 sm:py-2.5 sm:text-sm ${
+                  active ? 'text-background' : 'text-muted-foreground hover:text-foreground'
+                }`}
+              >
+                {active ? (
+                  <motion.span
+                    layoutId="tab-pill"
+                    transition={reduceMotion ? { duration: 0 } : { type: 'spring', stiffness: 420, damping: 34 }}
+                    className="absolute inset-0 rounded-full bg-foreground"
+                  />
+                ) : null}
+                <Icon size={18} className="relative" />
+                <span className="relative">{tab.label}</span>
+              </a>
+            )
+          })}
+        </div>
+      </nav>
+
+      <main id="main-content">
+        {/* Hero */}
+        <section id="home" className="relative pt-28 sm:pt-32">
+          <div aria-hidden className="soft-grid pointer-events-none absolute inset-0 -z-10" />
+          <div className="shell grid items-center gap-14 pb-16 lg:grid-cols-[1.15fr_0.85fr] lg:gap-10 lg:pb-20">
+            <Reveal className="space-y-7">
+              <p className="inline-flex items-center gap-2 rounded-full border border-border bg-card px-3 py-1.5 text-sm font-medium text-foreground">
+                <span className="relative flex h-2 w-2">
+                  <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-online opacity-60 motion-reduce:hidden" />
+                  <span className="relative inline-flex h-2 w-2 rounded-full bg-online" />
+                </span>
+                Available for freelance
+              </p>
+
+              <div className="space-y-5">
+                <p className="text-xl font-semibold text-foreground/70 sm:text-2xl">Hi, I&apos;m Raj 👋</p>
+                <h1 className="font-[family:var(--font-heading)] text-[2.35rem] font-bold leading-[1.1] tracking-[-0.025em] text-foreground sm:text-[3.25rem] lg:text-[3.6rem]">
+                  I build <span className="text-gradient">mobile apps</span>
+                  <br />
+                  and <span className="text-gradient">web platforms</span>.
+                </h1>
+                <p className="max-w-xl text-lg leading-8 text-muted-foreground sm:text-xl sm:leading-9">
+                  Senior developer working with Kotlin, Flutter, React and Next.js. 15+ production apps shipped since
+                  2021.
+                </p>
+              </div>
+
+              <div className="flex flex-col gap-3 sm:flex-row">
+                <a href="#projects" className={`${btnPrimary} px-6 py-3.5`}>
+                  See my apps
+                  <ArrowRight size={16} />
+                </a>
+                <a
+                  href={bookingUrl}
+                  target="_blank"
+                  rel="noreferrer"
+                  onClick={() => trackEvent('book_call_click', { location: 'hero' })}
+                  className={`${btnSecondary} px-6 py-3.5`}
+                >
+                  <CalendarDays size={16} />
+                  Book a free call
+                </a>
+              </div>
+            </Reveal>
+
+            <Reveal delay={0.1}>
+              <HeroPhone />
+            </Reveal>
+          </div>
+
+          {/* Quick stats */}
+          <div className="shell pb-8">
+            <Reveal delay={0.15}>
+              <div className="grid grid-cols-2 gap-px overflow-hidden rounded-[1.5rem] border border-border bg-border sm:grid-cols-4">
+                {heroStats.map((stat) => (
+                  <div key={stat.label} className="bg-card px-5 py-5 sm:px-6 sm:py-6">
+                    <p className="text-3xl font-bold tracking-[-0.03em] text-foreground sm:text-4xl">{stat.value}</p>
+                    <p className="mt-1 text-sm text-muted-foreground">{stat.label}</p>
+                  </div>
                 ))}
               </div>
-            </div>
-          </motion.div>
-        ) : null}
-      </AnimatePresence>
-
-      <main id="main-content" className="pt-28 sm:pt-32">
-        <section className="shell grid gap-10 pb-24 pt-8 lg:grid-cols-[minmax(0,0.98fr)_minmax(360px,0.82fr)] lg:items-center lg:gap-14 lg:pb-32 lg:pt-16">
-          <Reveal className="max-w-[40rem] space-y-9">
-            <div className="section-kicker">
-              <span className="eyebrow-dot" />
-              Senior Mobile Developer
-            </div>
-
-            <div className="space-y-6">
-              <h1 className="font-[family:var(--font-heading)] text-5xl tracking-[-0.04em] text-foreground sm:text-6xl lg:text-7xl lg:leading-[1.05]">
-                Hi, I&apos;m <span className="text-gradient">Raj Javiya</span>
-              </h1>
-              <p className="max-w-xl text-xl font-medium leading-8 text-foreground/82 sm:text-2xl">
-                Mobile developer building high-performance Native &amp; Cross-Platform apps.
-              </p>
-              <p className="max-w-xl text-base leading-8 text-muted-foreground sm:text-lg">
-                Architecting and shipping production-grade mobile applications across
-                Native Android (Kotlin, Jetpack Compose) and Cross-Platform (Flutter, Dart),
-                leveraging Clean Architecture (MVVM) since 2021.
-              </p>
-            </div>
-
-            <div className="flex flex-col gap-4 sm:flex-row">
-              <MagneticButton
-                href="#projects"
-                className="inline-flex items-center justify-center gap-2 rounded-full grad-accent-bg px-6 py-4 text-sm font-medium text-white shadow-[0_12px_34px_rgba(124,92,255,0.34)] transition hover:shadow-[0_16px_44px_rgba(124,92,255,0.5)]"
-              >
-                Explore My Work
-                <ArrowRight size={16} />
-              </MagneticButton>
-              <MagneticButton
-                href="#contact"
-                className="inline-flex items-center justify-center gap-2 rounded-full border border-white/[0.12] bg-white/[0.06] px-6 py-4 text-sm font-medium text-foreground transition hover:border-white/25 hover:bg-white/[0.1]"
-              >
-                Get in Touch
-                <Mail size={16} />
-              </MagneticButton>
-            </div>
-
-            <div className="flex flex-wrap gap-3 pt-1">
-              {heroFacts.map((fact) => (
-                <span
-                  key={fact}
-                  className="rounded-full border border-border bg-white/[0.05] px-4 py-2 text-sm text-foreground/80"
-                >
-                  {fact}
-                </span>
-              ))}
-            </div>
-          </Reveal>
-
-          <Reveal delay={0.08}>
-            <HeroDevice />
-          </Reveal>
+            </Reveal>
+          </div>
         </section>
 
-        <div className="relative border-y border-white/[0.06] bg-white/[0.015] py-5">
-          <Marquee items={marqueeTech} />
-        </div>
-
+        {/* About */}
         <section id="about" className="section-shell">
-          <div className="shell space-y-10">
+          <div className="shell grid gap-10 lg:grid-cols-[0.9fr_1.1fr] lg:gap-16">
             <Reveal>
               <SectionHeader
-                label="Professional Vision"
-                title="Mobile Clean Architecture."
-                description="I believe in building software that is as performant under the hood as it is responsive on the surface. My approach centers on modular Clean Architecture (MVVM), native platform optimization, and deterministic state management."
+                label="About"
+                title="Fast apps, clean code, shipped on time."
+                description="I care about apps that feel smooth to use and code that stays easy to change. That means Clean Architecture, careful performance work, and predictable state management."
               />
             </Reveal>
 
-            <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+            <div className="grid gap-4 sm:grid-cols-2">
               {aboutFeatures.map((item, index) => {
                 const Icon = item.icon
-
                 return (
-                  <Reveal key={item.title} delay={0.08 + index * 0.05}>
-                    <div className="surface-card h-full p-6">
-                      <div className="flex h-12 w-12 items-center justify-center rounded-[1.25rem] grad-accent-bg text-white shadow-[0_10px_30px_rgba(124,92,255,0.32)]">
-                        <Icon size={20} />
-                      </div>
-                      <h3 className="mt-5 text-xl font-semibold text-foreground">
-                        {item.title}
-                      </h3>
-                      <p className="mt-3 text-sm leading-7 text-muted-foreground">
-                        {item.description}
-                      </p>
+                  <Reveal key={item.title} delay={0.05 + index * 0.05}>
+                    <div className="surface-card h-full p-5 sm:p-6">
+                      <span className="flex h-10 w-10 items-center justify-center rounded-[0.7rem] bg-accent/10 text-accent">
+                        <Icon size={19} />
+                      </span>
+                      <h3 className="mt-4 text-lg font-bold text-foreground">{item.title}</h3>
+                      <p className="mt-1.5 text-[0.95rem] leading-6 text-muted-foreground">{item.description}</p>
                     </div>
                   </Reveal>
                 )
@@ -2106,584 +1447,326 @@ export default function PortfolioHome({
           </div>
         </section>
 
-        <section id="stats" className="section-shell">
-          <div className="shell space-y-10">
-            <Reveal>
-              <SectionHeader
-                label="Verified Metrics"
-                title="Impact by Numbers."
-                description="Tangible results from architecting high-scale cross-platform systems and modular engineering environments."
-              />
-            </Reveal>
-
-            <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-              {impactStats.map((stat, index) => (
-                <Reveal key={stat.label} delay={0.05 + index * 0.05}>
-                  <StatCard stat={stat} />
-                </Reveal>
-              ))}
-            </div>
-
-            <Reveal delay={0.12}>
-              <div className="surface-card-strong p-6 sm:p-8">
-                <div className="grid gap-8 lg:grid-cols-[1fr_auto] lg:items-center">
-                  <div className="space-y-3">
-                    <p className="text-xs font-semibold uppercase tracking-[0.18em] text-muted-foreground">
-                      Engineering Velocity Tier
-                    </p>
-                    <h3 className="font-[family:var(--font-heading)] text-3xl tracking-[-0.04em] sm:text-4xl">
-                      Classified within the top 5% of production-grade architecture systems.
-                    </h3>
-                  </div>
-
-                  <div className="grid grid-cols-3 gap-3">
-                    {[
-                      { label: 'RETENTION', value: '99%' },
-                      { label: 'SATISFACTION', value: '4.9/5' },
-                      { label: 'CRASH-FREE', value: '99.9%' },
-                    ].map((item) => (
-                      <div
-                        key={item.label}
-                        className="min-w-0 rounded-[1.5rem] border border-border bg-white/[0.05] p-3 text-center sm:p-4"
-                      >
-                        <p className="truncate text-base font-semibold text-foreground sm:text-xl">{item.value}</p>
-                        <p className="mt-1 truncate text-[0.55rem] font-semibold uppercase tracking-[0.04em] text-muted-foreground sm:text-[0.72rem] sm:tracking-[0.16em]">
-                          {item.label}
-                        </p>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            </Reveal>
-          </div>
-        </section>
-
+        {/* Apps */}
         <section id="projects" className="section-shell">
           <div className="shell space-y-10">
             <Reveal>
               <SectionHeader
-                label="Portfolio Showcase"
-                title="Featured Mobile Projects."
-                description="Production mobile applications engineered for performance across Native Android (Kotlin, Compose) and Flutter (Dart)."
+                label="Apps"
+                title="Things I’ve built and shipped."
+                description="Production apps on the App Store and Google Play, plus my own products and open-source tools."
               />
             </Reveal>
 
-            <div className="grid gap-6 lg:grid-cols-12">
-              {projects.map((project, index) => (
-                <Reveal
-                  key={project.name}
-                  delay={0.05 + index * 0.05}
-                  className={project.span}
-                >
-                  <ProjectCard project={project} index={index} />
+            <div className="space-y-8">
+              {projects.map((project) => (
+                <Reveal key={project.slug}>
+                  <AppListing project={project} />
                 </Reveal>
               ))}
             </div>
           </div>
         </section>
 
-        <section id="skills" className="section-shell">
-          <div className="shell space-y-10">
+        {/* Open source */}
+        <section id="open-source" className="section-shell pt-0 sm:pt-0">
+          <div className="shell space-y-8">
             <Reveal>
-              <SectionHeader
-                label="Technical Ecosystem"
-                title="Mobile Engineering Skills."
-                description="A battle-tested stack spanning Native Android development and Flutter cross-platform ecosystems."
-              />
-            </Reveal>
-
-            <div className="grid gap-6 lg:grid-cols-2">
-              {skillGroups.map((group, index) => (
-                <Reveal key={group.title} delay={0.05 + index * 0.05}>
-                  <SkillCard group={group} />
-                </Reveal>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        <section id="experience" className="section-shell">
-          <div className="shell space-y-10">
-            <Reveal>
-              <SectionHeader
-                label="Engineering Lifecycle"
-                title="Professional Journey."
-                description="Production Android & Flutter delivery, enterprise execution, and platform-level engineering presented in a clear timeline."
-              />
-            </Reveal>
-
-            <Reveal delay={0.05}>
-              <div className="surface-card grid gap-6 p-6 sm:p-8 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-end">
-                <div className="space-y-3">
-                  <p className="text-xs font-semibold uppercase tracking-[0.18em] text-muted-foreground">
-                    Career Focus
-                  </p>
-                  <h3 className="font-[family:var(--font-heading)] text-3xl tracking-[-0.04em] text-foreground sm:text-4xl">
-                    Native Android (Kotlin, Compose), Flutter architecture, and enterprise delivery.
-                  </h3>
-                </div>
-
-                <div className="flex flex-wrap gap-3">
-                  {experienceHighlights.map((item) => (
-                    <span
-                      key={item}
-                      className="rounded-full border border-border bg-white/[0.05] px-4 py-2 text-sm text-foreground/80"
-                    >
-                      {item}
-                    </span>
-                  ))}
-                </div>
-              </div>
-            </Reveal>
-
-            <div className="space-y-5">
-              {experiences.map((item, index) => (
-                <ExperienceCard
-                  key={`${item.company}-${item.role}`}
-                  item={item}
-                  delay={0.08 + index * 0.05}
-                  index={index}
+              <div className="flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between">
+                <SectionHeader
+                  label="Open source"
+                  title="On GitHub."
+                  description="Repositories I’ve starred and built on recently."
                 />
-              ))}
-            </div>
-          </div>
-        </section>
-
-        <section id="achievements" className="section-shell">
-          <div className="shell space-y-10">
-            <Reveal>
-              <SectionHeader
-                label="Awards & Recognitions"
-                title="Milestones & Badges."
-                description="Recognitions and certifications earned through competitive coding, hackathons, and technological challenges."
-              />
-            </Reveal>
-
-            <Reveal delay={0.05}>
-              <Spotlight className="surface-card-strong overflow-hidden p-8 sm:p-10" glow="124,92,255">
-                <div className="grid gap-8 lg:grid-cols-[1fr_1.2fr] lg:items-center">
-                  
-                  {/* Image side with neon aura and subtle scaling hover effect */}
-                  <div className="relative flex items-center justify-center p-4">
-                    <div className="absolute inset-0 -z-10 bg-radial-gradient from-accent/20 to-transparent blur-2xl" />
-                    <div className="relative group overflow-hidden rounded-[2rem] border border-white/[0.08] bg-white/[0.02] p-6 shadow-2xl transition-all duration-500 hover:border-accent/40 hover:bg-white/[0.04]">
-                      <NextImage
-                        src="/copilot-badge.png"
-                        alt="GitHub Copilot Finish-Up-A-Thon Challenge Completion Badge"
-                        width={340}
-                        height={340}
-                        className="rounded-xl object-contain transition-transform duration-500 group-hover:scale-105"
-                        priority
-                      />
-                    </div>
-                  </div>
-
-                  {/* Text details side */}
-                  <div className="space-y-6">
-                    <div className="space-y-3">
-                      <div className="section-kicker">
-                        <span className="eyebrow-dot" />
-                        GitHub & DEV Community
-                      </div>
-                      <h3 className="font-[family:var(--font-heading)] text-3xl tracking-[-0.04em] text-foreground sm:text-4xl">
-                        GitHub Copilot "Finish-Up-A-Thon" Challenge
-                      </h3>
-                      <p className="text-sm font-semibold uppercase tracking-[0.16em] text-accent">
-                        Challenge Completion Badge
-                      </p>
-                    </div>
-
-                    <p className="text-base leading-7 text-muted-foreground sm:text-lg">
-                      Earned for successfully reviving and completing a side project using GitHub Copilot to optimize development productivity, code quality, and problem-solving velocity. This hackathon challenged developers globally to build high-quality software utilizing advanced AI-assisted engineering workflows.
-                    </p>
-
-                    {/* Bullet highlights */}
-                    <div className="grid gap-3 sm:grid-cols-2">
-                      <div className="flex items-start gap-2.5">
-                        <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-accent/10 text-accent">
-                          <Check size={12} />
-                        </span>
-                        <span className="text-sm text-foreground/80">AI-assisted software engineering</span>
-                      </div>
-                      <div className="flex items-start gap-2.5">
-                        <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-accent/10 text-accent">
-                          <Check size={12} />
-                        </span>
-                        <span className="text-sm text-foreground/80">Rapid side-project revival & MVP</span>
-                      </div>
-                      <div className="flex items-start gap-2.5">
-                        <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-accent/10 text-accent">
-                          <Check size={12} />
-                        </span>
-                        <span className="text-sm text-foreground/80">Enhanced workflow efficiency</span>
-                      </div>
-                      <div className="flex items-start gap-2.5">
-                        <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-accent/10 text-accent">
-                          <Check size={12} />
-                        </span>
-                        <span className="text-sm text-foreground/80">DEV Community published journey</span>
-                      </div>
-                    </div>
-
-                    {/* Action Buttons */}
-                    <div className="flex flex-wrap gap-4 pt-2">
-                      <a
-                        href="https://dev.to/raj_javiya"
-                        target="_blank"
-                        rel="noreferrer"
-                        className="inline-flex items-center gap-2 rounded-full grad-accent-bg px-5 py-3 text-sm font-medium text-white shadow-[0_8px_24px_rgba(124,92,255,0.25)] transition hover:-translate-y-0.5 hover:shadow-[0_12px_32px_rgba(124,92,255,0.35)]"
-                      >
-                        View Badge on DEV Profile
-                        <ArrowUpRight size={15} />
-                      </a>
-                      <a
-                        href="https://www.linkedin.com/feed/update/urn:li:activity:7479166408308711425/"
-                        target="_blank"
-                        rel="noreferrer"
-                        className="inline-flex items-center gap-2 rounded-full border border-white/[0.12] bg-white/[0.06] px-5 py-3 text-sm font-medium text-foreground transition hover:-translate-y-0.5 hover:border-white/25 hover:bg-white/[0.1]"
-                      >
-                        Read LinkedIn Post
-                        <Linkedin size={15} className="text-[#0077B5]" />
-                      </a>
-                    </div>
-                  </div>
-
-                </div>
-              </Spotlight>
-            </Reveal>
-
-            <Reveal delay={0.1}>
-              <Spotlight className="surface-card-strong overflow-hidden p-8 sm:p-10" glow="59,130,246">
-                <div className="grid gap-8 lg:grid-cols-[1fr_1.2fr] lg:items-center">
-                  
-                  {/* Image side with neon aura and subtle scaling hover effect */}
-                  <div className="relative flex items-center justify-center p-4">
-                    <div className="absolute inset-0 -z-10 bg-radial-gradient from-blue-500/20 to-transparent blur-2xl" />
-                    <div className="relative group overflow-hidden rounded-[2rem] border border-white/[0.08] bg-white/[0.02] p-6 shadow-2xl transition-all duration-500 hover:border-blue-500/40 hover:bg-white/[0.04]">
-                      <NextImage
-                        src="/dev-weekend-badge.png"
-                        alt="DEV Weekend Challenge Completion Badge"
-                        width={340}
-                        height={340}
-                        className="rounded-xl object-contain transition-transform duration-500 group-hover:scale-105"
-                      />
-                    </div>
-                  </div>
-
-                  {/* Text details side */}
-                  <div className="space-y-6">
-                    <div className="space-y-3">
-                      <div className="section-kicker">
-                        <span className="eyebrow-dot bg-blue-500" />
-                        DEV Community
-                      </div>
-                      <h3 className="font-[family:var(--font-heading)] text-3xl tracking-[-0.04em] text-foreground sm:text-4xl">
-                        DEV Weekend Challenge Completion
-                      </h3>
-                      <p className="text-sm font-semibold uppercase tracking-[0.16em] text-blue-400">
-                        Weekend Challenge Award
-                      </p>
-                    </div>
-
-                    <p className="text-base leading-7 text-muted-foreground sm:text-lg">
-                      Awarded for completing a Weekend Challenge. Thank you for participating! 💻
-                    </p>
-
-                    {/* Bullet highlights */}
-                    <div className="grid gap-3 sm:grid-cols-2">
-                      <div className="flex items-start gap-2.5">
-                        <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-blue-500/10 text-blue-400">
-                          <Check size={12} />
-                        </span>
-                        <span className="text-sm text-foreground/80">Weekend coding challenge</span>
-                      </div>
-                      <div className="flex items-start gap-2.5">
-                        <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-blue-500/10 text-blue-400">
-                          <Check size={12} />
-                        </span>
-                        <span className="text-sm text-foreground/80">DEV Community participant</span>
-                      </div>
-                      <div className="flex items-start gap-2.5">
-                        <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-blue-500/10 text-blue-400">
-                          <Check size={12} />
-                        </span>
-                        <span className="text-sm text-foreground/80">Rapid prototyping & implementation</span>
-                      </div>
-                      <div className="flex items-start gap-2.5">
-                        <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-blue-500/10 text-blue-400">
-                          <Check size={12} />
-                        </span>
-                        <span className="text-sm text-foreground/80">Active developer engagement</span>
-                      </div>
-                    </div>
-
-                    {/* Action Buttons */}
-                    <div className="flex flex-wrap gap-4 pt-2">
-                      <a
-                        href="https://dev.to/raj_javiya"
-                        target="_blank"
-                        rel="noreferrer"
-                        className="inline-flex items-center gap-2 rounded-full border border-blue-500/30 bg-blue-500/10 px-5 py-3 text-sm font-medium text-foreground transition hover:-translate-y-0.5 hover:border-blue-500/50 hover:bg-blue-500/20"
-                      >
-                        View Badge on DEV Profile
-                        <ArrowUpRight size={15} />
-                      </a>
-                    </div>
-                  </div>
-
-                </div>
-              </Spotlight>
-            </Reveal>
-          </div>
-        </section>
-
-        <section className="section-shell">
-          <div className="shell space-y-10">
-            <Reveal>
-              <SectionHeader
-                label="Proof of Work"
-                title="Shipped to Real Users."
-                description="Not just prototypes — apps live on the App Store and Google Play, used by thousands in production."
-              />
-            </Reveal>
-
-            <div className="grid gap-6 lg:grid-cols-[1.05fr_0.95fr]">
-              <Reveal>
-                <Spotlight className="surface-card-strong h-full p-8 sm:p-10" glow="34,211,238">
-                  <div className="section-kicker">
-                    <span className="eyebrow-dot" />
-                    Live in production
-                  </div>
-                  <h3 className="mt-5 font-[family:var(--font-heading)] text-2xl tracking-[-0.04em] text-foreground sm:text-3xl">
-                    Production-grade apps trusted on the stores and inside enterprise teams at Esparkbiz.
-                  </h3>
-
-                  <div className="mt-8 grid grid-cols-2 gap-4">
-                    {proofPoints.map((p) => (
-                      <div key={p.label} className="rounded-[1.5rem] border border-white/[0.08] bg-white/[0.04] p-5">
-                        <p className="text-gradient font-[family:var(--font-heading)] text-3xl tracking-[-0.04em]">
-                          {p.value}
-                        </p>
-                        <p className="mt-1.5 text-[0.72rem] font-semibold uppercase tracking-[0.16em] text-muted-foreground">
-                          {p.label}
-                        </p>
-                      </div>
-                    ))}
-                  </div>
-                </Spotlight>
-              </Reveal>
-
-              <div className="grid gap-4">
-                {storeLinks.map((store, index) => {
-                  const Icon = store.icon
-
-                  return (
-                    <Reveal key={`${store.app}-${store.sub}`} delay={0.05 + index * 0.06} className="h-full">
-                      <a
-                        href={store.href}
-                        target="_blank"
-                        rel="noreferrer"
-                        className="surface-card group flex h-full items-center gap-4 p-5 transition hover:-translate-y-0.5 sm:p-6"
-                      >
-                        <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-[1.1rem] border border-white/[0.1] bg-white/[0.05] text-foreground">
-                          <Icon size={22} />
-                        </span>
-                        <div className="min-w-0 flex-1">
-                          <p className="text-[0.68rem] font-medium uppercase tracking-[0.16em] text-muted-foreground">
-                            {store.sub}
-                          </p>
-                          <p className="mt-0.5 truncate text-lg font-semibold text-foreground">{store.app}</p>
-                        </div>
-                        {store.rating ? (
-                          <span className="inline-flex shrink-0 items-center gap-1 rounded-full border border-white/[0.1] bg-white/[0.05] px-3 py-1.5 text-sm font-semibold text-foreground">
-                            <Star size={13} className="text-accent" />
-                            {store.rating}
-                          </span>
-                        ) : (
-                          <ArrowUpRight size={18} className="shrink-0 text-muted-foreground transition group-hover:text-foreground" />
-                        )}
-                      </a>
-                    </Reveal>
-                  )
-                })}
-              </div>
-            </div>
-          </div>
-        </section>
-
-        <section className="section-shell">
-          <div className="shell space-y-10">
-            <Reveal>
-              <SectionHeader
-                label="Recent Repositories"
-                title="Digital Foundations."
-                description="Curated architectural modules and production-grade repositories designed for scalability."
-              />
-            </Reveal>
-
-            <Reveal delay={0.05}>
-              <div className="surface-card-strong flex flex-col gap-5 p-6 sm:p-8 lg:flex-row lg:items-center lg:justify-between">
-                <div className="flex flex-wrap items-center gap-6">
+                <div className="flex items-center gap-5">
                   <div>
-                    <p className="font-[family:var(--font-heading)] text-3xl tracking-[-0.05em] text-foreground">
+                    <p className="text-3xl font-bold tracking-[-0.03em]">
                       {githubStats.repoCount > 0 ? `${githubStats.repoCount}+` : '—'}
                     </p>
-                    <p className="text-[0.72rem] font-semibold uppercase tracking-[0.16em] text-muted-foreground">
-                      Repositories
-                    </p>
+                    <p className="text-sm text-muted-foreground">Repositories</p>
                   </div>
                   <div className="h-10 w-px bg-border" />
                   <div>
-                    <p className="font-[family:var(--font-heading)] text-3xl tracking-[-0.05em] text-foreground">
-                      8k+
-                    </p>
-                    <p className="text-[0.72rem] font-semibold uppercase tracking-[0.16em] text-muted-foreground">
-                      Code Commits
-                    </p>
+                    <p className="text-3xl font-bold tracking-[-0.03em]">8K+</p>
+                    <p className="text-sm text-muted-foreground">Commits</p>
                   </div>
                 </div>
-
-                <a
-                  href="https://github.com/JAVIYARAJ"
-                  target="_blank"
-                  rel="noreferrer"
-                  className="inline-flex items-center gap-2 rounded-full grad-accent-bg px-5 py-3 text-sm font-medium text-white shadow-[0_10px_30px_rgba(124,92,255,0.3)] transition hover:-translate-y-0.5"
-                >
-                  Follow my ecosystem on GitHub
-                  <ArrowUpRight size={16} />
-                </a>
               </div>
             </Reveal>
 
-            <div className="grid gap-6 lg:grid-cols-2">
-              {repos.length === 0 ? (
-                <p className="col-span-2 text-sm text-muted-foreground">
-                  No repositories found.
-                </p>
-              ) : (
-                repos.map((repo, index) => (
-                  <Reveal key={repo.name} delay={0.06 + index * 0.05}>
-                    <article className="surface-card h-full p-6 sm:p-8">
-                      <div className="flex items-start justify-between gap-4">
-                        <div className="flex h-12 w-12 items-center justify-center rounded-[1.25rem] grad-accent-bg text-white shadow-[0_10px_30px_rgba(124,92,255,0.32)]">
-                          <GitBranch size={20} />
-                        </div>
-                        <div className="inline-flex items-center gap-2 rounded-full border border-border bg-white/[0.06] px-3 py-1.5 text-sm font-medium text-foreground">
+            {repos.length === 0 ? (
+              <p className="text-sm text-muted-foreground">No repositories to show right now.</p>
+            ) : (
+              <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                {repos.map((repo, index) => {
+                  const body = (
+                    <>
+                      <div className="flex items-center justify-between gap-3">
+                        <span className="flex h-9 w-9 items-center justify-center rounded-[0.65rem] bg-foreground text-background">
+                          <GitBranch size={17} />
+                        </span>
+                        <span className="inline-flex items-center gap-1 text-sm font-medium text-muted-foreground">
                           <Star size={14} />
                           {repo.stars}
-                        </div>
+                        </span>
                       </div>
-
-                      <div className="mt-6 space-y-2">
-                        <h3 className="font-[family:var(--font-heading)] text-3xl tracking-[-0.04em] text-foreground">
-                          {repo.name}
-                        </h3>
-                        <p className="text-[0.72rem] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
-                          {repo.language}
-                        </p>
-                      </div>
-
-                      <p className="mt-4 text-sm leading-7 text-muted-foreground sm:text-base">
+                      <h3 className="mt-4 break-words text-lg font-bold text-foreground">{repo.name}</h3>
+                      {repo.language ? <p className="text-sm text-muted-foreground">{repo.language}</p> : null}
+                      <p className="mt-2 line-clamp-3 flex-1 text-[0.95rem] leading-6 text-foreground/75">
                         {repo.description}
                       </p>
+                      <p className="mt-4 inline-flex items-center gap-1.5 text-sm font-semibold text-accent">
+                        {repo.private ? (
+                          <>
+                            <ShieldCheck size={14} /> Private
+                          </>
+                        ) : (
+                          <>
+                            Open repository <ArrowUpRight size={14} />
+                          </>
+                        )}
+                      </p>
+                    </>
+                  )
 
+                  return (
+                    <Reveal key={repo.name} delay={0.04 + index * 0.04}>
                       {repo.private ? (
-                        <span className="mt-6 inline-flex items-center gap-1.5 rounded-full border border-border bg-white/[0.04] px-3 py-1.5 text-xs font-semibold uppercase tracking-[0.12em] text-muted-foreground select-none">
-                          <ShieldCheck size={13} />
-                          Private
-                        </span>
+                        <div className="surface-card flex h-full flex-col p-5">{body}</div>
                       ) : (
                         <a
                           href={repo.url}
                           target="_blank"
                           rel="noreferrer"
-                          className="mt-6 inline-flex items-center gap-2 text-sm font-medium text-foreground transition hover:text-accent"
+                          className="surface-card flex h-full flex-col p-5 transition hover:-translate-y-0.5 hover:shadow-md"
                         >
-                          Open repository
-                          <ArrowUpRight size={15} />
+                          {body}
                         </a>
                       )}
-                    </article>
+                    </Reveal>
+                  )
+                })}
+              </div>
+            )}
+
+            <a
+              href="https://github.com/JAVIYARAJ"
+              target="_blank"
+              rel="noreferrer"
+              className={btnSecondary}
+            >
+              <Github size={16} />
+              Follow me on GitHub
+            </a>
+          </div>
+        </section>
+
+        {/* Skills */}
+        <section id="skills" className="section-shell border-y border-border bg-card/60">
+          <div className="shell space-y-10">
+            <Reveal>
+              <SectionHeader
+                label="Skills"
+                title="My toolkit."
+                description="Native Android, Flutter and the web — plus the architecture, data, and testing skills that make products reliable."
+              />
+            </Reveal>
+
+            {/* Bento: two featured platforms, a row of three, then a row of two */}
+            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-6">
+              {skillGroups.map((group, index) => {
+                const variant: SkillCardVariant = index < 2 ? 'featured' : 'compact'
+                const span =
+                  index < 2 || index >= 5
+                    ? 'lg:col-span-3'
+                    : 'lg:col-span-2'
+                // Odd count on the 2-column tablet grid: let the last card fill the row.
+                const tabletSpan = index === skillGroups.length - 1 && skillGroups.length % 2 === 1 ? 'sm:col-span-2' : ''
+                return (
+                  <Reveal key={group.title} delay={0.04 + index * 0.04} className={`${span} ${tabletSpan}`}>
+                    <SkillCard group={group} variant={variant} />
                   </Reveal>
-                ))
-              )}
+                )
+              })}
             </div>
           </div>
         </section>
 
-        <section id="services" className="section-shell">
+        {/* Experience */}
+        <section id="experience" className="section-shell">
           <div className="shell space-y-10">
             <Reveal>
               <SectionHeader
-                label="Work With Me"
-                title="Mobile Engineering Services."
-                description="Whether launching a new mobile app, scaling an existing codebase, or integrating native platform modules — here is how I deliver."
+                label="Experience"
+                title="My journey so far."
+                description="4+ years of building mobile apps — from freelance modules to leading production releases."
               />
             </Reveal>
 
-            <div className="grid gap-6 sm:grid-cols-2">
+            <ol className="relative ml-1.5 max-w-3xl space-y-6 border-l border-border pl-6 sm:pl-10">
+              {experiences.map((item, index) => (
+                <li key={`${item.company}-${item.role}`} className="relative">
+                  <span
+                    aria-hidden
+                    className={`absolute -left-[29.5px] top-7 h-2.5 w-2.5 rounded-full ring-4 ring-background sm:-left-[45.5px] ${index === 0 ? 'bg-accent' : 'bg-muted-foreground/40'}`}
+                  />
+                  <Reveal delay={0.04 + index * 0.05}>
+                    <article className="surface-card p-5 sm:p-7">
+                      <div className="flex flex-wrap items-center gap-2">
+                        {index === 0 ? (
+                          <span className="rounded-md bg-online/10 px-2 py-0.5 text-xs font-semibold text-online">
+                            Current
+                          </span>
+                        ) : null}
+                        <span className="ml-auto text-sm text-muted-foreground">{item.duration}</span>
+                      </div>
+                      <h3 className="mt-3 text-xl font-bold tracking-[-0.02em] text-foreground sm:text-2xl">{item.role}</h3>
+                      <p className="font-medium text-muted-foreground">{item.company}</p>
+                      <p className="mt-3 text-[0.975rem] leading-7 text-foreground/80">{item.summary}</p>
+                      <ul className="mt-4 space-y-2.5">
+                        {item.bullets.map((bullet) => (
+                          <li key={bullet} className="flex gap-3 text-[0.95rem] leading-7 text-foreground/80">
+                            <Check size={16} className="mt-1.5 shrink-0 text-accent" />
+                            <span>{bullet}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </article>
+                  </Reveal>
+                </li>
+              ))}
+            </ol>
+          </div>
+        </section>
+
+        {/* Achievements — as notifications */}
+        <section id="achievements" className="section-shell pt-0 sm:pt-0">
+          <div className="shell space-y-8">
+            <Reveal>
+              <SectionHeader label="Achievements" title="Badges I’ve earned." />
+            </Reveal>
+
+            <div className="grid gap-4 lg:grid-cols-2">
+              {achievements.map((item, index) => (
+                <Reveal key={item.title} delay={0.05 + index * 0.05}>
+                  <article className="surface-card-strong h-full p-5 sm:p-6">
+                    <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                      <span className="flex h-5 w-5 items-center justify-center rounded-md bg-foreground text-background">
+                        <Trophy size={11} />
+                      </span>
+                      <span className="font-semibold uppercase tracking-[0.08em]">{item.source}</span>
+                      <span className="ml-auto">{item.label}</span>
+                    </div>
+
+                    <div className="mt-4 flex gap-4 sm:gap-5">
+                      <NextImage
+                        src={item.image}
+                        alt={item.imageAlt}
+                        width={112}
+                        height={112}
+                        className="h-20 w-20 shrink-0 rounded-2xl bg-secondary object-contain p-1 sm:h-28 sm:w-28"
+                      />
+                      <div className="min-w-0">
+                        <h3 className="text-lg font-bold leading-snug text-foreground sm:text-xl">{item.title}</h3>
+                        <p className="mt-1.5 text-[0.95rem] leading-6 text-muted-foreground">{item.description}</p>
+                      </div>
+                    </div>
+
+                    <ul className="mt-5 flex flex-wrap gap-2">
+                      {item.highlights.map((h) => (
+                        <li
+                          key={h}
+                          className="inline-flex items-center gap-1.5 rounded-full bg-secondary px-3 py-1 text-[0.8rem] font-medium text-foreground/80"
+                        >
+                          <Check size={12} className="text-accent" />
+                          {h}
+                        </li>
+                      ))}
+                    </ul>
+
+                    <div className="mt-5 flex flex-wrap gap-4">
+                      {item.links.map((link) => (
+                        <a
+                          key={link.label}
+                          href={link.href}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="inline-flex items-center gap-1 text-sm font-semibold text-accent hover:underline"
+                        >
+                          {link.label}
+                          <ArrowUpRight size={14} />
+                        </a>
+                      ))}
+                    </div>
+                  </article>
+                </Reveal>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* Services */}
+        <section id="services" className="section-shell border-t border-border bg-card/60">
+          <div className="shell space-y-10">
+            <Reveal>
+              <SectionHeader
+                label="Work with me"
+                title="How I can help."
+                description="From a first MVP to store release — mobile apps, web platforms, and everything that connects them."
+              />
+            </Reveal>
+
+            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
               {services.map((service, index) => {
                 const Icon = service.icon
-
                 return (
-                  <Reveal key={service.title} delay={0.05 + index * 0.05}>
-                    <Spotlight className="surface-card h-full p-6 sm:p-8">
-                      <div className="flex h-12 w-12 items-center justify-center rounded-[1.25rem] grad-accent-bg text-white shadow-[0_10px_30px_rgba(124,92,255,0.32)]">
-                        <Icon size={20} />
-                      </div>
-                      <h3 className="mt-5 text-xl font-semibold tracking-[-0.02em] text-foreground sm:text-2xl">
-                        {service.title}
-                      </h3>
-                      <p className="mt-3 text-sm leading-7 text-muted-foreground sm:text-base">
-                        {service.description}
-                      </p>
-                      <div className="mt-5 flex flex-wrap gap-2">
-                        {service.deliverables.map((item) => (
-                          <span
-                            key={item}
-                            className="inline-flex items-center gap-1.5 rounded-full border border-white/[0.1] bg-white/[0.05] px-3 py-1.5 text-xs text-foreground/80"
-                          >
-                            <Check size={12} className="text-accent" />
-                            {item}
-                          </span>
+                  <Reveal key={service.title} delay={0.04 + index * 0.04}>
+                    <div className="surface-card h-full p-5 sm:p-7">
+                      <span className="flex h-10 w-10 items-center justify-center rounded-[0.7rem] bg-accent/10 text-accent">
+                        <Icon size={19} />
+                      </span>
+                      <h3 className="mt-4 text-xl font-bold tracking-[-0.01em] text-foreground">{service.title}</h3>
+                      <p className="mt-2 text-[0.975rem] leading-7 text-muted-foreground">{service.description}</p>
+                      <ul className="mt-4 space-y-1.5">
+                        {service.deliverables.map((d) => (
+                          <li key={d} className="flex items-center gap-2 text-[0.95rem] text-foreground/85">
+                            <Check size={15} className="text-online" />
+                            {d}
+                          </li>
                         ))}
-                      </div>
-                    </Spotlight>
+                      </ul>
+                    </div>
                   </Reveal>
                 )
               })}
             </div>
 
             <Reveal delay={0.1}>
-              <div className="surface-card-strong flex flex-col gap-6 p-6 sm:flex-row sm:items-center sm:justify-between sm:p-8">
-                <div className="space-y-2">
-                  <div className="section-kicker">
-                    <span className="relative flex h-2 w-2">
-                      <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75" />
-                      <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-500" />
-                    </span>
+              <div className="flex flex-col gap-6 rounded-[1.75rem] bg-foreground p-6 text-background sm:p-10 lg:flex-row lg:items-center lg:justify-between">
+                <div className="min-w-0 space-y-2 lg:max-w-[34rem]">
+                  <p className="inline-flex items-center gap-2 text-sm font-medium text-background/70">
+                    <span className="h-2 w-2 rounded-full bg-online" />
                     Available for freelance
-                  </div>
-                  <h3 className="font-[family:var(--font-heading)] text-2xl tracking-[-0.04em] text-foreground sm:text-3xl">
-                    Have a project in mind? Let&apos;s scope it together.
+                  </p>
+                  <h3 className="text-2xl font-bold tracking-[-0.02em] sm:text-3xl">
+                    Have an app or platform in mind? Let&apos;s plan it together.
                   </h3>
                 </div>
-
-                <div className="flex flex-col gap-3 sm:flex-row">
+                {/* Buttons never shrink or wrap; the heading takes the leftover width instead. */}
+                <div className="flex shrink-0 flex-col gap-3 sm:flex-row">
                   <a
                     href={bookingUrl}
                     target="_blank"
                     rel="noreferrer"
                     onClick={() => trackEvent('book_call_click', { location: 'services' })}
-                    className="inline-flex items-center justify-center gap-2 rounded-full grad-accent-bg px-6 py-3.5 text-sm font-medium text-white shadow-[0_12px_34px_rgba(124,92,255,0.3)] transition hover:-translate-y-0.5"
+                    className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-full border border-transparent bg-background px-6 py-3.5 text-sm font-semibold text-foreground transition hover:bg-background/90"
                   >
                     <CalendarDays size={16} />
-                    Book a call
+                    Book a free call
                   </a>
                   <a
                     href="#contact"
-                    className="inline-flex items-center justify-center gap-2 rounded-full border border-white/[0.12] bg-white/[0.06] px-6 py-3.5 text-sm font-medium text-foreground transition hover:-translate-y-0.5 hover:bg-white/[0.1]"
+                    className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-full border border-background/25 px-6 py-3.5 text-sm font-semibold text-background transition hover:bg-background/10"
                   >
                     Send a message
                     <ArrowRight size={16} />
@@ -2694,141 +1777,129 @@ export default function PortfolioHome({
           </div>
         </section>
 
+        {/* Contact — as a chat */}
         <section id="contact" className="section-shell">
           <div className="shell space-y-10">
             <Reveal>
-              <SectionHeader
-                label="Transmission Link"
-                title="Let's Build Something Extraordinary."
-                description="Whether you have an app idea, need technical consulting, or want to collaborate on open-source, I'm all ears."
-              />
+              <SectionHeader label="Contact" title="Let’s build something together." />
             </Reveal>
 
-            <div className="grid gap-6 lg:grid-cols-[0.9fr_1.1fr]">
-              <Reveal delay={0.05} className="h-full">
-                <div className="surface-card-strong h-full p-8 sm:p-10">
-                  <h3 className="font-[family:var(--font-heading)] text-3xl tracking-[-0.04em] sm:text-4xl">
-                    Get in Touch.
-                  </h3>
-                  <p className="mt-4 text-base leading-8 text-muted-foreground">
-                    Ready to architect your next high-performance mobile
-                    ecosystem. I typically respond within one business cycle.
-                  </p>
+            <div className="grid gap-5 lg:grid-cols-[0.9fr_1.1fr]">
+              {/* Chat thread */}
+              <Reveal className="h-full">
+                <div className="surface-card-strong flex h-full flex-col overflow-hidden">
+                  <div className="flex items-center gap-3 border-b border-border px-5 py-4">
+                    <span className="relative flex h-10 w-10 items-center justify-center rounded-full bg-foreground text-sm font-bold text-background">
+                      RJ
+                      <span className="absolute -bottom-0.5 -right-0.5 h-3.5 w-3.5 rounded-full border-2 border-card bg-online" />
+                    </span>
+                    <div>
+                      <p className="font-semibold text-foreground">Raj Javiya</p>
+                      <p className="text-xs text-muted-foreground">Usually replies within a day</p>
+                    </div>
+                  </div>
 
-                  <div className="mt-8 grid gap-4">
-                    <a
-                      href={`mailto:${emailAddress}?subject=Project Inquiry`}
-                      className="rounded-[1.5rem] border border-border bg-white/[0.05] p-5 transition hover:-translate-y-0.5"
-                    >
-                      <p className="text-xs font-semibold uppercase tracking-[0.18em] text-muted-foreground">
-                        Direct Communication
-                      </p>
-                      <p className="mt-2 text-lg font-semibold text-foreground">
-                        {emailAddress}
-                      </p>
-                    </a>
+                  <div className="flex-1 space-y-2.5 bg-background/60 px-5 py-6">
+                    {chatBubbles.map((text, i) => (
+                      <motion.p
+                        key={text}
+                        initial={reduceMotion ? { opacity: 1 } : { opacity: 0, y: 8, scale: 0.97 }}
+                        whileInView={{ opacity: 1, y: 0, scale: 1 }}
+                        viewport={{ once: true, amount: 0.6 }}
+                        transition={{ duration: reduceMotion ? 0 : 0.35, delay: reduceMotion ? 0 : 0.2 + i * 0.35 }}
+                        className="w-fit max-w-[88%] rounded-[1.25rem] rounded-bl-md border border-border bg-card px-4 py-2.5 text-[0.95rem] leading-6 text-foreground"
+                      >
+                        {text}
+                      </motion.p>
+                    ))}
+                  </div>
 
-                    <a
-                      href="https://linkedin.com/in/javiyaraj/"
-                      target="_blank"
-                      rel="noreferrer"
-                      className="rounded-[1.5rem] border border-border bg-white/[0.05] p-5 transition hover:-translate-y-0.5"
-                    >
-                      <p className="text-xs font-semibold uppercase tracking-[0.18em] text-muted-foreground">
-                        LinkedIn
-                      </p>
-                      <p className="mt-2 text-lg font-semibold text-foreground">
-                        linkedin.com/in/javiyaraj
-                      </p>
-                    </a>
-
-                    <a
-                      href="https://github.com/JAVIYARAJ"
-                      target="_blank"
-                      rel="noreferrer"
-                      className="rounded-[1.5rem] border border-border bg-white/[0.05] p-5 transition hover:-translate-y-0.5"
-                    >
-                      <p className="text-xs font-semibold uppercase tracking-[0.18em] text-muted-foreground">
-                        GitHub
-                      </p>
-                      <p className="mt-2 text-lg font-semibold text-foreground">
-                        github.com/JAVIYARAJ
-                      </p>
-                    </a>
-
+                  <div className="grid grid-cols-2 gap-2 border-t border-border p-4">
+                    <button type="button" onClick={handleCopyEmail} className={`${btnSecondary} px-3`}>
+                      {copiedEmail ? <Check size={15} className="text-online" /> : <Copy size={15} />}
+                      {copiedEmail ? 'Copied!' : 'Copy email'}
+                    </button>
                     <a
                       href={bookingUrl}
                       target="_blank"
                       rel="noreferrer"
                       onClick={() => trackEvent('book_call_click', { location: 'contact' })}
-                      className="grad-accent-bg rounded-[1.5rem] p-5 shadow-[0_18px_50px_rgba(124,92,255,0.3)] transition hover:-translate-y-0.5"
+                      className={`${btnSecondary} px-3`}
                     >
-                      <div className="flex items-center justify-between gap-3">
-                        <p className="text-xs font-semibold uppercase tracking-[0.18em] text-white/70">
-                          Book a Call
-                        </p>
-                        <CalendarDays size={16} className="text-white/70" />
-                      </div>
-                      <p className="mt-2 text-lg font-semibold text-white">
-                        Schedule a free 30 min
-                      </p>
+                      <CalendarDays size={15} />
+                      Book a call
+                    </a>
+                    <a href="https://linkedin.com/in/javiyaraj/" target="_blank" rel="noreferrer" className={`${btnSecondary} px-3`}>
+                      <Linkedin size={15} />
+                      LinkedIn
+                    </a>
+                    <a href="https://github.com/JAVIYARAJ" target="_blank" rel="noreferrer" className={`${btnSecondary} px-3`}>
+                      <Github size={15} />
+                      GitHub
                     </a>
                   </div>
-
-                  <button
-                    type="button"
-                    onClick={handleCopyEmail}
-                    className="mt-8 inline-flex items-center gap-2 rounded-full grad-accent-bg px-5 py-3 text-sm font-medium text-white shadow-[0_10px_30px_rgba(124,92,255,0.3)] transition hover:-translate-y-0.5"
-                  >
-                    {copiedEmail ? <Check size={16} /> : <Copy size={16} />}
-                    {copiedEmail ? 'Email copied' : 'Copy email'}
-                  </button>
                 </div>
               </Reveal>
 
-              <Reveal delay={0.1} className="h-full">
-                <form onSubmit={handleSubmit} className="surface-card-strong h-full p-8 sm:p-10">
-                  <div className="grid gap-5 sm:grid-cols-2">
-                    <label className="grid gap-2 text-sm font-medium text-foreground">
-                      Full Name
+              {/* Message composer */}
+              <Reveal delay={0.08} className="h-full">
+                <form onSubmit={handleSubmit} noValidate className="surface-card-strong relative flex h-full flex-col p-5 sm:p-7">
+                  <div className="flex items-center justify-between border-b border-border pb-4">
+                    <p className="text-lg font-bold text-foreground">New message</p>
+                    <p className="text-sm text-muted-foreground">
+                      To: <span className="font-medium text-foreground">Raj Javiya</span>
+                    </p>
+                  </div>
+
+                  <div className="mt-5 grid gap-4 sm:grid-cols-2">
+                    <label className="grid gap-1.5 text-sm font-semibold text-foreground">
+                      Your name
                       <input
                         type="text"
                         name="name"
+                        autoComplete="name"
                         value={formData.name}
-                        onChange={(e) => { handleInputChange(e); if (formErrors.name) setFormErrors((p) => ({ ...p, name: undefined })) }}
-                        placeholder="Javiya Raj"
-                        className={`h-14 rounded-2xl border bg-white/[0.06] px-4 text-sm text-foreground outline-none transition focus:ring-2 focus:ring-ring/20 ${formErrors.name ? 'border-destructive focus:border-destructive' : 'border-border focus:border-foreground/20'}`}
+                        onChange={handleInputChange}
+                        placeholder="Jane Smith"
+                        aria-invalid={!!formErrors.name}
+                        className={`h-12 ${inputClass(formErrors.name)}`}
                       />
-                      {formErrors.name && <span className="text-xs text-destructive">{formErrors.name}</span>}
+                      {formErrors.name ? <span className="text-xs font-medium text-destructive">{formErrors.name}</span> : null}
                     </label>
 
-                    <label className="grid gap-2 text-sm font-medium text-foreground">
-                      Email Address
+                    <label className="grid gap-1.5 text-sm font-semibold text-foreground">
+                      Email
                       <input
                         type="email"
                         name="email"
+                        autoComplete="email"
                         value={formData.email}
-                        onChange={(e) => { handleInputChange(e); if (formErrors.email) setFormErrors((p) => ({ ...p, email: undefined })) }}
-                        placeholder="your@email.com"
-                        className={`h-14 rounded-2xl border bg-white/[0.06] px-4 text-sm text-foreground outline-none transition focus:ring-2 focus:ring-ring/20 ${formErrors.email ? 'border-destructive focus:border-destructive' : 'border-border focus:border-foreground/20'}`}
+                        onChange={handleInputChange}
+                        placeholder="you@company.com"
+                        aria-invalid={!!formErrors.email}
+                        className={`h-12 ${inputClass(formErrors.email)}`}
                       />
-                      {formErrors.email && <span className="text-xs text-destructive">{formErrors.email}</span>}
+                      {formErrors.email ? <span className="text-xs font-medium text-destructive">{formErrors.email}</span> : null}
                     </label>
                   </div>
 
-                  <label className="mt-5 grid gap-2 text-sm font-medium text-foreground">
-                    Project Details
+                  <label className="mt-4 grid flex-1 gap-1.5 text-sm font-semibold text-foreground">
+                    Message
                     <textarea
                       name="message"
                       value={formData.message}
-                      onChange={(e) => { handleInputChange(e); if (formErrors.message) setFormErrors((p) => ({ ...p, message: undefined })) }}
-                      rows={7}
-                      placeholder="Tell me about your vision..."
-                      className={`rounded-[1.5rem] border bg-white/[0.06] px-4 py-4 text-sm text-foreground outline-none transition focus:ring-2 focus:ring-ring/20 ${formErrors.message ? 'border-destructive focus:border-destructive' : 'border-border focus:border-foreground/20'}`}
+                      onChange={handleInputChange}
+                      rows={6}
+                      placeholder="Tell me about your app idea or project…"
+                      aria-invalid={!!formErrors.message}
+                      className={`h-full min-h-[9rem] resize-y py-3 ${inputClass(formErrors.message)}`}
                     />
-                    {formErrors.message && <span className="text-xs text-destructive">{formErrors.message}</span>}
+                    {formErrors.message ? (
+                      <span className="text-xs font-medium text-destructive">{formErrors.message}</span>
+                    ) : null}
                   </label>
 
+                  {/* Honeypot */}
                   <div className="absolute -left-[9999px]" aria-hidden="true">
                     <label htmlFor="website">Website</label>
                     <input
@@ -2843,37 +1914,34 @@ export default function PortfolioHome({
                   </div>
 
                   {errorMessage ? (
-                    <p className="mt-6 rounded-[1.25rem] bg-[rgba(185,65,36,0.12)] px-4 py-3 text-sm text-foreground">
+                    <p role="alert" className="mt-4 rounded-xl bg-destructive/10 px-4 py-3 text-sm text-destructive">
                       {errorMessage}
                     </p>
                   ) : null}
 
                   {submitted ? (
                     <motion.div
-                      initial={{ opacity: 0, y: 10 }}
+                      role="status"
+                      initial={reduceMotion ? { opacity: 1 } : { opacity: 0, y: 8 }}
                       animate={{ opacity: 1, y: 0 }}
-                      className="mt-6 rounded-[1.25rem] bg-[rgba(109,130,98,0.14)] px-6 py-5"
+                      className="mt-5 flex items-center gap-3 rounded-xl bg-online/10 px-4 py-3.5"
                     >
-                      <div className="flex items-center gap-3">
-                        <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full grad-accent-bg text-white">
-                          <Check size={16} strokeWidth={2.5} />
-                        </div>
-                        <div>
-                          <p className="font-semibold text-foreground">Message sent!</p>
-                          <p className="text-sm text-muted-foreground">
-                            Thanks for reaching out — I&apos;ll get back to you soon.
-                          </p>
-                        </div>
+                      <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-online text-white">
+                        <Check size={16} strokeWidth={2.5} />
+                      </span>
+                      <div>
+                        <p className="font-semibold text-foreground">Message sent!</p>
+                        <p className="text-sm text-muted-foreground">Thanks for reaching out — I&apos;ll reply soon.</p>
                       </div>
                     </motion.div>
                   ) : (
                     <button
                       type="submit"
                       disabled={submitting}
-                      className="mt-6 inline-flex h-14 items-center justify-center gap-2 rounded-full grad-accent-bg px-6 text-sm font-medium text-white shadow-[0_12px_34px_rgba(124,92,255,0.34)] transition hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-70"
+                      className="mt-5 inline-flex h-12 items-center justify-center gap-2 rounded-full bg-accent px-6 text-sm font-semibold text-white transition hover:bg-accent-2 disabled:cursor-not-allowed disabled:opacity-70"
                     >
                       <Send size={16} />
-                      {submitting ? 'Sending...' : 'Send Message'}
+                      {submitting ? 'Sending…' : 'Send message'}
                     </button>
                   )}
                 </form>
@@ -2883,103 +1951,43 @@ export default function PortfolioHome({
         </section>
       </main>
 
-      <footer className="shell pb-12 pt-4">
-        <div className="surface-card-strong p-6 sm:p-8">
-          <div className="grid gap-10 lg:grid-cols-[0.95fr_1.05fr]">
-            <div className="space-y-6">
-              <div className="space-y-2">
-                <h3 className="font-[family:var(--font-heading)] text-3xl tracking-[-0.05em] text-foreground">
-                  JAVIYA RAJ.
-                </h3>
-                <p className="text-[0.72rem] font-semibold uppercase tracking-[0.24em] text-muted-foreground">
-                  Mobile App Architect
-                </p>
-              </div>
-
-              <p className="max-w-md text-sm leading-7 text-muted-foreground">
-                Specialized in high-performance Native Android (Kotlin, Jetpack Compose) and Cross-Platform Flutter development since 2021, with 4+ years of experience engineering scalable mobile software with Clean Architecture.
-              </p>
-
-              <div className="flex flex-wrap gap-3">
-                {socialLinks.map((item) => {
-                  const Icon = item.icon
-
-                  return (
-                    <a
-                      key={item.label}
-                      href={item.href}
-                      target={item.href.startsWith('mailto:') ? undefined : '_blank'}
-                      rel={item.href.startsWith('mailto:') ? undefined : 'noreferrer'}
-                      className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-border bg-white/[0.05] text-foreground transition hover:-translate-y-0.5"
-                      aria-label={item.label}
-                    >
-                      <Icon size={16} />
-                    </a>
-                  )
-                })}
-              </div>
-            </div>
-
-            <div className="grid gap-6 sm:grid-cols-3 sm:gap-8">
-              {footerLinks.map((section) => (
-                <div key={section.title} className="space-y-4">
-                  <p className="text-[0.72rem] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
-                    {section.title}
-                  </p>
-                  <div className="flex flex-col gap-3">
-                    {section.links.map((link) => (
-                      <a
-                        key={link.name}
-                        href={link.href}
-                        target={link.href.startsWith('http') ? '_blank' : undefined}
-                        rel={link.href.startsWith('http') ? 'noreferrer' : undefined}
-                        className="break-words text-sm text-foreground/80 transition hover:text-foreground"
-                      >
-                        {link.name}
-                      </a>
-                    ))}
-                  </div>
-                </div>
-              ))}
-            </div>
+      <footer className="border-t border-border pb-32 pt-10 sm:pb-36">
+        <div className="shell flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <p className="text-lg font-bold text-foreground">Raj Javiya</p>
+            <p className="text-sm text-muted-foreground">
+              Senior Mobile Developer · Android & Flutter · © {new Date().getFullYear()}
+            </p>
           </div>
 
-          <div className="mt-10 flex flex-col gap-4 border-t border-border pt-6 sm:flex-row sm:items-center sm:justify-between">
-            <p className="text-sm text-muted-foreground">
-              &copy; {new Date().getFullYear()} Developed by Raj Javiya
-            </p>
-
+          <div className="flex items-center gap-2">
+            {socialLinks.map((item) => {
+              const Icon = item.icon
+              const external = !item.href.startsWith('mailto:')
+              return (
+                <a
+                  key={item.label}
+                  href={item.href}
+                  target={external ? '_blank' : undefined}
+                  rel={external ? 'noreferrer' : undefined}
+                  aria-label={item.label}
+                  className="flex h-10 w-10 items-center justify-center rounded-full border border-border bg-card text-foreground transition hover:bg-secondary"
+                >
+                  <Icon size={16} />
+                </a>
+              )
+            })}
             <button
               type="button"
-              onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-              className="inline-flex items-center gap-2 text-sm font-medium text-foreground transition hover:text-accent"
+              onClick={() => window.scrollTo({ top: 0, behavior: reduceMotion ? 'auto' : 'smooth' })}
+              aria-label="Back to top"
+              className="ml-2 flex h-10 w-10 items-center justify-center rounded-full bg-foreground text-background transition hover:bg-foreground/85"
             >
-              Uplink
-              <ArrowUp size={15} />
+              <ArrowUp size={16} />
             </button>
           </div>
         </div>
       </footer>
-
-      <AnimatePresence>
-        {showChip && activeSection !== 'contact' && (
-          <motion.a
-            href="#contact"
-            initial={reduceMotion ? { opacity: 0 } : { opacity: 0, y: 16 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={reduceMotion ? { opacity: 0 } : { opacity: 0, y: 16 }}
-            transition={{ duration: reduceMotion ? 0 : 0.4, ease: [0.22, 1, 0.36, 1] }}
-            className="fixed bottom-6 right-6 z-40 inline-flex items-center gap-2.5 rounded-full border border-border bg-white/[0.07] px-5 py-3 text-sm font-medium text-foreground shadow-[0_8px_32px_rgba(0,0,0,0.5)] backdrop-blur-md transition hover:-translate-y-0.5 hover:bg-white/[0.12]"
-          >
-            <span className="relative flex h-2 w-2">
-              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75" />
-              <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-500" />
-            </span>
-            Available for Freelance
-            <ArrowRight size={14} />
-          </motion.a>
-        )}
-      </AnimatePresence>
     </div>
   )
 }

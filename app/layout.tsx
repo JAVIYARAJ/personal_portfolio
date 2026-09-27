@@ -3,17 +3,18 @@ import type { ReactNode } from 'react'
 import { Analytics } from '@vercel/analytics/next'
 import Script from 'next/script'
 import './globals.css'
+import { siteUrl } from '@/lib/site'
 
 export const viewport: Viewport = {
-  themeColor: '#08090c',
-  colorScheme: 'dark',
+  themeColor: '#f5f5f2',
+  colorScheme: 'light',
 }
 
 export const metadata: Metadata = {
-  metadataBase: new URL('https://javiyaraj.dev'),
-  title: 'Javiya Raj — Senior Mobile Developer | Native Android & Flutter',
+  metadataBase: new URL(siteUrl),
+  title: 'Javiya Raj — Senior Mobile Developer | Flutter, Native Android & Web',
   description:
-    'Senior Mobile Developer with 4+ years experience shipping 15+ production apps. Expert in Native Android (Kotlin, Jetpack Compose), Flutter, Dart & Clean Architecture. Available for freelance.',
+    'Senior Mobile Developer with 4+ years experience shipping 15+ production apps with Flutter and Native Android (Kotlin, Jetpack Compose), plus web platforms with React and Next.js. Available for freelance.',
   keywords: [
     'Mobile developer',
     'Android developer',
@@ -30,7 +31,7 @@ export const metadata: Metadata = {
     'Javiya Raj',
   ],
   alternates: {
-    canonical: 'https://javiyaraj.dev',
+    canonical: siteUrl,
   },
   robots: {
     index: true,
@@ -44,10 +45,10 @@ export const metadata: Metadata = {
     },
   },
   openGraph: {
-    title: 'Javiya Raj — Senior Mobile Developer (Android & Flutter)',
+    title: 'Javiya Raj — Senior Mobile Developer (Flutter, Android & Web)',
     description:
-      '4+ years · 15+ production apps · Native Android (Kotlin, Compose) & Cross-Platform (Flutter, Dart). Available for freelance.',
-    url: 'https://javiyaraj.dev',
+      '4+ years · 15+ production apps · Flutter & Native Android apps, plus web platforms with React and Next.js. Available for freelance.',
+    url: siteUrl,
     siteName: 'Javiya Raj Portfolio',
     locale: 'en_US',
     type: 'website',
@@ -62,9 +63,9 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Javiya Raj — Senior Mobile Developer (Android & Flutter)',
+    title: 'Javiya Raj — Senior Mobile Developer (Flutter, Android & Web)',
     description:
-      '4+ years · 15+ production apps · Native Android (Kotlin/Compose) & Flutter. Available for freelance.',
+      '4+ years · 15+ production apps · Flutter, Native Android & web. Available for freelance.',
     creator: '@Rjcoding',
     images: ['/opengraph-image'],
   },
@@ -101,7 +102,7 @@ export default function RootLayout({
             '@context': 'https://schema.org',
             '@type': 'Person',
             name: 'Javiya Raj',
-            url: 'https://javiyaraj.dev',
+            url: siteUrl,
             jobTitle: 'Senior Mobile Developer',
             description:
               'Senior Mobile Developer with 4+ years of experience architecting and shipping 15+ production-grade Native Android and Flutter apps.',
