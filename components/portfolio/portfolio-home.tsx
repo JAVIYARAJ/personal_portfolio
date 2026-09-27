@@ -4,10 +4,12 @@ import NextImage from 'next/image'
 import type { GitHubStats, Repo } from '@/lib/github'
 import type { ChangeEvent, FormEvent, ReactNode } from 'react'
 import { useEffect, useRef, useState } from 'react'
+import { createPortal } from 'react-dom'
 import { AnimatePresence, motion, useReducedMotion } from 'framer-motion'
 import type { LucideIcon } from 'lucide-react'
 import {
   Activity,
+  Anvil,
   Apple,
   ArrowRight,
   ArrowUp,
@@ -20,12 +22,14 @@ import {
   ChevronRight,
   CircuitBoard,
   Copy,
+  Cpu,
   Database,
   Download,
   ExternalLink,
   FileText,
   GitBranch,
   Github,
+  Globe,
   History,
   House,
   LayoutGrid,
@@ -36,6 +40,7 @@ import {
   Play,
   Rocket,
   Send,
+  Server,
   ShieldCheck,
   SignalHigh,
   Smartphone,
@@ -137,6 +142,11 @@ type Project = {
   appIcon?: string
   appIconWide?: boolean
   mockups?: string[]
+  // One caption per mockup, shown as numbered workflow steps.
+  mockupCaptions?: string[]
+  // Desktop/web screenshots (wide) rather than phone screens (tall).
+  landscapeMockups?: boolean
+  inProgress?: boolean
 }
 
 const shots = (dir: string, count: number) =>
@@ -239,7 +249,7 @@ const projects: Project[] = [
     platform: 'Flutter',
     description:
       'A mobile sales tool with a custom calendar, reusable UI components, and adaptive layouts for phones and tablets.',
-    tags: ['Flutter', 'Jetpack Compose', 'Custom Calendar', 'Adaptive Layouts', 'Reactive Data Flow'],
+    tags: ['Flutter', 'Custom Calendar', 'Adaptive Layouts', 'Reactive Data Flow'],
     stats: [
       { label: 'Efficiency', value: '+40%' },
       { label: 'Sales', value: '+25%' },
@@ -250,6 +260,64 @@ const projects: Project[] = [
     appIcon: '/projects/smackdab/icon.svg',
     appIconWide: true,
     links: [],
+  },
+  {
+    slug: 'krushna-forge',
+    name: 'Krushna Forge Admin',
+    homeLabel: 'Krushna',
+    category: 'Admin panel · Billing & stock',
+    type: 'Client',
+    platform: 'Web',
+    description:
+      'A private admin panel and billing system for a forging company in Rajkot. It brings stock, production, GST billing, payments, purchases, expenses, staff salary, and monthly profit into one app that works in any browser — on a computer or a phone.',
+    tags: ['Next.js', 'Role-based Access', 'GST Invoicing', 'Stock Tracking', 'P&L Reports', 'Audit Log', 'Responsive'],
+    stats: [
+      { label: 'Modules', value: '9' },
+      { label: 'User roles', value: '3' },
+    ],
+    impact:
+      'Designed the full system: owner-controlled users and permissions, stock that balances itself (inward − outward − rejection), GST invoices in the client’s own format, and a monthly P&L built automatically.',
+    accent: '#d9662c',
+    icon: Anvil,
+    appIcon: '/projects/krushna-forge/icon.png',
+    appIconWide: true,
+    inProgress: true,
+    landscapeMockups: true,
+    mockups: [
+      'login',
+      'home',
+      'orders',
+      'order-detail',
+      'production',
+      'production-days',
+      'daily-entry',
+      'billing',
+      'payments',
+      'pl-report',
+      'pl-month',
+      'pl-year',
+      'products',
+      'staff',
+      'audit-log',
+    ].map((name, i) => `/projects/krushna-forge/${String(i + 1).padStart(2, '0')}-${name}.webp`),
+    mockupCaptions: [
+      'Private login — no public sign-up',
+      'Home: today’s work at a glance',
+      'Orders from raw material to completion',
+      'Order detail with production progress',
+      'Daily production for the month',
+      'Day-wise earnings and production days',
+      'Daily entry: one row per order',
+      'GST bills made from completed orders',
+      'Payments received against bills',
+      'P&L report, built automatically',
+      'Month breakdown: turnover, expenses, salary',
+      'Month-wise P&L for the financial year',
+      'Products with HSN/SAC and GST rate',
+      'Staff and monthly salary',
+      'Audit log: who changed what, and when',
+    ],
+    links: [{ label: 'Company website', href: 'https://www.krushnaforge.com/', icon: ExternalLink }],
   },
   {
     slug: 'feature-gate-pro',
@@ -331,6 +399,14 @@ const skillGroups: SkillGroup[] = [
     skills: ['Flutter', 'Dart', 'BLoC / Cubit', 'Riverpod', 'GetX / Provider', 'Shorebird (OTA)', 'Custom Animations', 'Responsive UI'],
   },
   {
+    title: 'Web',
+    description: 'Web platforms and admin panels with React, Next.js and Node.js.',
+    icon: Globe,
+    color: '#0d9488',
+    level: 'Proficient',
+    skills: ['React', 'Next.js', 'Node.js', 'TypeScript', 'Tailwind CSS', 'Vite', 'Framer Motion', 'Vercel'],
+  },
+  {
     title: 'Architecture',
     description: 'Code that stays easy to test and change as the app grows.',
     icon: Layers3,
@@ -340,11 +416,11 @@ const skillGroups: SkillGroup[] = [
   },
   {
     title: 'Data & APIs',
-    description: 'Offline-first data layers and real-time backend sync.',
+    description: 'Databases, APIs, offline-first data layers and real-time sync.',
     icon: Database,
     color: '#ea580c',
     level: 'Proficient',
-    skills: ['Retrofit', 'Room', 'DataStore', 'GraphQL (Apollo)', 'Firebase', 'Supabase / PostgreSQL', 'Hive / SQLite'],
+    skills: ['Retrofit', 'Room', 'DataStore', 'GraphQL (Apollo)', 'Firebase', 'Supabase / PostgreSQL', 'MySQL', 'MongoDB', 'Hive / SQLite'],
   },
   {
     title: 'Testing & Delivery',
@@ -378,13 +454,15 @@ const experiences = [
     role: 'Senior Mobile Developer',
     duration: 'Sep 2023 – Present',
     summary:
-      'Building and shipping production apps with Native Android (Kotlin, Jetpack Compose) and Flutter, using Clean Architecture (MVVM).',
+      'Building and shipping production apps for Android and iOS with Flutter — and going native with Kotlin and Jetpack Compose when a feature needs the platform.',
     bullets: [
-      'Shipped multiple production apps with Clean Architecture and feature-first modules — cutting dev time by 20% with a 95% on-time release rate.',
-      'Led the move to reactive state management (StateFlow on Android, BLoC/Cubit in Flutter), making code easier to test and review.',
-      'Turned Figma designs into pixel-perfect, responsive 60fps UIs with Jetpack Compose and custom Flutter animations.',
-      'Integrated REST/GraphQL, Supabase, and Firebase behind a repository layer for offline resilience.',
-      'Set up GitHub Actions CI/CD for linting, tests, and staged production releases.',
+      'Built and shipped production Flutter apps with Clean Architecture, MVVM and feature-first modules — easier to maintain and faster to ship new features.',
+      'Brought BLoC/Cubit state management to the team, improving testability and cutting state-related bugs caught in code review.',
+      'Built native Android features in Kotlin, Java and Jetpack Compose wherever the app needed platform-specific capabilities.',
+      'Turned Figma designs into responsive, pixel-accurate UIs with custom animations that run smoothly on Android and iOS.',
+      'Integrated REST and GraphQL APIs, Supabase and Firebase (Auth, Firestore, FCM) behind a repository layer for offline resilience.',
+      'Owned App Store and Play Store releases end to end — versioning, staged rollouts and release notes — on GitHub Actions CI/CD.',
+      'Led architecture and code-quality reviews, joined client requirement discussions, and mentored two junior developers.',
     ],
   },
   {
@@ -447,28 +525,46 @@ type Service = {
 
 const services: Service[] = [
   {
-    title: 'App development',
-    description: 'Complete mobile apps in Native Android or Flutter — from architecture to store launch.',
+    title: 'Flutter app development',
+    description:
+      'One codebase for iOS and Android — from Figma designs to a store-ready app, or a fast MVP that can grow into the full product.',
     icon: Smartphone,
-    deliverables: ['Native Android (Kotlin)', 'Flutter for iOS & Android', 'Store submission'],
+    deliverables: ['iOS & Android from one codebase', 'Clean Architecture + BLoC/Cubit', 'MVP to full product'],
   },
   {
-    title: 'Architecture & code audits',
-    description: 'Clean Architecture setup, state management refactors, and code quality reviews.',
+    title: 'Native Android development',
+    description:
+      'Kotlin and Jetpack Compose apps with MVVM — or native modules when a Flutter app needs platform-specific features.',
+    icon: Cpu,
+    deliverables: ['Kotlin & Jetpack Compose', 'Native modules for Flutter apps', 'Retrofit, Room & FCM'],
+  },
+  {
+    title: 'Web platforms & admin panels',
+    description:
+      'Dashboards and back-office tools with React and Next.js: billing, stock, reports, and role-based access for your team.',
+    icon: Globe,
+    deliverables: ['Next.js / React', 'Role-based access & audit logs', 'Reports, billing & exports'],
+  },
+  {
+    title: 'Backend & API integration',
+    description:
+      'Connect your app to REST or GraphQL APIs, Supabase or Firebase — with login, real-time updates and push notifications.',
+    icon: Server,
+    deliverables: ['REST & GraphQL APIs', 'Supabase / Firebase / Node.js', 'Auth, real-time & push (FCM)'],
+  },
+  {
+    title: 'Architecture & code review',
+    description:
+      'A review of your existing app: structure, state management and performance — with a clear plan to fix what slows your team down.',
     icon: ShieldCheck,
-    deliverables: ['Clean Architecture (MVVM)', 'StateFlow / BLoC review', 'Refactoring plan'],
+    deliverables: ['Codebase & architecture audit', 'State management refactor', 'Performance fixes'],
   },
   {
-    title: 'Native integrations',
-    description: 'Connect native Android services (Retrofit, Room, FCM) to Flutter via platform channels.',
-    icon: Layers3,
-    deliverables: ['Platform channels', 'Native Android modules', 'Safe rollout'],
-  },
-  {
-    title: 'MVP in weeks',
-    description: 'A production-quality first version that is built to grow into your full product.',
+    title: 'App Store & Play Store release',
+    description:
+      'Get your app published and keep releases smooth: store listings, versioning, staged rollouts and automated CI/CD builds.',
     icon: Rocket,
-    deliverables: ['Production MVP', 'Scalable foundation', 'Fast iteration'],
+    deliverables: ['Store submission & review', 'Staged rollouts & versioning', 'CI/CD (GitHub Actions, Codemagic)'],
   },
 ]
 
@@ -682,11 +778,15 @@ function GalleryModal({
   startIndex,
   onClose,
   title,
+  captions,
+  landscape = false,
 }: {
   images: string[]
   startIndex: number
   onClose: () => void
   title: string
+  captions?: string[]
+  landscape?: boolean
 }) {
   const [index, setIndex] = useState(startIndex)
   const reduceMotion = useReducedMotion()
@@ -749,7 +849,7 @@ function GalleryModal({
       </button>
 
       <div
-        className="relative flex h-[72vh] w-full items-center justify-center px-12 sm:max-w-[360px] sm:px-0"
+        className={`relative flex w-full items-center justify-center px-12 ${landscape ? 'max-h-[72vh] sm:max-w-5xl sm:px-16' : 'h-[72vh] sm:max-w-[360px] sm:px-0'}`}
         onClick={(e) => e.stopPropagation()}
         onTouchStart={(e) => {
           touchStartX.current = e.touches[0].clientX
@@ -780,7 +880,7 @@ function GalleryModal({
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: reduceMotion ? 1 : 0.97 }}
             transition={{ duration: reduceMotion ? 0 : 0.2 }}
-            className="h-full w-auto rounded-[1.5rem] object-contain"
+            className={landscape ? 'max-h-[72vh] w-full rounded-xl object-contain' : 'h-full w-auto rounded-[1.5rem] object-contain'}
           />
         </AnimatePresence>
 
@@ -817,8 +917,9 @@ function GalleryModal({
         ))}
       </div>
 
-      <p className="mt-3 text-sm text-white/50">
+      <p className="mt-3 px-4 text-center text-sm text-white/50">
         {index + 1} / {images.length}
+        {captions?.[index] ? <span className="text-white/85"> · {captions[index]}</span> : null}
       </p>
     </motion.div>
   )
@@ -827,7 +928,9 @@ function GalleryModal({
 // App Store–style listing: icon + name, info row, swipeable screenshots, details.
 function AppListing({ project }: { project: Project }) {
   const [galleryIndex, setGalleryIndex] = useState<number | null>(null)
-  const [primaryLink, ...otherLinks] = project.links
+  const [mounted, setMounted] = useState(false)
+
+  useEffect(() => setMounted(true), [])
 
   const info = [
     ...project.stats,
@@ -837,21 +940,29 @@ function AppListing({ project }: { project: Project }) {
 
   return (
     <>
-      <AnimatePresence>
-        {galleryIndex !== null && project.mockups ? (
-          <GalleryModal
-            images={project.mockups}
-            startIndex={galleryIndex}
-            title={project.name}
-            onClose={() => setGalleryIndex(null)}
-          />
-        ) : null}
-      </AnimatePresence>
+      {/* Portal to <body>: the Reveal wrapper's transform would otherwise trap the fixed overlay inside this card. */}
+      {mounted
+        ? createPortal(
+            <AnimatePresence>
+              {galleryIndex !== null && project.mockups ? (
+                <GalleryModal
+                  images={project.mockups}
+                  startIndex={galleryIndex}
+                  title={project.name}
+                  captions={project.mockupCaptions}
+                  landscape={project.landscapeMockups}
+                  onClose={() => setGalleryIndex(null)}
+                />
+              ) : null}
+            </AnimatePresence>,
+            document.body
+          )
+        : null}
 
       <article id={`app-${project.slug}`} className="surface-card-strong scroll-mt-24 overflow-hidden">
         <div className="p-5 sm:p-8">
           {/* Header */}
-          <div className="flex items-center gap-4 sm:gap-5">
+          <div className="flex flex-wrap items-center gap-x-4 gap-y-3 sm:flex-nowrap sm:gap-5">
             <AppIcon
               project={project}
               className="h-16 w-16 shrink-0 rounded-[1.1rem] shadow-sm sm:h-20 sm:w-20 sm:rounded-[1.35rem]"
@@ -859,17 +970,33 @@ function AppListing({ project }: { project: Project }) {
             <div className="min-w-0 flex-1">
               <h3 className="text-xl font-bold tracking-[-0.02em] text-foreground sm:text-2xl">{project.name}</h3>
               <p className="mt-0.5 text-sm text-muted-foreground sm:text-base">{project.category}</p>
+              {project.inProgress ? (
+                <p className="mt-1.5 inline-flex items-center gap-1.5 rounded-full bg-[#d97706]/10 px-2.5 py-0.5 text-xs font-semibold text-[#b45309]">
+                  <span className="h-1.5 w-1.5 rounded-full bg-[#d97706]" />
+                  In development
+                </p>
+              ) : null}
             </div>
-            {primaryLink ? (
-              <a
-                href={primaryLink.href}
-                target="_blank"
-                rel="noreferrer"
-                className="hidden shrink-0 items-center gap-1.5 rounded-full bg-accent/10 px-4 py-2 text-sm font-bold text-accent transition hover:bg-accent/15 sm:inline-flex"
-              >
-                {primaryLink.label}
-                <ArrowUpRight size={15} />
-              </a>
+            {/* Store / project links, together in the top-right */}
+            {project.links.length > 0 ? (
+              <div className="flex w-full flex-wrap gap-2 sm:w-auto sm:shrink-0 sm:justify-end">
+                {project.links.map((link) => {
+                  const LinkIcon = link.icon
+                  return (
+                    <a
+                      key={link.label}
+                      href={link.href}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="inline-flex items-center gap-1.5 rounded-full bg-accent/10 px-4 py-2 text-sm font-bold text-accent transition hover:bg-accent/15"
+                    >
+                      <LinkIcon size={15} />
+                      {link.label}
+                      <ArrowUpRight size={14} />
+                    </a>
+                  )
+                })}
+              </div>
             ) : null}
           </div>
 
@@ -890,7 +1017,7 @@ function AppListing({ project }: { project: Project }) {
         {project.mockups ? (
           <div className="border-y border-border bg-[#efefea] py-5">
             <p className="px-5 pb-3 text-sm font-semibold text-foreground sm:px-8">
-              Screenshots
+              {project.mockupCaptions ? 'Workflow' : 'Screenshots'}
               <span className="ml-2 font-normal text-muted-foreground">· swipe or tap to enlarge</span>
             </p>
             <div className="no-scrollbar flex snap-x snap-mandatory gap-3 overflow-x-auto scroll-px-5 px-5 sm:scroll-px-8 sm:px-8">
@@ -900,14 +1027,26 @@ function AppListing({ project }: { project: Project }) {
                   type="button"
                   onClick={() => setGalleryIndex(i)}
                   aria-label={`Enlarge ${project.name} screenshot ${i + 1}`}
-                  className="shrink-0 snap-start transition hover:-translate-y-1"
+                  className={`shrink-0 snap-start text-left transition hover:-translate-y-1 ${project.landscapeMockups ? 'w-[82vw] max-w-[34rem] sm:w-[34rem]' : ''}`}
                 >
                   <img
                     src={src}
-                    alt={`${project.name} screenshot ${i + 1}`}
+                    alt={project.mockupCaptions?.[i] ?? `${project.name} screenshot ${i + 1}`}
                     loading="lazy"
-                    className="h-[320px] w-auto rounded-[1.25rem] object-contain sm:h-[400px]"
+                    className={
+                      project.landscapeMockups
+                        ? 'aspect-[16/9] w-full rounded-xl border border-black/5 object-cover shadow-[0_8px_24px_-12px_rgba(16,17,20,0.35)]'
+                        : 'h-[320px] w-auto rounded-[1.25rem] object-contain sm:h-[400px]'
+                    }
                   />
+                  {project.mockupCaptions?.[i] ? (
+                    <p className="mt-2.5 flex items-start gap-2 text-sm text-foreground/80">
+                      <span className="mt-px flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-foreground text-[0.65rem] font-bold text-background">
+                        {i + 1}
+                      </span>
+                      {project.mockupCaptions[i]}
+                    </p>
+                  ) : null}
                 </button>
               ))}
             </div>
@@ -935,26 +1074,6 @@ function AppListing({ project }: { project: Project }) {
               <p className="mt-1.5 text-[0.95rem] leading-7 text-foreground/85">{project.impact}</p>
             </div>
 
-            {project.links.length > 0 ? (
-              <div className="flex flex-wrap gap-2">
-                {/* On mobile the header pill is hidden, so show every link here. */}
-                {[primaryLink, ...otherLinks].map((link, i) => {
-                  const LinkIcon = link.icon
-                  return (
-                    <a
-                      key={link.label}
-                      href={link.href}
-                      target="_blank"
-                      rel="noreferrer"
-                      className={`${btnSecondary} px-4 py-2.5 ${i === 0 ? 'sm:hidden' : ''}`}
-                    >
-                      <LinkIcon size={15} />
-                      {link.label}
-                    </a>
-                  )
-                })}
-              </div>
-            ) : null}
           </div>
         </div>
       </article>
@@ -962,37 +1081,83 @@ function AppListing({ project }: { project: Project }) {
   )
 }
 
-const skillLevelStyles: Record<SkillLevel, string> = {
-  Expert: 'bg-accent/10 text-accent',
-  Proficient: 'bg-secondary text-foreground/75',
-  Familiar: 'bg-secondary text-muted-foreground',
+const skillLevelBars: Record<SkillLevel, number> = {
+  Expert: 4,
+  Proficient: 3,
+  Familiar: 2,
 }
 
-function SkillCard({ group }: { group: SkillGroup }) {
-  const Icon = group.icon
+// Proficiency drawn as phone signal bars.
+function SignalMeter({ level, color }: { level: SkillLevel; color: string }) {
+  const filled = skillLevelBars[level]
 
   return (
-    <div className="surface-card flex h-full flex-col p-5 sm:p-6">
-      <div className="flex items-center gap-3">
-        <span
-          className="flex h-10 w-10 shrink-0 items-center justify-center rounded-[0.7rem] text-white"
-          style={{ background: group.color }}
-        >
-          <Icon size={19} />
-        </span>
-        <h3 className="flex-1 text-lg font-bold tracking-[-0.01em] text-foreground">{group.title}</h3>
-        <span className={`rounded-full px-2.5 py-1 text-xs font-semibold ${skillLevelStyles[group.level]}`}>
-          {group.level}
-        </span>
-      </div>
-      <p className="mt-3 text-[0.95rem] leading-6 text-muted-foreground">{group.description}</p>
-      <ul className="mt-4 flex flex-wrap gap-1.5">
-        {group.skills.map((skill) => (
-          <li key={skill} className="rounded-lg border border-border bg-background px-2.5 py-1 text-[0.85rem] text-foreground/85">
-            {skill}
-          </li>
+    <span className="inline-flex items-center gap-2 rounded-full border border-border bg-card/80 py-1 pl-2.5 pr-3 text-xs font-semibold text-foreground">
+      <span aria-hidden className="flex h-3.5 items-end gap-[2px]">
+        {[1, 2, 3, 4].map((bar) => (
+          <span
+            key={bar}
+            className="w-[3px] rounded-full"
+            style={{ height: `${bar * 25}%`, background: bar <= filled ? color : 'rgba(16,17,20,0.14)' }}
+          />
         ))}
-      </ul>
+      </span>
+      {level}
+    </span>
+  )
+}
+
+type SkillCardVariant = 'featured' | 'compact'
+
+function SkillCard({ group, variant }: { group: SkillGroup; variant: SkillCardVariant }) {
+  const Icon = group.icon
+  const featured = variant === 'featured'
+
+  return (
+    <div
+      className="group/skill relative flex h-full flex-col overflow-hidden rounded-[1.75rem] border border-border bg-card p-5 transition duration-300 hover:-translate-y-1 hover:shadow-[0_18px_40px_-18px_rgba(16,17,20,0.25)] sm:p-7"
+      style={{ backgroundImage: `linear-gradient(160deg, ${group.color}${featured ? '17' : '0d'} 0%, transparent ${featured ? '60%' : '45%'})` }}
+    >
+      {/* Oversized watermark icon */}
+      <Icon
+        aria-hidden
+        strokeWidth={1.25}
+        className={`pointer-events-none absolute transition duration-500 group-hover/skill:rotate-[-8deg] group-hover/skill:scale-110 ${featured ? '-bottom-10 -right-8 h-48 w-48 sm:h-56 sm:w-56' : '-bottom-6 -right-6 h-32 w-32'}`}
+        style={{ color: group.color, opacity: featured ? 0.08 : 0.06 }}
+      />
+
+      <div className="relative flex h-full flex-col">
+        <div>
+          <div className="flex items-start justify-between gap-3">
+            <span
+              className={`flex shrink-0 items-center justify-center text-white ${featured ? 'h-14 w-14 rounded-[1.1rem]' : 'h-11 w-11 rounded-[0.8rem]'}`}
+              style={{ background: group.color, boxShadow: `0 10px 24px -8px ${group.color}99` }}
+            >
+              <Icon size={featured ? 26 : 20} />
+            </span>
+            <SignalMeter level={group.level} color={group.color} />
+          </div>
+
+          <h3 className={`mt-5 font-bold tracking-[-0.02em] text-foreground ${featured ? 'text-2xl sm:text-[1.75rem]' : 'text-xl'}`}>
+            {group.title}
+          </h3>
+          <p className={`mt-1.5 text-muted-foreground ${featured ? 'text-base leading-7' : 'text-[0.95rem] leading-6'}`}>
+            {group.description}
+          </p>
+        </div>
+
+        <ul className="mt-5 flex flex-wrap gap-2">
+          {group.skills.map((skill) => (
+            <li
+              key={skill}
+              className={`rounded-full border font-medium text-foreground/90 ${featured ? 'px-3.5 py-1.5 text-[0.9rem]' : 'px-3 py-1 text-[0.85rem]'}`}
+              style={{ background: `${group.color}0f`, borderColor: `${group.color}2e` }}
+            >
+              {skill}
+            </li>
+          ))}
+        </ul>
+      </div>
     </div>
   )
 }
@@ -1127,7 +1292,7 @@ export default function PortfolioHome({
         <div className="shell flex h-16 items-center justify-between">
           <a href="#home" className="flex items-center gap-2.5">
             <span className="flex h-9 w-9 items-center justify-center rounded-[0.7rem] bg-foreground text-sm font-bold text-background">
-              JR
+              RJ
             </span>
             <span className="leading-tight">
               <span className="block text-[0.95rem] font-bold tracking-[-0.01em] text-foreground">Raj Javiya</span>
@@ -1202,14 +1367,15 @@ export default function PortfolioHome({
               </p>
 
               <div className="space-y-5">
-                <h1 className="font-[family:var(--font-heading)] text-[2.6rem] font-bold leading-[1.06] tracking-[-0.025em] text-foreground sm:text-6xl lg:text-[4.1rem]">
-                  Hi, I&apos;m Raj.
+                <p className="text-xl font-semibold text-foreground/70 sm:text-2xl">Hi, I&apos;m Raj 👋</p>
+                <h1 className="font-[family:var(--font-heading)] text-[2.35rem] font-bold leading-[1.1] tracking-[-0.025em] text-foreground sm:text-[3.25rem] lg:text-[3.6rem]">
+                  I build <span className="text-gradient">mobile apps</span>
                   <br />
-                  I build <span className="text-gradient">mobile apps</span> people love to use.
+                  and <span className="text-gradient">web platforms</span>.
                 </h1>
                 <p className="max-w-xl text-lg leading-8 text-muted-foreground sm:text-xl sm:leading-9">
-                  Senior Mobile Developer working in Native Android (Kotlin, Jetpack Compose) and Flutter. I&apos;ve
-                  shipped 15+ production apps since 2021.
+                  Senior developer working with Kotlin, Flutter, React and Next.js. 15+ production apps shipped since
+                  2021.
                 </p>
               </div>
 
@@ -1402,16 +1568,26 @@ export default function PortfolioHome({
               <SectionHeader
                 label="Skills"
                 title="My toolkit."
-                description="Native Android and Flutter, plus the architecture, data, and testing skills that make apps reliable."
+                description="Native Android, Flutter and the web — plus the architecture, data, and testing skills that make products reliable."
               />
             </Reveal>
 
-            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-              {skillGroups.map((group, index) => (
-                <Reveal key={group.title} delay={0.04 + index * 0.04}>
-                  <SkillCard group={group} />
-                </Reveal>
-              ))}
+            {/* Bento: two featured platforms, a row of three, then a row of two */}
+            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-6">
+              {skillGroups.map((group, index) => {
+                const variant: SkillCardVariant = index < 2 ? 'featured' : 'compact'
+                const span =
+                  index < 2 || index >= 5
+                    ? 'lg:col-span-3'
+                    : 'lg:col-span-2'
+                // Odd count on the 2-column tablet grid: let the last card fill the row.
+                const tabletSpan = index === skillGroups.length - 1 && skillGroups.length % 2 === 1 ? 'sm:col-span-2' : ''
+                return (
+                  <Reveal key={group.title} delay={0.04 + index * 0.04} className={`${span} ${tabletSpan}`}>
+                    <SkillCard group={group} variant={variant} />
+                  </Reveal>
+                )
+              })}
             </div>
           </div>
         </section>
@@ -1536,11 +1712,11 @@ export default function PortfolioHome({
               <SectionHeader
                 label="Work with me"
                 title="How I can help."
-                description="Launching a new app, scaling an existing one, or connecting native modules — here’s what I offer."
+                description="From a first MVP to store release — mobile apps, web platforms, and everything that connects them."
               />
             </Reveal>
 
-            <div className="grid gap-4 sm:grid-cols-2">
+            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
               {services.map((service, index) => {
                 const Icon = service.icon
                 return (
@@ -1567,29 +1743,30 @@ export default function PortfolioHome({
 
             <Reveal delay={0.1}>
               <div className="flex flex-col gap-6 rounded-[1.75rem] bg-foreground p-6 text-background sm:p-10 lg:flex-row lg:items-center lg:justify-between">
-                <div className="space-y-2">
+                <div className="min-w-0 space-y-2 lg:max-w-[34rem]">
                   <p className="inline-flex items-center gap-2 text-sm font-medium text-background/70">
                     <span className="h-2 w-2 rounded-full bg-online" />
                     Available for freelance
                   </p>
                   <h3 className="text-2xl font-bold tracking-[-0.02em] sm:text-3xl">
-                    Have an app in mind? Let&apos;s plan it together.
+                    Have an app or platform in mind? Let&apos;s plan it together.
                   </h3>
                 </div>
-                <div className="flex flex-col gap-3 sm:flex-row">
+                {/* Buttons never shrink or wrap; the heading takes the leftover width instead. */}
+                <div className="flex shrink-0 flex-col gap-3 sm:flex-row">
                   <a
                     href={bookingUrl}
                     target="_blank"
                     rel="noreferrer"
                     onClick={() => trackEvent('book_call_click', { location: 'services' })}
-                    className="inline-flex items-center justify-center gap-2 rounded-full bg-background px-6 py-3.5 text-sm font-semibold text-foreground transition hover:bg-background/90"
+                    className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-full border border-transparent bg-background px-6 py-3.5 text-sm font-semibold text-foreground transition hover:bg-background/90"
                   >
                     <CalendarDays size={16} />
                     Book a free call
                   </a>
                   <a
                     href="#contact"
-                    className="inline-flex items-center justify-center gap-2 rounded-full border border-background/25 px-6 py-3.5 text-sm font-semibold text-background transition hover:bg-background/10"
+                    className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-full border border-background/25 px-6 py-3.5 text-sm font-semibold text-background transition hover:bg-background/10"
                   >
                     Send a message
                     <ArrowRight size={16} />
@@ -1613,7 +1790,7 @@ export default function PortfolioHome({
                 <div className="surface-card-strong flex h-full flex-col overflow-hidden">
                   <div className="flex items-center gap-3 border-b border-border px-5 py-4">
                     <span className="relative flex h-10 w-10 items-center justify-center rounded-full bg-foreground text-sm font-bold text-background">
-                      JR
+                      RJ
                       <span className="absolute -bottom-0.5 -right-0.5 h-3.5 w-3.5 rounded-full border-2 border-card bg-online" />
                     </span>
                     <div>

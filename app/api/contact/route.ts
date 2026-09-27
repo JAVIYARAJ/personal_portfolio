@@ -12,6 +12,16 @@ const MAX_NAME = 120
 const MAX_EMAIL = 254
 const MAX_MESSAGE = 4000
 
+// Form input is untrusted: escape it before putting it into the email's HTML.
+function escapeHtml(value: string) {
+  return value
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;')
+}
+
 export async function POST(request: Request) {
   const apiKey = process.env.RESEND_API_KEY
 
@@ -57,20 +67,23 @@ export async function POST(request: Request) {
   }
 
   const resend = new Resend(apiKey)
+  const safeName = escapeHtml(name)
+  const safeEmail = escapeHtml(email)
+  const safeMessage = escapeHtml(message)
 
   const { error } = await resend.emails.send({
     from: 'Portfolio Contact <onboarding@resend.dev>',
     to: 'javiyaraj4@gmail.com',
     replyTo: email,
-    subject: `New message from ${name}`,
+    subject: `New message from ${name.replace(/[\r\n]+/g, ' ')}`,
     html: `
       <div style="font-family:sans-serif;max-width:560px;margin:0 auto">
         <h2 style="margin-bottom:4px">New contact form submission</h2>
         <hr style="border:none;border-top:1px solid #e5e5e5;margin:16px 0"/>
-        <p><strong>Name:</strong> ${name}</p>
-        <p><strong>Email:</strong> <a href="mailto:${email}">${email}</a></p>
+        <p><strong>Name:</strong> ${safeName}</p>
+        <p><strong>Email:</strong> <a href="mailto:${safeEmail}">${safeEmail}</a></p>
         <p><strong>Message:</strong></p>
-        <p style="white-space:pre-wrap;background:#f5f5f5;padding:12px;border-radius:6px">${message}</p>
+        <p style="white-space:pre-wrap;background:#f5f5f5;padding:12px;border-radius:6px">${safeMessage}</p>
       </div>
     `,
   })

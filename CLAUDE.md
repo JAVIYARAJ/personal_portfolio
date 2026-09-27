@@ -28,6 +28,10 @@ This is a **Next.js 16 / React 19** single-page portfolio. The entire visible si
 
 **`app/api/contact/route.ts`** — Next.js Route Handler. Validates the incoming form payload, silently drops honeypot submissions (`website` field non-empty), then sends an email via Resend to javiyaraj4@gmail.com.
 
+**`lib/site.ts`** — the public site URL (`siteUrl`). Metadata, sitemap, robots and the OG image all read it; change it here when moving to a custom domain.
+
+**`app/opengraph-image.tsx`** — the link-preview image. `next/og` only accepts ttf/otf/woff fonts, so Inter is vendored in `assets/fonts/`. Some `icon.png` files under `public/projects/` are really JPEGs; the OG image detects the type from the file bytes.
+
 ## Design System
 
 Tailwind CSS v4 (no `tailwind.config.js`; config lives in `app/globals.css` via `@theme inline`). The palette is a light, high-contrast system-UI look (off-white background, near-black ink, system-blue `accent`, green `online`). Light mode only.
