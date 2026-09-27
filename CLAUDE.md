@@ -24,36 +24,34 @@ Without this, the contact form returns a 500 (by design, not a crash).
 
 This is a **Next.js 16 / React 19** single-page portfolio. The entire visible site is rendered by one large client component:
 
-**`components/portfolio/portfolio-home.tsx`** — contains all page data (projects, skills, experiences, navigation links) as module-level constants, all section-level components (`Reveal`, `SectionHeader`, `StatCard`, `ProjectCard`, `SkillCard`, `ExperienceCard`), and all interaction state (mobile menu, contact form). This is intentionally a single file; do not split it unless asked.
+**`components/portfolio/portfolio-home.tsx`** — contains all page data (projects, skills, experiences, achievements, services, tabs) as module-level constants, all section-level components (`Reveal`, `SectionHeader`, `AppIcon`, `HeroPhone`, `AppListing`, `GalleryModal`, `SkillCard`), and all interaction state (active tab, contact form). The design uses a "portfolio as a phone" concept: the hero is a phone home screen whose app icons are the projects, navigation is a floating bottom tab bar, projects render as App Store–style listings, and contact as a chat. This is intentionally a single file; do not split it unless asked.
 
 **`app/api/contact/route.ts`** — Next.js Route Handler. Validates the incoming form payload, silently drops honeypot submissions (`website` field non-empty), then sends an email via Resend to javiyaraj4@gmail.com.
 
-**`components/portfolio/contact.tsx`** — an older standalone contact section component. It is not imported anywhere currently; `portfolio-home.tsx` contains the live contact section inline.
-
-The remaining files under `components/portfolio/` (`hero.tsx`, `about.tsx`, `navigation.tsx`, etc.) are similarly superseded legacy components. They are not used by the current page.
-
 ## Design System
 
-Tailwind CSS v4 (no `tailwind.config.js`; config lives in `app/globals.css` via `@theme inline`). The palette is a warm cream/earth tone — no dark mode despite `.dark {}` being defined (both classes share identical values).
+Tailwind CSS v4 (no `tailwind.config.js`; config lives in `app/globals.css` via `@theme inline`). The palette is a light, high-contrast system-UI look (off-white background, near-black ink, system-blue `accent`, green `online`). Light mode only.
 
 Key utility classes defined in `app/globals.css`:
 
 | Class | Purpose |
 |---|---|
-| `.shell` | Centered max-width wrapper (1200px) with responsive padding |
+| `.shell` | Centered max-width wrapper (1120px) with responsive padding |
 | `.section-shell` | Vertical section padding |
-| `.surface-card` | Frosted-glass card with subtle shadow |
-| `.surface-card-strong` | Stronger variant with more opacity and shadow |
-| `.section-kicker` | Small eyebrow label pill |
-| `.section-title` | Large serif heading with tight tracking |
+| `.surface-card` | White card with hairline border |
+| `.surface-card-strong` | Card variant with a soft drop shadow |
+| `.section-kicker` | Small mono uppercase eyebrow label |
+| `.section-title` | Large bold sans heading |
 | `.eyebrow-dot` | Accent dot used inside `.section-kicker` |
-| `.soft-grid` | Faint grid background pattern |
+| `.soft-grid` | Faint dot-grid background pattern |
+| `.phone-wallpaper` | Gradient wallpaper for the hero phone screen |
+| `.no-scrollbar` | Hides scrollbars on horizontal rails |
 
-The heading font is a system serif stack (`--font-heading`). Reference it as `font-[family:var(--font-heading)]`.
+The heading and body fonts are the native OS sans stack (SF Pro / Roboto) — no web fonts. The heading stack is `--font-heading`. Reference it as `font-[family:var(--font-heading)]`.
 
 ## Animations
 
-Framer Motion `<motion.div>` with `useReducedMotion()` — all animations are gated so they become instant for users who prefer reduced motion. The pattern in `portfolio-home.tsx` is the `<Reveal>` wrapper component which handles `whileInView` fade-up on scroll. Follow this pattern for any new animated elements.
+Framer Motion `<motion.div>` with `useReducedMotion()` — all animations are gated (never branch rendered markup on `useReducedMotion()`; it is unknown during SSR and causes hydration errors — use CSS `motion-reduce:` instead) so they become instant for users who prefer reduced motion. The pattern in `portfolio-home.tsx` is the `<Reveal>` wrapper component which handles `whileInView` fade-up on scroll. Follow this pattern for any new animated elements.
 
 ## Path Alias
 

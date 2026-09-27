@@ -5,8 +5,8 @@ import Script from 'next/script'
 import './globals.css'
 
 export const viewport: Viewport = {
-  themeColor: '#08090c',
-  colorScheme: 'dark',
+  themeColor: '#f5f5f2',
+  colorScheme: 'light',
 }
 
 export const metadata: Metadata = {
