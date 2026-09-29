@@ -26,6 +26,10 @@ This is a **Next.js 16 / React 19** single-page portfolio. The entire visible si
 
 **`components/portfolio/portfolio-home.tsx`** — contains all page data (projects, skills, experiences, achievements, services, tabs) as module-level constants, all section-level components (`Reveal`, `SectionHeader`, `AppIcon`, `HeroPhone`, `AppListing`, `GalleryModal`, `SkillCard`), and all interaction state (active tab, contact form). The design uses a "portfolio as a phone" concept: the hero is a phone home screen whose app icons are the projects, navigation is a floating bottom tab bar, projects render as App Store–style listings, and contact as a chat. This is intentionally a single file; do not split it unless asked.
 
+**`lib/projects.ts`** — the `projects` list (shared by the home page and the case-study pages).
+
+**`lib/case-studies.ts`** + **`app/projects/[slug]/page.tsx`** — long-form case study per project, keyed by slug and statically generated at `/projects/<slug>`. A project gets a page (and a "Read the case study" button on its listing, plus a sitemap entry) only when it has an entry in `caseStudies`.
+
 **`app/api/contact/route.ts`** — Next.js Route Handler. Validates the incoming form payload, silently drops honeypot submissions (`website` field non-empty), then sends an email via Resend to javiyaraj4@gmail.com.
 
 **`lib/site.ts`** — the public site URL (`siteUrl`). Metadata, sitemap, robots and the OG image all read it; change it here when moving to a custom domain.
