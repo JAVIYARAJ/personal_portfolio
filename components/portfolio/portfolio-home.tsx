@@ -43,12 +43,14 @@ import {
   Layers3,
   Linkedin,
   Mail,
+  MapPin,
   MessageCircle,
   Play,
   Rocket,
   Search,
   Send,
   Server,
+  Settings as SettingsIcon,
   ShieldCheck,
   SignalHigh,
   Smartphone,
@@ -109,6 +111,43 @@ const spotlightSections = [
   { id: 'services', label: 'Services', hint: 'In-app purchases — what you can hire me for', icon: Rocket },
   { id: 'contact', label: 'Contact', hint: 'Send me a message', icon: MessageCircle },
 ]
+
+type SettingsRow = {
+  label: string
+  value?: string
+  icon: LucideIcon
+  color: string
+  href?: string
+  online?: boolean
+}
+
+// The hero phone's Settings app: an "About me" written as iOS settings.
+const settingsGroups: SettingsRow[][] = [
+  [
+    { label: 'Status', value: 'Available', icon: Zap, color: '#16a34a', online: true },
+    { label: 'Experience', value: '4+ years', icon: History, color: '#2f5bff' },
+    { label: 'Apps shipped', value: '15+', icon: LayoutGrid, color: '#6a4bff' },
+    { label: 'Location', value: 'India · IST', icon: MapPin, color: '#ef4444' },
+  ],
+  [
+    { label: 'Languages', value: 'Kotlin, Dart, TS', icon: Cpu, color: '#ea580c' },
+    { label: 'Mobile', value: 'Compose, Flutter', icon: Smartphone, color: '#16a34a' },
+    { label: 'Web', value: 'React, Next.js', icon: Globe, color: '#0d9488' },
+    { label: 'Architecture', value: 'Clean · MVVM · BLoC', icon: Layers3, color: '#7c3aed' },
+  ],
+  [
+    { label: 'Résumé', icon: FileText, color: '#5c616b', href: resumeUrl },
+    { label: 'Book a call', icon: CalendarDays, color: '#2f5bff', href: bookingUrl },
+    { label: 'Send a message', icon: MessageCircle, color: '#16a34a', href: '#contact' },
+  ],
+]
+
+// Raj's local time, e.g. "12:06 AM". Only call after mount — it differs from the server render.
+function formatIstTime() {
+  return new Intl.DateTimeFormat('en-US', { timeZone: 'Asia/Kolkata', hour: 'numeric', minute: '2-digit' }).format(
+    new Date()
+  )
+}
 
 const marqueeItems = [
   'Kotlin',
@@ -480,12 +519,9 @@ function AppIcon({ project, className }: { project: Project; className: string }
   )
 }
 
-// Tapping a home-screen icon "launches" the app: a quick preview zooms out of the icon, like iOS.
-function PhoneAppPreview({ project, origin, onClose }: { project: Project; origin: string; onClose: () => void }) {
-  const reduce = useReducedMotion()
+// Focus the app's close button on open, close on Escape, and hand focus back to the icon on close.
+function usePhoneAppFocus(onClose: () => void) {
   const closeRef = useRef<HTMLButtonElement>(null)
-  const shots = project.mockups?.slice(0, project.landscapeMockups ? 1 : 3)
-  const facts = [...project.stats, { label: 'Platform', value: project.platform }]
 
   useEffect(() => {
     const opener = document.activeElement as HTMLElement | null
@@ -500,15 +536,32 @@ function PhoneAppPreview({ project, origin, onClose }: { project: Project; origi
     }
   }, [onClose])
 
+  return closeRef
+}
+
+// Apps open by zooming out of the tapped icon's position on the screen, like iOS.
+function appZoom(origin: string, reduce: boolean | null) {
+  return {
+    style: { transformOrigin: origin },
+    initial: reduce ? { opacity: 0 } : { opacity: 0, scale: 0.12, borderRadius: '40%' },
+    animate: { opacity: 1, scale: 1, borderRadius: '0%' },
+    exit: reduce ? { opacity: 0 } : { opacity: 0, scale: 0.12, borderRadius: '40%' },
+    transition: reduce ? { duration: 0 } : { type: 'spring' as const, stiffness: 320, damping: 30 },
+  }
+}
+
+// Tapping a project icon "launches" the app: a quick preview of the project.
+function PhoneAppPreview({ project, origin, onClose }: { project: Project; origin: string; onClose: () => void }) {
+  const reduce = useReducedMotion()
+  const closeRef = usePhoneAppFocus(onClose)
+  const shots = project.mockups?.slice(0, project.landscapeMockups ? 1 : 3)
+  const facts = [...project.stats, { label: 'Platform', value: project.platform }]
+
   return (
     <motion.div
       role="dialog"
       aria-label={`${project.name} preview`}
-      style={{ transformOrigin: origin }}
-      initial={reduce ? { opacity: 0 } : { opacity: 0, scale: 0.12, borderRadius: '40%' }}
-      animate={{ opacity: 1, scale: 1, borderRadius: '0%' }}
-      exit={reduce ? { opacity: 0 } : { opacity: 0, scale: 0.12, borderRadius: '40%' }}
-      transition={reduce ? { duration: 0 } : { type: 'spring', stiffness: 320, damping: 30 }}
+      {...appZoom(origin, reduce)}
       className="absolute inset-0 z-10 flex flex-col overflow-hidden bg-background"
     >
       <div
@@ -573,6 +626,329 @@ function PhoneAppPreview({ project, origin, onClose }: { project: Project; origi
   )
 }
 
+// The Settings app: "About me" as an iOS settings screen.
+function PhoneSettings({ origin, onClose }: { origin: string; onClose: () => void }) {
+  const reduce = useReducedMotion()
+  const closeRef = usePhoneAppFocus(onClose)
+
+  return (
+    <motion.div
+      role="dialog"
+      aria-label="Settings"
+      {...appZoom(origin, reduce)}
+      className="absolute inset-0 z-10 flex flex-col overflow-hidden bg-[#f2f2f7]"
+    >
+      <div className="flex items-end justify-between px-4 pb-1.5 pt-11">
+        <p className="text-[1.35rem] font-bold leading-none tracking-[-0.02em] text-foreground">Settings</p>
+        <button
+          ref={closeRef}
+          type="button"
+          onClick={onClose}
+          className="rounded-full px-1 text-[0.78rem] font-semibold text-accent transition hover:text-accent-2"
+        >
+          Done
+        </button>
+      </div>
+
+      <div className="no-scrollbar flex-1 space-y-3.5 overflow-y-auto px-3 pb-8 pt-2">
+        {/* Profile card */}
+        <div className="flex items-center gap-3 rounded-xl bg-white p-3">
+          <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-foreground text-sm font-bold text-background">
+            RJ
+          </span>
+          <div className="min-w-0">
+            <p className="text-[0.85rem] font-semibold text-foreground">Raj Javiya</p>
+            <p className="truncate text-[0.65rem] text-muted-foreground">Senior Mobile Developer · Esparkbiz</p>
+          </div>
+        </div>
+
+        {settingsGroups.map((group, groupIndex) => (
+          <ul key={groupIndex} className="overflow-hidden rounded-xl bg-white">
+            {group.map((row, i) => {
+              const Icon = row.icon
+              const last = i === group.length - 1
+              const external = row.href && !row.href.startsWith('#')
+              const content = (
+                <>
+                  <span
+                    className="flex h-6 w-6 shrink-0 items-center justify-center rounded-[0.4rem] text-white"
+                    style={{ background: row.color }}
+                  >
+                    <Icon size={13} />
+                  </span>
+                  <span
+                    className={`flex min-w-0 flex-1 items-center gap-2 py-2.5 pr-3 ${last ? '' : 'border-b border-black/[0.07]'}`}
+                  >
+                    <span className="shrink-0 text-[0.75rem] font-medium text-foreground">{row.label}</span>
+                    {row.value ? (
+                      <span className="ml-auto flex min-w-0 items-center gap-1 text-[0.7rem] text-muted-foreground">
+                        {row.online ? <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-online" /> : null}
+                        <span className="truncate">{row.value}</span>
+                      </span>
+                    ) : null}
+                    {row.href ? <ChevronRight size={13} className="ml-auto shrink-0 text-muted-foreground/60" /> : null}
+                  </span>
+                </>
+              )
+              return (
+                <li key={row.label}>
+                  {row.href ? (
+                    <a
+                      href={row.href}
+                      target={external ? '_blank' : undefined}
+                      rel={external ? 'noreferrer' : undefined}
+                      onClick={() => {
+                        trackEvent('hero_settings_row', { row: row.label })
+                        if (!external) onClose()
+                      }}
+                      className="flex items-center gap-2.5 pl-3 transition hover:bg-black/[0.03]"
+                    >
+                      {content}
+                    </a>
+                  ) : (
+                    <div className="flex items-center gap-2.5 pl-3">{content}</div>
+                  )}
+                </li>
+              )
+            })}
+          </ul>
+        ))}
+      </div>
+    </motion.div>
+  )
+}
+
+type PhoneChatMessage = { from: 'raj' | 'me'; text: string; status?: 'sending' | 'delivered' | 'failed' }
+type PhoneChatStep = 'name' | 'email' | 'message' | 'sending' | 'done'
+
+const phoneChatPlaceholders: Record<PhoneChatStep, string> = {
+  name: 'Your name',
+  email: 'you@company.com',
+  message: 'Tell me about your project…',
+  sending: 'Sending…',
+  done: 'Message sent ✓',
+}
+
+// The Messages app: a chat that collects name → email → message and sends it through /api/contact.
+function PhoneMessages({ origin, onClose }: { origin: string; onClose: () => void }) {
+  const reduce = useReducedMotion()
+  const closeRef = usePhoneAppFocus(onClose)
+  const threadRef = useRef<HTMLDivElement>(null)
+  const timers = useRef<number[]>([])
+  const [messages, setMessages] = useState<PhoneChatMessage[]>([])
+  const [typing, setTyping] = useState(false)
+  const [step, setStep] = useState<PhoneChatStep>('name')
+  const [draft, setDraft] = useState('')
+  const [contact, setContact] = useState({ name: '', email: '' })
+
+  const later = (fn: () => void, ms: number) => {
+    timers.current.push(window.setTimeout(fn, ms))
+  }
+
+  // Raj "types" each reply before it appears, a little longer for longer messages.
+  const rajSays = (texts: string[], delay = 350) => {
+    let t = delay
+    texts.forEach((text) => {
+      later(() => setTyping(true), t)
+      t += 650 + Math.min(text.length * 12, 900)
+      later(() => {
+        setTyping(false)
+        setMessages((current) => [...current, { from: 'raj', text }])
+      }, t)
+      t += 150
+    })
+  }
+
+  useEffect(() => {
+    rajSays(['Hey 👋 I’m Raj.', 'What’s your name?'])
+    const pending = timers.current
+    return () => pending.forEach((id) => window.clearTimeout(id))
+    // Greet once per open.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
+  // Keep the newest message in view (scroll the thread only, never the page).
+  useEffect(() => {
+    const thread = threadRef.current
+    if (thread) thread.scrollTo({ top: thread.scrollHeight, behavior: reduce ? 'auto' : 'smooth' })
+  }, [messages, typing, reduce])
+
+  const setLastStatus = (status: PhoneChatMessage['status']) =>
+    setMessages((current) => current.map((m, i) => (i === current.length - 1 ? { ...m, status } : m)))
+
+  const send = async (message: string) => {
+    setStep('sending')
+    try {
+      const response = await fetch('/api/contact', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ...contact, message, website: '' }),
+      })
+      if (!response.ok) {
+        const payload = await response.json().catch(() => ({}))
+        throw new Error(payload.error || 'Something went wrong.')
+      }
+      trackEvent('contact_submit', { location: 'hero_phone' })
+      setLastStatus('delivered')
+      setStep('done')
+      rajSays([`Thanks, ${contact.name.split(' ')[0]}! 🙌`, `I’ll reply to ${contact.email} within a day.`])
+    } catch (error) {
+      setLastStatus('failed')
+      setStep('message')
+      rajSays([
+        `Sorry, that didn’t go through (${error instanceof Error ? error.message : 'unknown error'}).`,
+        `Try sending it again, or email me at ${emailAddress}.`,
+      ])
+    }
+  }
+
+  const handleSubmit = (e?: FormEvent) => {
+    e?.preventDefault()
+    const text = draft.trim()
+    if (!text || typing || step === 'sending' || step === 'done') return
+    setDraft('')
+
+    if (step === 'name') {
+      const name = text.slice(0, 120)
+      setMessages((current) => [...current, { from: 'me', text: name }])
+      setContact((current) => ({ ...current, name }))
+      setStep('email')
+      rajSays([`Nice to meet you, ${name.split(' ')[0]}!`, 'What’s your email, so I can reply?'])
+    } else if (step === 'email') {
+      setMessages((current) => [...current, { from: 'me', text }])
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(text)) {
+        rajSays(['Hmm, that doesn’t look like an email address. Could you check it?'])
+        return
+      }
+      setContact((current) => ({ ...current, email: text }))
+      setStep('message')
+      rajSays(['Got it.', 'What would you like to build? Tell me a bit about your project.'])
+    } else {
+      const message = text.slice(0, 4000)
+      setMessages((current) => [...current, { from: 'me', text: message, status: 'sending' }])
+      void send(message)
+    }
+  }
+
+  const lastMine = messages.map((m) => m.from).lastIndexOf('me')
+  const locked = step === 'sending' || step === 'done'
+
+  return (
+    <motion.div
+      role="dialog"
+      aria-label="Messages with Raj"
+      {...appZoom(origin, reduce)}
+      className="absolute inset-0 z-10 flex flex-col overflow-hidden bg-white"
+    >
+      {/* Header */}
+      <div className="relative border-b border-black/[0.07] bg-[#f7f7f9]/95 px-3 pb-2 pt-10 text-center">
+        <button
+          ref={closeRef}
+          type="button"
+          onClick={onClose}
+          aria-label="Close Messages"
+          className="absolute left-2 top-11 flex h-7 w-7 items-center justify-center rounded-full text-accent transition hover:bg-accent/10"
+        >
+          <ChevronLeft size={20} />
+        </button>
+        <span className="relative mx-auto flex h-9 w-9 items-center justify-center rounded-full bg-foreground text-[0.7rem] font-bold text-background">
+          RJ
+          <span className="absolute -bottom-0.5 -right-0.5 h-2.5 w-2.5 rounded-full border-2 border-[#f7f7f9] bg-online" />
+        </span>
+        <p className="mt-1 text-[0.68rem] font-semibold text-foreground">Raj Javiya</p>
+        <p className="text-[0.55rem] text-muted-foreground">Usually replies within a day</p>
+      </div>
+
+      {/* Thread */}
+      <div ref={threadRef} aria-live="polite" className="no-scrollbar flex-1 space-y-1.5 overflow-y-auto px-3 py-3">
+        {messages.map((m, i) => (
+          <div key={i} className={`flex flex-col ${m.from === 'me' ? 'items-end' : 'items-start'}`}>
+            <motion.p
+              initial={reduce ? { opacity: 1 } : { opacity: 0, y: 6, scale: 0.96 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              transition={{ duration: reduce ? 0 : 0.2 }}
+              className={`w-fit max-w-[82%] whitespace-pre-line break-words rounded-[1rem] px-3 py-1.5 text-[0.72rem] leading-[1.35] ${
+                m.from === 'me'
+                  ? `origin-bottom-right rounded-br-[0.3rem] text-white ${m.status === 'failed' ? 'bg-destructive/80' : 'bg-accent'}`
+                  : 'origin-bottom-left rounded-bl-[0.3rem] bg-[#e9e9eb] text-foreground'
+              }`}
+            >
+              {m.text}
+            </motion.p>
+            {i === lastMine && m.status ? (
+              <span
+                className={`mt-0.5 pr-1 text-[0.55rem] font-medium ${m.status === 'failed' ? 'text-destructive' : 'text-muted-foreground'}`}
+              >
+                {m.status === 'sending' ? 'Sending…' : m.status === 'delivered' ? 'Delivered' : 'Not delivered'}
+              </span>
+            ) : null}
+          </div>
+        ))}
+        {typing ? (
+          <p
+            aria-label="Raj is typing"
+            className="flex w-fit items-center gap-1 rounded-[1rem] rounded-bl-[0.3rem] bg-[#e9e9eb] px-3 py-2.5"
+          >
+            {[0, 1, 2].map((dot) => (
+              <span
+                key={dot}
+                className="typing-dot h-1 w-1 rounded-full bg-muted-foreground"
+                style={{ animationDelay: `${dot * 0.15}s` }}
+              />
+            ))}
+          </p>
+        ) : null}
+      </div>
+
+      {/* Composer */}
+      <form onSubmit={handleSubmit} className="flex items-end gap-1.5 border-t border-black/[0.07] px-2.5 pb-6 pt-2">
+        <label className="sr-only" htmlFor="phone-chat-input">
+          {phoneChatPlaceholders[step]}
+        </label>
+        <textarea
+          id="phone-chat-input"
+          rows={1}
+          value={draft}
+          disabled={locked}
+          onChange={(e) => setDraft(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter' && !e.shiftKey) {
+              e.preventDefault()
+              handleSubmit()
+            }
+          }}
+          inputMode={step === 'email' ? 'email' : 'text'}
+          autoComplete={step === 'name' ? 'name' : step === 'email' ? 'email' : 'off'}
+          placeholder={phoneChatPlaceholders[step]}
+          className="no-scrollbar max-h-20 min-h-[2rem] flex-1 resize-none rounded-[1rem] border border-black/10 bg-white px-3 py-[0.45rem] text-[16px] leading-[1.2] text-foreground outline-none [field-sizing:content] placeholder:text-muted-foreground/70 focus:border-accent disabled:bg-[#f7f7f9] sm:text-[0.75rem]"
+        />
+        <button
+          type="submit"
+          disabled={locked || !draft.trim()}
+          aria-label="Send"
+          className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-accent text-white transition hover:bg-accent-2 disabled:bg-black/15"
+        >
+          <ArrowUp size={16} strokeWidth={2.5} />
+        </button>
+      </form>
+    </motion.div>
+  )
+}
+
+// Live status-bar clock in Raj's time zone, shown iOS-style without AM/PM. "9:41" until mounted.
+function useIstClock() {
+  const [time, setTime] = useState('9:41')
+
+  useEffect(() => {
+    const tick = () => setTime(formatIstTime().replace(/\s*[AP]M$/i, ''))
+    tick()
+    const timer = window.setInterval(tick, 15000)
+    return () => window.clearInterval(timer)
+  }, [])
+
+  return time
+}
+
 type IslandMessage = { key: string; icon: ReactNode; text: string }
 
 // Dynamic Island: every few seconds it expands with a short live status, then shrinks back.
@@ -582,8 +958,6 @@ function useIslandMessage() {
 
   useEffect(() => {
     const building = projects.find((project) => project.inProgress)
-    const istTime = () =>
-      new Intl.DateTimeFormat('en-US', { timeZone: 'Asia/Kolkata', hour: 'numeric', minute: '2-digit' }).format(new Date())
 
     const messages: (() => IslandMessage)[] = [
       ...(building
@@ -598,7 +972,7 @@ function useIslandMessage() {
       () => ({
         key: 'time',
         icon: <Globe size={11} className="shrink-0 text-[#7aa2ff]" />,
-        text: `${istTime()} IST · replies in a day`,
+        text: `${formatIstTime()} IST · replies in a day`,
       }),
       () => ({
         key: 'status',
@@ -628,7 +1002,10 @@ function useIslandMessage() {
 function HeroPhone() {
   const reduce = useReducedMotion()
   const screenRef = useRef<HTMLDivElement>(null)
-  const [launched, setLaunched] = useState<{ project: Project; origin: string } | null>(null)
+  const [launched, setLaunched] = useState<{ app: Project | 'settings' | 'messages'; origin: string } | null>(null)
+  // Built-in apps have light screens, so the status bar switches to dark text over them.
+  const lightApp = launched?.app === 'settings' || launched?.app === 'messages'
+  const clock = useIstClock()
   const closeApp = useCallback(() => setLaunched(null), [])
   const island = useIslandMessage()
 
@@ -684,14 +1061,14 @@ function HeroPhone() {
     .filter((project): project is Project => Boolean(project))
 
   // Zoom the preview out of the tapped icon's position on the screen.
-  const launchApp = (project: Project, icon: HTMLElement) => {
+  const launchApp = (app: Project | 'settings' | 'messages', icon: HTMLElement) => {
     const screen = screenRef.current?.getBoundingClientRect()
     const rect = icon.getBoundingClientRect()
     const origin = screen
       ? `${((rect.left + rect.width / 2 - screen.left) / screen.width) * 100}% ${((rect.top + rect.width / 2 - screen.top) / screen.height) * 100}%`
       : '50% 50%'
-    setLaunched({ project, origin })
-    trackEvent('hero_app_open', { project: project.slug })
+    setLaunched({ app, origin })
+    trackEvent('hero_app_open', { project: typeof app === 'string' ? app : app.slug })
   }
 
   const pop = (i: number) => ({
@@ -718,9 +1095,9 @@ function HeroPhone() {
             >
               {/* Status bar */}
               <div
-                className={`relative z-20 flex items-center justify-between px-7 pt-3.5 text-[0.72rem] font-semibold text-white transition-opacity duration-300 ${island || jiggle ? 'opacity-0' : ''}`}
+                className={`relative z-20 flex items-center justify-between px-7 pt-3.5 text-[0.72rem] font-semibold transition duration-300 ${lightApp ? 'text-foreground' : 'text-white'} ${island || jiggle ? 'opacity-0' : ''}`}
               >
-                <span>9:41</span>
+                <span className="tabular-nums">{clock}</span>
                 <span className="flex items-center gap-1">
                   <SignalHigh size={13} strokeWidth={2.6} />
                   <Wifi size={13} strokeWidth={2.6} />
@@ -856,6 +1233,50 @@ function HeroPhone() {
                     Resume
                   </span>
                 </motion.a>
+                <motion.button
+                  type="button"
+                  aria-label="Open Settings"
+                  aria-haspopup="dialog"
+                  onClick={(e) => {
+                    if (!jiggle) launchApp('settings', e.currentTarget)
+                  }}
+                  {...pop(projects.length + 2)}
+                  layout
+                  whileTap={reduce || jiggle ? undefined : { scale: 0.88 }}
+                  className="group flex flex-col items-center gap-1"
+                >
+                  <span
+                    className={`flex h-[3.1rem] w-[3.1rem] items-center justify-center rounded-[0.9rem] bg-gradient-to-b from-[#a1a1a6] to-[#636366] text-white shadow-[0_4px_10px_rgba(0,0,0,0.18)] transition group-hover:-translate-y-0.5 ${jiggle ? 'jiggle' : ''}`}
+                    style={jiggle ? { animationDelay: '-0.05s' } : undefined}
+                  >
+                    <SettingsIcon size={24} strokeWidth={1.75} />
+                  </span>
+                  <span className="text-[0.6rem] font-medium text-white [text-shadow:0_1px_2px_rgba(0,0,0,0.35)]">
+                    Settings
+                  </span>
+                </motion.button>
+                <motion.button
+                  type="button"
+                  aria-label="Open Messages"
+                  aria-haspopup="dialog"
+                  onClick={(e) => {
+                    if (!jiggle) launchApp('messages', e.currentTarget)
+                  }}
+                  {...pop(projects.length + 3)}
+                  layout
+                  whileTap={reduce || jiggle ? undefined : { scale: 0.88 }}
+                  className="group flex flex-col items-center gap-1"
+                >
+                  <span
+                    className={`flex h-[3.1rem] w-[3.1rem] items-center justify-center rounded-[0.9rem] bg-gradient-to-b from-[#6ee27f] to-[#27b847] text-white shadow-[0_4px_10px_rgba(0,0,0,0.18)] transition group-hover:-translate-y-0.5 ${jiggle ? 'jiggle' : ''}`}
+                    style={jiggle ? { animationDelay: '-0.12s' } : undefined}
+                  >
+                    <MessageCircle size={25} fill="currentColor" strokeWidth={1.5} />
+                  </span>
+                  <span className="text-[0.6rem] font-medium text-white [text-shadow:0_1px_2px_rgba(0,0,0,0.35)]">
+                    Messages
+                  </span>
+                </motion.button>
               </div>
 
               {/* Dock */}
@@ -880,10 +1301,14 @@ function HeroPhone() {
               </div>
 
               <AnimatePresence>
-                {launched ? (
+                {launched?.app === 'settings' ? (
+                  <PhoneSettings key="settings" origin={launched.origin} onClose={closeApp} />
+                ) : launched?.app === 'messages' ? (
+                  <PhoneMessages key="messages" origin={launched.origin} onClose={closeApp} />
+                ) : launched ? (
                   <PhoneAppPreview
-                    key={launched.project.slug}
-                    project={launched.project}
+                    key={launched.app.slug}
+                    project={launched.app}
                     origin={launched.origin}
                     onClose={closeApp}
                   />
