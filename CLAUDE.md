@@ -24,7 +24,7 @@ Without this, the contact form returns a 500 (by design, not a crash).
 
 This is a **Next.js 16 / React 19** single-page portfolio. The entire visible site is rendered by one large client component:
 
-**`components/portfolio/portfolio-home.tsx`** — contains all page data (projects, skills, experiences, achievements, services, tabs) as module-level constants, all section-level components (`Reveal`, `SectionHeader`, `AppIcon`, `HeroPhone`, `AppListing`, `GalleryModal`, `SkillCard`), and all interaction state (active tab, contact form). The design uses a "portfolio as a phone" concept: the hero is a phone home screen whose app icons are the projects, navigation is a floating bottom tab bar, projects render as App Store–style listings, and contact as a chat. This is intentionally a single file; do not split it unless asked.
+**`components/portfolio/portfolio-home.tsx`** — contains all page data (projects, skills, experiences, achievements, services, tabs) as module-level constants, all section-level components (`Reveal`, `SectionHeader`, `AppIcon`, `HeroPhone` + `PhoneAppPreview`, `Spotlight`, `CountUp`, `AppListing`, `GalleryModal`, `SkillCard`), and all interaction state (active tab, contact form). The design uses a "portfolio as a phone" concept: the hero is a phone home screen whose app icons are the projects, tapping a hero icon zooms open an in-phone app preview, ⌘K / `/` opens a Spotlight search, navigation is a floating bottom tab bar, projects render as App Store–style listings, experience as a version history, and contact as a chat with a typing indicator. This is intentionally a single file; do not split it unless asked.
 
 **`lib/projects.ts`** — the `projects` list (shared by the home page and the case-study pages).
 

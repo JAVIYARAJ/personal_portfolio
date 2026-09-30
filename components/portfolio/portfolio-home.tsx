@@ -2,13 +2,21 @@
 
 import Link from 'next/link'
 import NextImage from 'next/image'
+import { useRouter } from 'next/navigation'
 import type { GitHubStats, Repo } from '@/lib/github'
 import { hasCaseStudy } from '@/lib/case-studies'
 import { projects, type Project } from '@/lib/projects'
-import type { ChangeEvent, FormEvent, ReactNode } from 'react'
-import { useEffect, useRef, useState } from 'react'
+import type { ChangeEvent, FormEvent, KeyboardEvent as ReactKeyboardEvent, PointerEvent, ReactNode } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
-import { AnimatePresence, motion, useReducedMotion } from 'framer-motion'
+import {
+  AnimatePresence,
+  animate,
+  motion,
+  useInView,
+  useReducedMotion,
+  useScroll,
+} from 'framer-motion'
 import type { LucideIcon } from 'lucide-react'
 import {
   ArrowRight,
@@ -21,6 +29,7 @@ import {
   ChevronRight,
   CircuitBoard,
   Copy,
+  CornerDownLeft,
   Cpu,
   Database,
   Download,
@@ -37,6 +46,7 @@ import {
   MessageCircle,
   Play,
   Rocket,
+  Search,
   Send,
   Server,
   ShieldCheck,
@@ -86,6 +96,40 @@ const sectionToTab: Record<string, string> = {
   services: 'contact',
   contact: 'contact',
 }
+
+// Everything Spotlight (⌘K) can jump to, besides the apps and actions.
+const spotlightSections = [
+  { id: 'home', label: 'Home', hint: 'Back to the top', icon: House },
+  { id: 'about', label: 'About', hint: 'How I work', icon: Sparkles },
+  { id: 'projects', label: 'Apps', hint: 'Everything I’ve shipped', icon: LayoutGrid },
+  { id: 'open-source', label: 'Open source', hint: 'GitHub repositories', icon: GitBranch },
+  { id: 'skills', label: 'Skills', hint: 'My toolkit', icon: Layers3 },
+  { id: 'experience', label: 'Journey', hint: 'Version history of my career', icon: History },
+  { id: 'achievements', label: 'Achievements', hint: 'Badges I’ve earned', icon: Trophy },
+  { id: 'services', label: 'Services', hint: 'How I can help', icon: Rocket },
+  { id: 'contact', label: 'Contact', hint: 'Send me a message', icon: MessageCircle },
+]
+
+const marqueeItems = [
+  'Kotlin',
+  'Jetpack Compose',
+  'Flutter',
+  'Dart',
+  'BLoC',
+  'Riverpod',
+  'Hilt',
+  'Room',
+  'Retrofit',
+  'Supabase',
+  'Firebase',
+  'GraphQL',
+  'React',
+  'Next.js',
+  'TypeScript',
+  'Node.js',
+  'GitHub Actions',
+  'Figma',
+]
 
 const heroStats = [
   { value: '4+', label: 'Years building apps' },
@@ -208,6 +252,7 @@ const skillGroups: SkillGroup[] = [
 
 const experiences = [
   {
+    version: 'v3.0',
     company: 'Esparkbiz',
     role: 'Senior Mobile Developer',
     duration: 'Sep 2023 – Present',
@@ -224,6 +269,7 @@ const experiences = [
     ],
   },
   {
+    version: 'v2.0',
     company: 'Esparkbiz',
     role: 'Software Developer Intern',
     duration: 'Jan 2023 – Sep 2023',
@@ -235,6 +281,7 @@ const experiences = [
     ],
   },
   {
+    version: 'v1.0',
     company: 'Freelance',
     role: 'Independent Mobile Developer',
     duration: 'Jun 2021 – Dec 2022',
@@ -326,6 +373,12 @@ const services: Service[] = [
   },
 ]
 
+const chatBubbles = [
+  'Hey 👋 thanks for stopping by!',
+  'Got an app idea, a codebase that needs help, or want a second opinion on architecture?',
+  'Send me a message — I usually reply within a day.',
+]
+
 const btnPrimary =
   'inline-flex items-center justify-center gap-2 rounded-full bg-foreground px-5 py-3 text-sm font-semibold text-background transition hover:bg-foreground/85'
 const btnSecondary =
@@ -401,7 +454,7 @@ function AppIcon({ project, className }: { project: Project; className: string }
 
   if (project.appIcon) {
     return (
-      <span aria-hidden className={`relative overflow-hidden ring-1 ring-black/5 ${className}`}>
+      <span aria-hidden className={`relative block overflow-hidden ring-1 ring-black/5 ${className}`}>
         <NextImage src={project.appIcon} alt="" fill sizes="80px" className="object-cover" />
       </span>
     )
@@ -418,9 +471,219 @@ function AppIcon({ project, className }: { project: Project; className: string }
   )
 }
 
+// Tapping a home-screen icon "launches" the app: a quick preview zooms out of the icon, like iOS.
+function PhoneAppPreview({ project, origin, onClose }: { project: Project; origin: string; onClose: () => void }) {
+  const reduce = useReducedMotion()
+  const closeRef = useRef<HTMLButtonElement>(null)
+  const shots = project.mockups?.slice(0, project.landscapeMockups ? 1 : 3)
+  const facts = [...project.stats, { label: 'Platform', value: project.platform }]
+
+  useEffect(() => {
+    const opener = document.activeElement as HTMLElement | null
+    closeRef.current?.focus({ preventScroll: true })
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') onClose()
+    }
+    window.addEventListener('keydown', onKey)
+    return () => {
+      window.removeEventListener('keydown', onKey)
+      opener?.focus?.({ preventScroll: true })
+    }
+  }, [onClose])
+
+  return (
+    <motion.div
+      role="dialog"
+      aria-label={`${project.name} preview`}
+      style={{ transformOrigin: origin }}
+      initial={reduce ? { opacity: 0 } : { opacity: 0, scale: 0.12, borderRadius: '40%' }}
+      animate={{ opacity: 1, scale: 1, borderRadius: '0%' }}
+      exit={reduce ? { opacity: 0 } : { opacity: 0, scale: 0.12, borderRadius: '40%' }}
+      transition={reduce ? { duration: 0 } : { type: 'spring', stiffness: 320, damping: 30 }}
+      className="absolute inset-0 z-10 flex flex-col overflow-hidden bg-background"
+    >
+      <div
+        className="relative px-5 pb-5 pt-11 text-white"
+        style={{ background: `linear-gradient(160deg, ${project.accent}, ${project.accent}c7)` }}
+      >
+        <button
+          ref={closeRef}
+          type="button"
+          onClick={onClose}
+          aria-label="Close preview"
+          className="absolute right-3 top-10 flex h-7 w-7 items-center justify-center rounded-full bg-black/20 text-white transition hover:bg-black/30"
+        >
+          <X size={14} />
+        </button>
+        <AppIcon project={project} className="h-14 w-14 rounded-[1rem] shadow-[0_6px_16px_rgba(0,0,0,0.25)]" />
+        <p className="mt-3 text-lg font-bold leading-tight">{project.name}</p>
+        <p className="text-[0.72rem] text-white/85">{project.category}</p>
+      </div>
+
+      <div className="flex flex-1 flex-col gap-3 overflow-hidden px-4 pb-7 pt-4">
+        <dl className="grid grid-cols-3 gap-1.5 rounded-2xl bg-card p-2.5 text-center ring-1 ring-black/5">
+          {facts.map((fact) => (
+            <div key={fact.label} className="min-w-0">
+              <dd className="truncate text-[0.8rem] font-bold text-foreground">{fact.value}</dd>
+              <dt className="truncate text-[0.55rem] uppercase tracking-[0.08em] text-muted-foreground">{fact.label}</dt>
+            </div>
+          ))}
+        </dl>
+
+        <p className={`text-[0.75rem] leading-5 text-foreground/80 ${shots ? 'line-clamp-3' : 'line-clamp-6'}`}>
+          {project.description}
+        </p>
+
+        {shots ? (
+          <div className="flex gap-1.5 overflow-hidden">
+            {shots.map((src) => (
+              <img
+                key={src}
+                src={src}
+                alt=""
+                className={
+                  project.landscapeMockups
+                    ? 'aspect-[16/10] w-full rounded-lg object-cover ring-1 ring-black/5'
+                    : 'h-32 w-auto rounded-lg object-cover'
+                }
+              />
+            ))}
+          </div>
+        ) : null}
+
+        <a
+          href={`#app-${project.slug}`}
+          onClick={onClose}
+          className="mt-auto inline-flex items-center justify-center gap-1.5 rounded-full bg-foreground py-2.5 text-[0.75rem] font-semibold text-background transition hover:bg-foreground/85"
+        >
+          View full listing
+          <ArrowRight size={13} />
+        </a>
+      </div>
+    </motion.div>
+  )
+}
+
+type IslandMessage = { key: string; icon: ReactNode; text: string }
+
+// Dynamic Island: every few seconds it expands with a short live status, then shrinks back.
+// Messages are built after mount (the IST clock would otherwise mismatch the server render).
+function useIslandMessage() {
+  const [message, setMessage] = useState<IslandMessage | null>(null)
+
+  useEffect(() => {
+    const building = projects.find((project) => project.inProgress)
+    const istTime = () =>
+      new Intl.DateTimeFormat('en-US', { timeZone: 'Asia/Kolkata', hour: 'numeric', minute: '2-digit' }).format(new Date())
+
+    const messages: (() => IslandMessage)[] = [
+      ...(building
+        ? [
+            () => ({
+              key: 'building',
+              icon: <AppIcon project={building} className="h-4 w-4 shrink-0 rounded-[0.3rem]" />,
+              text: `Building ${building.name}`,
+            }),
+          ]
+        : []),
+      () => ({
+        key: 'time',
+        icon: <Globe size={11} className="shrink-0 text-[#7aa2ff]" />,
+        text: `${istTime()} IST · replies in a day`,
+      }),
+      () => ({
+        key: 'status',
+        icon: <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-online" />,
+        text: 'Open to new projects',
+      }),
+    ]
+
+    let index = 0
+    let timer: number
+    const show = () => {
+      setMessage(messages[index % messages.length]())
+      index += 1
+      timer = window.setTimeout(() => {
+        setMessage(null)
+        timer = window.setTimeout(show, 2200)
+      }, 3800)
+    }
+    timer = window.setTimeout(show, 2000)
+    return () => window.clearTimeout(timer)
+  }, [])
+
+  return message
+}
+
 // The hero: a phone home screen where every app icon is a real project.
 function HeroPhone() {
   const reduce = useReducedMotion()
+  const screenRef = useRef<HTMLDivElement>(null)
+  const [launched, setLaunched] = useState<{ project: Project; origin: string } | null>(null)
+  const closeApp = useCallback(() => setLaunched(null), [])
+  const island = useIslandMessage()
+
+  // Jiggle mode: press and hold an icon, then drag icons onto each other to rearrange them.
+  const [jiggle, setJiggle] = useState(false)
+  const [order, setOrder] = useState(() => projects.map((project) => project.slug))
+  const pressTimer = useRef<number | undefined>(undefined)
+  const longPressed = useRef(false)
+  const pressPointerType = useRef('')
+
+  useEffect(() => {
+    if (!jiggle) return
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setJiggle(false)
+    }
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [jiggle])
+
+  const startPress = (e: PointerEvent<HTMLElement>) => {
+    pressPointerType.current = e.pointerType
+    if (jiggle) return
+    longPressed.current = false
+    window.clearTimeout(pressTimer.current)
+    pressTimer.current = window.setTimeout(() => {
+      longPressed.current = true
+      setJiggle(true)
+      navigator.vibrate?.(15)
+      trackEvent('hero_jiggle_mode')
+    }, 500)
+  }
+
+  const cancelPress = () => window.clearTimeout(pressTimer.current)
+
+  // Swap the dragged icon with whichever icon it was dropped on.
+  const handleDrop = (slug: string, point: { x: number; y: number }) => {
+    const target = document
+      .elementsFromPoint(point.x - window.scrollX, point.y - window.scrollY)
+      .map((el) => (el as HTMLElement).closest<HTMLElement>('[data-app-slug]')?.dataset.appSlug)
+      .find((found) => found && found !== slug)
+    if (!target) return
+    setOrder((current) => {
+      const next = [...current]
+      const from = next.indexOf(slug)
+      const to = next.indexOf(target)
+      ;[next[from], next[to]] = [next[to], next[from]]
+      return next
+    })
+  }
+
+  const orderedProjects = order
+    .map((slug) => projects.find((project) => project.slug === slug))
+    .filter((project): project is Project => Boolean(project))
+
+  // Zoom the preview out of the tapped icon's position on the screen.
+  const launchApp = (project: Project, icon: HTMLElement) => {
+    const screen = screenRef.current?.getBoundingClientRect()
+    const rect = icon.getBoundingClientRect()
+    const origin = screen
+      ? `${((rect.left + rect.width / 2 - screen.left) / screen.width) * 100}% ${((rect.top + rect.width / 2 - screen.top) / screen.height) * 100}%`
+      : '50% 50%'
+    setLaunched({ project, origin })
+    trackEvent('hero_app_open', { project: project.slug })
+  }
 
   const pop = (i: number) => ({
     initial: reduce ? { opacity: 1 } : { opacity: 0, scale: 0.6 },
@@ -434,100 +697,405 @@ function HeroPhone() {
     <div className="relative mx-auto w-full max-w-[18.5rem] sm:max-w-[19.5rem]">
       <div aria-hidden className="absolute -inset-10 rounded-[5rem] bg-accent/15 blur-3xl" />
 
-      <div className="float-slow relative">
-        <div className="rounded-[3.1rem] bg-[#101114] p-2.5 shadow-[0_40px_80px_-30px_rgba(16,17,20,0.55),inset_0_0_0_1.5px_rgba(255,255,255,0.08)]">
-          <div className="phone-wallpaper relative aspect-[9/18] overflow-hidden rounded-[2.5rem]">
-            {/* Status bar */}
-            <div className="flex items-center justify-between px-7 pt-3.5 text-[0.72rem] font-semibold text-white">
-              <span>9:41</span>
-              <span className="flex items-center gap-1">
-                <SignalHigh size={13} strokeWidth={2.6} />
-                <Wifi size={13} strokeWidth={2.6} />
-                <BatteryFull size={16} strokeWidth={2} />
-              </span>
-            </div>
-            <div aria-hidden className="absolute left-1/2 top-2.5 h-[1.4rem] w-[5.5rem] -translate-x-1/2 rounded-full bg-black" />
-
-            {/* Widget */}
-            <motion.div
-              {...pop(0)}
-              className="mx-4 mt-6 rounded-[1.4rem] bg-white/20 p-3.5 text-white ring-1 ring-white/25 backdrop-blur-md"
+      <div className="relative">
+        <div className={`float-slow relative ${jiggle ? '[animation-play-state:paused]' : ''}`}>
+          <div className="rounded-[3.1rem] bg-[#101114] p-2.5 shadow-[0_40px_80px_-30px_rgba(16,17,20,0.55),inset_0_0_0_1.5px_rgba(255,255,255,0.08)]">
+            <div
+              ref={screenRef}
+              onClick={(e) => {
+                if (jiggle && !(e.target as HTMLElement).closest('a, button')) setJiggle(false)
+              }}
+              className="phone-wallpaper relative aspect-[9/18] overflow-hidden rounded-[2.5rem]"
             >
-              <p className="text-[0.62rem] font-semibold uppercase tracking-[0.12em] text-white/75">Status</p>
-              <p className="mt-1 text-[0.95rem] font-semibold leading-tight">Raj Javiya</p>
-              <p className="text-[0.72rem] text-white/85">Android & Flutter developer</p>
-              <p className="mt-2 inline-flex items-center gap-1.5 rounded-full bg-white/90 px-2 py-0.5 text-[0.62rem] font-semibold text-[#101114]">
-                <span className="h-1.5 w-1.5 rounded-full bg-online" />
-                Open to new projects
-              </p>
-            </motion.div>
+              {/* Status bar */}
+              <div
+                className={`relative z-20 flex items-center justify-between px-7 pt-3.5 text-[0.72rem] font-semibold text-white transition-opacity duration-300 ${island || jiggle ? 'opacity-0' : ''}`}
+              >
+                <span>9:41</span>
+                <span className="flex items-center gap-1">
+                  <SignalHigh size={13} strokeWidth={2.6} />
+                  <Wifi size={13} strokeWidth={2.6} />
+                  <BatteryFull size={16} strokeWidth={2} />
+                </span>
+              </div>
+              <motion.div
+                aria-hidden
+                initial={false}
+                animate={{ width: island ? '14.5rem' : '5.5rem', height: island ? '1.75rem' : '1.4rem' }}
+                transition={reduce ? { duration: 0 } : { type: 'spring', stiffness: 400, damping: 30 }}
+                className="absolute left-1/2 top-2.5 z-30 flex max-w-[calc(100%-1.5rem)] -translate-x-1/2 items-center justify-center overflow-hidden rounded-full bg-black text-white"
+              >
+                <AnimatePresence mode="wait">
+                  {island ? (
+                    <motion.span
+                      key={island.key}
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      exit={{ opacity: 0 }}
+                      transition={{ duration: reduce ? 0 : 0.2, delay: reduce ? 0 : 0.12 }}
+                      className="flex min-w-0 items-center gap-1.5 whitespace-nowrap px-3 text-[0.62rem] font-semibold"
+                    >
+                      {island.icon}
+                      <span className="truncate">{island.text}</span>
+                    </motion.span>
+                  ) : null}
+                </AnimatePresence>
+              </motion.div>
 
-            {/* App grid — each icon jumps to that project */}
-            <div className="mt-5 grid grid-cols-4 gap-x-2 gap-y-4 px-4">
-              {projects.map((project, i) => (
+              {jiggle ? (
+                <button
+                  type="button"
+                  onClick={() => setJiggle(false)}
+                  className="absolute right-4 top-2.5 z-40 h-[1.4rem] rounded-full bg-white/90 px-3 text-[0.68rem] font-semibold text-[#101114] shadow-sm transition hover:bg-white"
+                >
+                  Done
+                </button>
+              ) : null}
+
+              {/* Widget */}
+              <motion.div
+                {...pop(0)}
+                className="mx-4 mt-6 rounded-[1.4rem] bg-white/20 p-3.5 text-white ring-1 ring-white/25 backdrop-blur-md"
+              >
+                <p className="text-[0.62rem] font-semibold uppercase tracking-[0.12em] text-white/75">Status</p>
+                <p className="mt-1 text-[0.95rem] font-semibold leading-tight">Raj Javiya</p>
+                <p className="text-[0.72rem] text-white/85">Android & Flutter developer</p>
+                <p className="mt-2 inline-flex items-center gap-1.5 rounded-full bg-white/90 px-2 py-0.5 text-[0.62rem] font-semibold text-[#101114]">
+                  <span className="h-1.5 w-1.5 rounded-full bg-online" />
+                  Open to new projects
+                </p>
+              </motion.div>
+
+              {/* App grid — each icon launches a preview of that project */}
+              <div className="mt-5 grid grid-cols-4 gap-x-2 gap-y-4 px-4">
+                {orderedProjects.map((project, i) => {
+                  const intro = pop(projects.indexOf(project) + 1)
+                  return (
+                    <motion.a
+                      key={project.slug}
+                      data-app-slug={project.slug}
+                      href={`#app-${project.slug}`}
+                      aria-label={`Open ${project.name}`}
+                      aria-haspopup="dialog"
+                      onClick={(e) => {
+                        e.preventDefault()
+                        if (jiggle || longPressed.current) {
+                          longPressed.current = false
+                          return
+                        }
+                        launchApp(project, e.currentTarget)
+                      }}
+                      onPointerDown={startPress}
+                      onPointerUp={cancelPress}
+                      onPointerLeave={cancelPress}
+                      onPointerCancel={cancelPress}
+                      onContextMenu={(e) => {
+                        if (pressPointerType.current === 'touch') e.preventDefault()
+                      }}
+                      initial={intro.initial}
+                      animate={intro.animate}
+                      transition={{ ...intro.transition, layout: { type: 'spring', stiffness: 500, damping: 35 } }}
+                      layout
+                      drag={jiggle}
+                      dragSnapToOrigin
+                      dragElastic={0.6}
+                      onDragEnd={(_, info) => handleDrop(project.slug, info.point)}
+                      whileTap={reduce || jiggle ? undefined : { scale: 0.88 }}
+                      whileDrag={{ scale: 1.12, zIndex: 10 }}
+                      style={{ touchAction: jiggle ? 'none' : undefined }}
+                      className="group relative flex select-none flex-col items-center gap-1 [-webkit-touch-callout:none] [-webkit-user-drag:none] [&_img]:pointer-events-none"
+                    >
+                      <span
+                        className={`block ${jiggle ? 'jiggle' : ''}`}
+                        style={jiggle ? { animationDelay: `${(i % 3) * -0.09}s` } : undefined}
+                      >
+                        <AppIcon
+                          project={project}
+                          className="h-[3.1rem] w-[3.1rem] rounded-[0.9rem] shadow-[0_4px_10px_rgba(0,0,0,0.18)] transition group-hover:-translate-y-0.5"
+                        />
+                      </span>
+                      <span className="w-full truncate text-center text-[0.6rem] font-medium text-white [text-shadow:0_1px_2px_rgba(0,0,0,0.35)]">
+                        {project.homeLabel}
+                      </span>
+                    </motion.a>
+                  )
+                })}
                 <motion.a
-                  key={project.slug}
-                  href={`#app-${project.slug}`}
-                  aria-label={`Jump to ${project.name}`}
-                  {...pop(i + 1)}
-                  whileTap={reduce ? undefined : { scale: 0.88 }}
+                  href={resumeUrl}
+                  target="_blank"
+                  rel="noreferrer"
+                  aria-label="Open resume (PDF)"
+                  onClick={(e) => {
+                    if (jiggle) {
+                      e.preventDefault()
+                      return
+                    }
+                    trackEvent('resume_open', { location: 'hero_phone' })
+                  }}
+                  {...pop(projects.length + 1)}
+                  layout
+                  whileTap={reduce || jiggle ? undefined : { scale: 0.88 }}
                   className="group flex flex-col items-center gap-1"
                 >
-                  <AppIcon
-                    project={project}
-                    className="h-[3.1rem] w-[3.1rem] rounded-[0.9rem] shadow-[0_4px_10px_rgba(0,0,0,0.18)] transition group-hover:-translate-y-0.5"
-                  />
-                  <span className="w-full truncate text-center text-[0.6rem] font-medium text-white [text-shadow:0_1px_2px_rgba(0,0,0,0.35)]">
-                    {project.homeLabel}
+                  <span
+                    className={`flex h-[3.1rem] w-[3.1rem] items-center justify-center rounded-[0.9rem] bg-white text-[#101114] shadow-[0_4px_10px_rgba(0,0,0,0.18)] transition group-hover:-translate-y-0.5 ${jiggle ? 'jiggle' : ''}`}
+                    style={jiggle ? { animationDelay: '-0.18s' } : undefined}
+                  >
+                    <FileText size={22} />
+                  </span>
+                  <span className="text-[0.6rem] font-medium text-white [text-shadow:0_1px_2px_rgba(0,0,0,0.35)]">
+                    Resume
                   </span>
                 </motion.a>
-              ))}
-              <motion.a
-                href={resumeUrl}
-                target="_blank"
-                rel="noreferrer"
-                aria-label="Open resume (PDF)"
-                onClick={() => trackEvent('resume_open', { location: 'hero_phone' })}
-                {...pop(projects.length + 1)}
-                whileTap={reduce ? undefined : { scale: 0.88 }}
-                className="group flex flex-col items-center gap-1"
-              >
-                <span className="flex h-[3.1rem] w-[3.1rem] items-center justify-center rounded-[0.9rem] bg-white text-[#101114] shadow-[0_4px_10px_rgba(0,0,0,0.18)] transition group-hover:-translate-y-0.5">
-                  <FileText size={22} />
-                </span>
-                <span className="text-[0.6rem] font-medium text-white [text-shadow:0_1px_2px_rgba(0,0,0,0.35)]">
-                  Resume
-                </span>
-              </motion.a>
-            </div>
+              </div>
 
-            {/* Dock */}
-            <div className="absolute inset-x-3 bottom-5 grid grid-cols-4 gap-2 rounded-[1.6rem] bg-white/25 p-2.5 ring-1 ring-white/25 backdrop-blur-md">
-              {socialLinks.map((item) => {
-                const Icon = item.icon
-                const external = !item.href.startsWith('mailto:')
-                return (
-                  <a
-                    key={item.label}
-                    href={item.href}
-                    target={external ? '_blank' : undefined}
-                    rel={external ? 'noreferrer' : undefined}
-                    aria-label={item.label}
-                    className="mx-auto flex h-[2.9rem] w-[2.9rem] items-center justify-center rounded-[0.85rem] text-white shadow-[0_4px_10px_rgba(0,0,0,0.18)] transition hover:-translate-y-0.5"
-                    style={{ background: item.tile }}
-                  >
-                    <Icon size={20} />
-                  </a>
-                )
-              })}
+              {/* Dock */}
+              <div className="absolute inset-x-3 bottom-5 grid grid-cols-4 gap-2 rounded-[1.6rem] bg-white/25 p-2.5 ring-1 ring-white/25 backdrop-blur-md">
+                {socialLinks.map((item) => {
+                  const Icon = item.icon
+                  const external = !item.href.startsWith('mailto:')
+                  return (
+                    <a
+                      key={item.label}
+                      href={item.href}
+                      target={external ? '_blank' : undefined}
+                      rel={external ? 'noreferrer' : undefined}
+                      aria-label={item.label}
+                      className="mx-auto flex h-[2.9rem] w-[2.9rem] items-center justify-center rounded-[0.85rem] text-white shadow-[0_4px_10px_rgba(0,0,0,0.18)] transition hover:-translate-y-0.5"
+                      style={{ background: item.tile }}
+                    >
+                      <Icon size={20} />
+                    </a>
+                  )
+                })}
+              </div>
+
+              <AnimatePresence>
+                {launched ? (
+                  <PhoneAppPreview
+                    key={launched.project.slug}
+                    project={launched.project}
+                    origin={launched.origin}
+                    onClose={closeApp}
+                  />
+                ) : null}
+              </AnimatePresence>
+
+              <div
+                aria-hidden
+                className={`absolute bottom-1.5 left-1/2 z-20 h-1 w-24 -translate-x-1/2 rounded-full transition-colors ${launched ? 'bg-foreground/70' : 'bg-white/80'}`}
+              />
             </div>
-            <div aria-hidden className="absolute bottom-1.5 left-1/2 h-1 w-24 -translate-x-1/2 rounded-full bg-white/80" />
           </div>
         </div>
       </div>
 
-      <p className="mt-5 text-center text-xs text-muted-foreground">Tap an app to jump to it</p>
+      <p className="mt-5 text-center text-xs text-muted-foreground">
+        {jiggle ? 'Drag icons to rearrange · tap Done when finished' : 'Tap an app to open it · press and hold to rearrange'}
+      </p>
     </div>
+  )
+}
+
+// Counts a stat like "10K+" or "4.8★" up from zero the first time it scrolls into view.
+function CountUp({ value }: { value: string }) {
+  const ref = useRef<HTMLSpanElement>(null)
+  const inView = useInView(ref, { once: true, amount: 0.6 })
+  const reduce = useReducedMotion()
+  const [display, setDisplay] = useState(value)
+
+  const match = value.match(/^(\d+(?:\.\d+)?)(.*)$/)
+  const target = match ? parseFloat(match[1]) : null
+  const decimals = match?.[1].split('.')[1]?.length ?? 0
+  const suffix = match?.[2] ?? ''
+
+  useEffect(() => {
+    if (target === null || reduce || !inView) return
+    const controls = animate(0, target, {
+      duration: 1.4,
+      ease: [0.22, 1, 0.36, 1],
+      onUpdate: (v) => setDisplay(`${v.toFixed(decimals)}${suffix}`),
+    })
+    return () => controls.stop()
+  }, [inView, reduce, target, decimals, suffix])
+
+  return (
+    <span ref={ref} className="tabular-nums">
+      {display}
+    </span>
+  )
+}
+
+type SpotlightItem = {
+  id: string
+  group: 'Apps' | 'Sections' | 'Actions'
+  label: string
+  hint: string
+  icon: LucideIcon
+  project?: Project
+  run: () => void
+}
+
+const spotlightGroups = ['Apps', 'Sections', 'Actions'] as const
+
+// iOS-style Spotlight search (⌘K or /) over apps, sections and quick actions.
+function Spotlight({ items, onClose }: { items: SpotlightItem[]; onClose: () => void }) {
+  const reduceMotion = useReducedMotion()
+  const [query, setQuery] = useState('')
+  const [active, setActive] = useState(0)
+  const inputRef = useRef<HTMLInputElement>(null)
+  const listRef = useRef<HTMLUListElement>(null)
+
+  const q = query.trim().toLowerCase()
+  const results = q ? items.filter((item) => `${item.label} ${item.hint} ${item.group}`.toLowerCase().includes(q)) : items
+  const groups = spotlightGroups
+    .map((group) => ({ group, items: results.filter((item) => item.group === group) }))
+    .filter((g) => g.items.length > 0)
+  const ordered = groups.flatMap((g) => g.items)
+  const activeItem = ordered[active]
+
+  // Same focus/scroll handling as the gallery: focus in, lock scroll, restore on close.
+  useEffect(() => {
+    const opener = document.activeElement as HTMLElement | null
+    const previousOverflow = document.body.style.overflow
+    document.body.style.overflow = 'hidden'
+    inputRef.current?.focus()
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') onClose()
+    }
+    window.addEventListener('keydown', onKey)
+    return () => {
+      window.removeEventListener('keydown', onKey)
+      document.body.style.overflow = previousOverflow
+      opener?.focus?.({ preventScroll: true })
+    }
+  }, [onClose])
+
+  useEffect(() => {
+    listRef.current?.querySelector('[aria-selected="true"]')?.scrollIntoView({ block: 'nearest' })
+  }, [active, query])
+
+  const select = (item: SpotlightItem) => {
+    onClose()
+    // Run after the overlay unmounts so the scroll lock is released first.
+    window.setTimeout(item.run, 10)
+  }
+
+  const handleKeyDown = (e: ReactKeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'ArrowDown') {
+      e.preventDefault()
+      setActive((i) => Math.min(i + 1, ordered.length - 1))
+    } else if (e.key === 'ArrowUp') {
+      e.preventDefault()
+      setActive((i) => Math.max(i - 1, 0))
+    } else if (e.key === 'Enter' && activeItem) {
+      e.preventDefault()
+      select(activeItem)
+    } else if (e.key === 'Tab') {
+      e.preventDefault()
+    }
+  }
+
+  return (
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      transition={{ duration: reduceMotion ? 0 : 0.15 }}
+      className="fixed inset-0 z-[999] flex items-start justify-center bg-[#0b0c0f]/40 px-4 pt-[12vh] backdrop-blur-sm"
+      onMouseDown={onClose}
+    >
+      <motion.div
+        role="dialog"
+        aria-modal="true"
+        aria-label="Search the site"
+        initial={reduceMotion ? { opacity: 0 } : { opacity: 0, y: -12, scale: 0.98 }}
+        animate={{ opacity: 1, y: 0, scale: 1 }}
+        exit={reduceMotion ? { opacity: 0 } : { opacity: 0, y: -8, scale: 0.98 }}
+        transition={{ duration: reduceMotion ? 0 : 0.18, ease: [0.22, 1, 0.36, 1] }}
+        className="w-full max-w-xl overflow-hidden rounded-[1.5rem] border border-border bg-card shadow-[0_30px_80px_-20px_rgba(16,17,20,0.45)]"
+        onMouseDown={(e) => e.stopPropagation()}
+      >
+        <div className="flex items-center gap-3 border-b border-border px-4">
+          <Search size={18} className="shrink-0 text-muted-foreground" />
+          <input
+            ref={inputRef}
+            type="text"
+            role="combobox"
+            aria-expanded="true"
+            aria-controls="spotlight-results"
+            aria-activedescendant={activeItem ? `spotlight-${activeItem.id}` : undefined}
+            aria-label="Search apps, sections and actions"
+            value={query}
+            onChange={(e) => {
+              setQuery(e.target.value)
+              setActive(0)
+            }}
+            onKeyDown={handleKeyDown}
+            placeholder="Search apps, sections and actions…"
+            className="h-14 min-w-0 flex-1 bg-transparent text-base text-foreground outline-none placeholder:text-muted-foreground/70"
+          />
+          <kbd className="hidden rounded-md border border-border px-1.5 py-0.5 font-mono text-[0.7rem] text-muted-foreground sm:inline">
+            esc
+          </kbd>
+        </div>
+
+        <ul id="spotlight-results" ref={listRef} role="listbox" className="max-h-[min(60vh,26rem)] overflow-y-auto p-2">
+          {groups.length === 0 ? (
+            <li className="px-3 py-10 text-center text-sm text-muted-foreground">No results for “{query}”</li>
+          ) : (
+            groups.map(({ group, items: groupItems }) => (
+              <li key={group} role="presentation">
+                <p className="px-3 pb-1 pt-3 text-[0.7rem] font-semibold uppercase tracking-[0.1em] text-muted-foreground">
+                  {group}
+                </p>
+                <ul role="group" aria-label={group}>
+                  {groupItems.map((item) => {
+                    const index = ordered.indexOf(item)
+                    const selected = index === active
+                    const Icon = item.icon
+                    return (
+                      <li
+                        key={item.id}
+                        id={`spotlight-${item.id}`}
+                        role="option"
+                        aria-selected={selected}
+                        onMouseMove={() => setActive(index)}
+                        onClick={() => select(item)}
+                        className={`flex cursor-pointer items-center gap-3 rounded-xl px-3 py-2.5 ${selected ? 'bg-accent text-white' : 'text-foreground'}`}
+                      >
+                        {item.project ? (
+                          <AppIcon project={item.project} className="h-8 w-8 shrink-0 rounded-[0.55rem]" />
+                        ) : (
+                          <span
+                            className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-[0.55rem] ${selected ? 'bg-white/20' : 'bg-secondary'}`}
+                          >
+                            <Icon size={16} />
+                          </span>
+                        )}
+                        <span className="min-w-0 flex-1">
+                          <span className="block truncate text-[0.95rem] font-semibold">{item.label}</span>
+                          <span className={`block truncate text-xs ${selected ? 'text-white/75' : 'text-muted-foreground'}`}>
+                            {item.hint}
+                          </span>
+                        </span>
+                        {selected ? <CornerDownLeft size={15} className="shrink-0" /> : null}
+                      </li>
+                    )
+                  })}
+                </ul>
+              </li>
+            ))
+          )}
+        </ul>
+
+        <p className="hidden gap-4 border-t border-border px-4 py-2.5 text-xs text-muted-foreground sm:flex">
+          <span>↑ ↓ to move</span>
+          <span>↵ to open</span>
+          <span>esc to close</span>
+        </p>
+      </motion.div>
+    </motion.div>
   )
 }
 
@@ -937,6 +1505,17 @@ export default function PortfolioHome({
   githubStats: GitHubStats
 }) {
   const reduceMotion = useReducedMotion()
+  const router = useRouter()
+  const { scrollYProgress } = useScroll()
+  const [spotlightOpen, setSpotlightOpen] = useState(false)
+  const [modKey, setModKey] = useState('⌘')
+  const closeSpotlight = useCallback(() => setSpotlightOpen(false), [])
+  const chatRef = useRef<HTMLDivElement>(null)
+  const chatInView = useInView(chatRef, { once: true, amount: 0.5 })
+  // All bubbles render on the server; after mount they replay one by one with a typing indicator.
+  const [shownBubbles, setShownBubbles] = useState(chatBubbles.length)
+  const [typing, setTyping] = useState(false)
+  const [sentMessage, setSentMessage] = useState<string | null>(null)
   const [activeTab, setActiveTab] = useState('home')
   const [copiedEmail, setCopiedEmail] = useState(false)
   const [submitting, setSubmitting] = useState(false)
@@ -965,6 +1544,42 @@ export default function PortfolioHome({
     })
     return () => observers.forEach((o) => o?.disconnect())
   }, [])
+
+  // ⌘K / Ctrl+K toggles Spotlight; "/" opens it when not typing in a field.
+  useEffect(() => {
+    if (!/Mac|iPhone|iPad/i.test(navigator.userAgent)) setModKey('Ctrl ')
+    const onKey = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
+        e.preventDefault()
+        setSpotlightOpen((open) => !open)
+        return
+      }
+      const target = e.target as HTMLElement | null
+      if (e.key === '/' && !target?.closest('input, textarea, [contenteditable="true"]')) {
+        e.preventDefault()
+        setSpotlightOpen(true)
+      }
+    }
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [])
+
+  useEffect(() => {
+    setShownBubbles(reduceMotion ? chatBubbles.length : 0)
+  }, [reduceMotion])
+
+  useEffect(() => {
+    if (!chatInView || shownBubbles >= chatBubbles.length) return
+    const startTyping = window.setTimeout(() => setTyping(true), 250)
+    const showBubble = window.setTimeout(() => {
+      setTyping(false)
+      setShownBubbles((n) => n + 1)
+    }, 1150)
+    return () => {
+      window.clearTimeout(startTyping)
+      window.clearTimeout(showBubble)
+    }
+  }, [chatInView, shownBubbles])
 
   const handleInputChange = (event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = event.target
@@ -1024,6 +1639,7 @@ export default function PortfolioHome({
       }
 
       trackEvent('contact_submit', { location: 'contact_form' })
+      setSentMessage(formData.message.trim())
       setSubmitted(true)
       setFormData({ name: '', email: '', message: '', website: '' })
       window.setTimeout(() => setSubmitted(false), 4000)
@@ -1039,10 +1655,94 @@ export default function PortfolioHome({
       hasError ? 'border-destructive focus:ring-destructive/10' : 'border-border focus:border-accent focus:ring-accent/10'
     }`
 
-  const chatBubbles = [
-    'Hey 👋 thanks for stopping by!',
-    'Got an app idea, a codebase that needs help, or want a second opinion on architecture?',
-    'Send me a message — I usually reply within a day.',
+  const jumpTo = (id: string) => {
+    document.getElementById(id)?.scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth', block: 'start' })
+    window.history.replaceState(null, '', `#${id}`)
+  }
+
+  const openExternal = (href: string) => window.open(href, '_blank', 'noopener,noreferrer')
+
+  const spotlightItems: SpotlightItem[] = [
+    ...projects.flatMap((project): SpotlightItem[] => [
+      {
+        id: `app-${project.slug}`,
+        group: 'Apps',
+        label: project.name,
+        hint: project.category,
+        icon: project.icon,
+        project,
+        run: () => jumpTo(`app-${project.slug}`),
+      },
+      ...(hasCaseStudy(project.slug)
+        ? [
+            {
+              id: `case-${project.slug}`,
+              group: 'Apps' as const,
+              label: `${project.name} case study`,
+              hint: 'Read the full story',
+              icon: FileText,
+              run: () => {
+                trackEvent('case_study_open', { project: project.slug, location: 'spotlight' })
+                router.push(`/projects/${project.slug}`)
+              },
+            },
+          ]
+        : []),
+    ]),
+    ...spotlightSections.map(
+      (section): SpotlightItem => ({
+        id: `section-${section.id}`,
+        group: 'Sections',
+        label: section.label,
+        hint: section.hint,
+        icon: section.icon,
+        run: () => jumpTo(section.id),
+      })
+    ),
+    {
+      id: 'action-resume',
+      group: 'Actions',
+      label: 'Open resume',
+      hint: 'PDF',
+      icon: Download,
+      run: () => {
+        trackEvent('resume_open', { location: 'spotlight' })
+        openExternal(resumeUrl)
+      },
+    },
+    {
+      id: 'action-book',
+      group: 'Actions',
+      label: 'Book a free call',
+      hint: '30 minutes on Cal.com',
+      icon: CalendarDays,
+      run: () => {
+        trackEvent('book_call_click', { location: 'spotlight' })
+        openExternal(bookingUrl)
+      },
+    },
+    {
+      id: 'action-email',
+      group: 'Actions',
+      label: 'Email me',
+      hint: emailAddress,
+      icon: Mail,
+      run: () => {
+        window.location.href = `mailto:${emailAddress}?subject=Portfolio Inquiry`
+      },
+    },
+    ...socialLinks
+      .filter((link) => !link.href.startsWith('mailto:'))
+      .map(
+        (link): SpotlightItem => ({
+          id: `action-${link.label}`,
+          group: 'Actions',
+          label: link.label,
+          hint: link.href.replace(/^https:\/\//, ''),
+          icon: link.icon,
+          run: () => openExternal(link.href),
+        })
+      ),
   ]
 
   return (
@@ -1054,8 +1754,18 @@ export default function PortfolioHome({
         Skip to content
       </a>
 
+      <AnimatePresence>
+        {spotlightOpen ? <Spotlight items={spotlightItems} onClose={closeSpotlight} /> : null}
+      </AnimatePresence>
+
       {/* Top bar */}
       <header className="fixed inset-x-0 top-0 z-50 border-b border-border/70 bg-background/80 backdrop-blur-xl">
+        {/* Scroll progress */}
+        <motion.div
+          aria-hidden
+          style={{ scaleX: scrollYProgress }}
+          className="grad-accent-bg absolute inset-x-0 -bottom-px h-0.5 origin-left"
+        />
         <div className="shell flex h-16 items-center justify-between">
           <a href="#home" className="flex items-center gap-2.5">
             <span className="flex h-9 w-9 items-center justify-center rounded-[0.7rem] bg-foreground text-sm font-bold text-background">
@@ -1067,7 +1777,20 @@ export default function PortfolioHome({
             </span>
           </a>
 
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1.5 sm:gap-2">
+            <button
+              type="button"
+              onClick={() => setSpotlightOpen(true)}
+              aria-label="Search the site"
+              aria-keyshortcuts="Meta+K Control+K /"
+              className="inline-flex h-10 items-center gap-2 rounded-full px-3 text-sm font-semibold text-foreground transition hover:bg-secondary"
+            >
+              <Search size={16} />
+              <span className="hidden md:inline">Search</span>
+              <kbd className="hidden rounded-md border border-border bg-card px-1.5 py-0.5 font-mono text-[0.7rem] font-medium text-muted-foreground md:inline">
+                {modKey}K
+              </kbd>
+            </button>
             <a
               href={resumeUrl}
               target="_blank"
@@ -1175,7 +1898,9 @@ export default function PortfolioHome({
               <div className="grid grid-cols-2 gap-px overflow-hidden rounded-[1.5rem] border border-border bg-border sm:grid-cols-4">
                 {heroStats.map((stat) => (
                   <div key={stat.label} className="bg-card px-5 py-5 sm:px-6 sm:py-6">
-                    <p className="text-3xl font-bold tracking-[-0.03em] text-foreground sm:text-4xl">{stat.value}</p>
+                    <p className="text-3xl font-bold tracking-[-0.03em] text-foreground sm:text-4xl">
+                      <CountUp value={stat.value} />
+                    </p>
                     <p className="mt-1 text-sm text-muted-foreground">{stat.label}</p>
                   </div>
                 ))}
@@ -1183,6 +1908,30 @@ export default function PortfolioHome({
             </Reveal>
           </div>
         </section>
+
+        {/* Tech ticker */}
+        <div className="marquee border-y border-border bg-card/70 py-4">
+          <div className="marquee-track flex">
+            {[0, 1].map((copy) => (
+              <ul
+                key={copy}
+                aria-label={copy === 0 ? 'Technologies I work with' : undefined}
+                aria-hidden={copy === 1 ? true : undefined}
+                className="flex shrink-0 items-center"
+              >
+                {marqueeItems.map((item) => (
+                  <li
+                    key={item}
+                    className="flex items-center gap-6 pr-6 text-lg font-semibold tracking-[-0.01em] text-foreground/70 sm:text-xl"
+                  >
+                    {item}
+                    <span aria-hidden className="h-1.5 w-1.5 rounded-full bg-accent" />
+                  </li>
+                ))}
+              </ul>
+            ))}
+          </div>
+        </div>
 
         {/* About */}
         <section id="about" className="section-shell">
@@ -1365,8 +2114,8 @@ export default function PortfolioHome({
             <Reveal>
               <SectionHeader
                 label="Experience"
-                title="My journey so far."
-                description="4+ years of building mobile apps — from freelance modules to leading production releases."
+                title="Version history."
+                description="Release notes from 4+ years of building mobile apps — from freelance modules to leading production releases."
               />
             </Reveal>
 
@@ -1380,9 +2129,12 @@ export default function PortfolioHome({
                   <Reveal delay={0.04 + index * 0.05}>
                     <article className="surface-card p-5 sm:p-7">
                       <div className="flex flex-wrap items-center gap-2">
+                        <span className="rounded-md bg-foreground px-2 py-0.5 font-mono text-xs font-semibold text-background">
+                          {item.version}
+                        </span>
                         {index === 0 ? (
                           <span className="rounded-md bg-online/10 px-2 py-0.5 text-xs font-semibold text-online">
-                            Current
+                            Latest · Current role
                           </span>
                         ) : null}
                         <span className="ml-auto text-sm text-muted-foreground">{item.duration}</span>
@@ -1390,7 +2142,10 @@ export default function PortfolioHome({
                       <h3 className="mt-3 text-xl font-bold tracking-[-0.02em] text-foreground sm:text-2xl">{item.role}</h3>
                       <p className="font-medium text-muted-foreground">{item.company}</p>
                       <p className="mt-3 text-[0.975rem] leading-7 text-foreground/80">{item.summary}</p>
-                      <ul className="mt-4 space-y-2.5">
+                      <p className="mt-5 text-xs font-semibold uppercase tracking-[0.1em] text-muted-foreground">
+                        What&apos;s new
+                      </p>
+                      <ul className="mt-2.5 space-y-2.5">
                         {item.bullets.map((bullet) => (
                           <li key={bullet} className="flex gap-3 text-[0.95rem] leading-7 text-foreground/80">
                             <Check size={16} className="mt-1.5 shrink-0 text-accent" />
@@ -1566,19 +2321,45 @@ export default function PortfolioHome({
                     </div>
                   </div>
 
-                  <div className="flex-1 space-y-2.5 bg-background/60 px-5 py-6">
-                    {chatBubbles.map((text, i) => (
+                  <div ref={chatRef} aria-live="polite" className="min-h-[15rem] flex-1 space-y-2.5 bg-background/60 px-5 py-6">
+                    {chatBubbles.slice(0, shownBubbles).map((text) => (
                       <motion.p
                         key={text}
                         initial={reduceMotion ? { opacity: 1 } : { opacity: 0, y: 8, scale: 0.97 }}
-                        whileInView={{ opacity: 1, y: 0, scale: 1 }}
-                        viewport={{ once: true, amount: 0.6 }}
-                        transition={{ duration: reduceMotion ? 0 : 0.35, delay: reduceMotion ? 0 : 0.2 + i * 0.35 }}
-                        className="w-fit max-w-[88%] rounded-[1.25rem] rounded-bl-md border border-border bg-card px-4 py-2.5 text-[0.95rem] leading-6 text-foreground"
+                        animate={{ opacity: 1, y: 0, scale: 1 }}
+                        transition={{ duration: reduceMotion ? 0 : 0.3 }}
+                        className="w-fit max-w-[88%] origin-bottom-left rounded-[1.25rem] rounded-bl-md border border-border bg-card px-4 py-2.5 text-[0.95rem] leading-6 text-foreground"
                       >
                         {text}
                       </motion.p>
                     ))}
+                    {typing ? (
+                      <p
+                        aria-label="Raj is typing"
+                        className="flex w-fit items-center gap-1 rounded-[1.25rem] rounded-bl-md border border-border bg-card px-4 py-3.5"
+                      >
+                        {[0, 1, 2].map((dot) => (
+                          <span
+                            key={dot}
+                            className="typing-dot h-1.5 w-1.5 rounded-full bg-muted-foreground"
+                            style={{ animationDelay: `${dot * 0.15}s` }}
+                          />
+                        ))}
+                      </p>
+                    ) : null}
+                    {sentMessage ? (
+                      <div className="flex flex-col items-end gap-1 pt-2">
+                        <motion.p
+                          initial={reduceMotion ? { opacity: 1 } : { opacity: 0, y: 8, scale: 0.97 }}
+                          animate={{ opacity: 1, y: 0, scale: 1 }}
+                          transition={{ duration: reduceMotion ? 0 : 0.3 }}
+                          className="w-fit max-w-[88%] origin-bottom-right line-clamp-6 whitespace-pre-line break-words rounded-[1.25rem] rounded-br-md bg-accent px-4 py-2.5 text-[0.95rem] leading-6 text-white"
+                        >
+                          {sentMessage}
+                        </motion.p>
+                        <span className="pr-1 text-xs font-medium text-muted-foreground">Delivered</span>
+                      </div>
+                    ) : null}
                   </div>
 
                   <div className="grid grid-cols-2 gap-2 border-t border-border p-4">
