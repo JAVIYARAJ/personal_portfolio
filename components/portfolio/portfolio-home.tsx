@@ -106,7 +106,7 @@ const spotlightSections = [
   { id: 'skills', label: 'Skills', hint: 'My toolkit', icon: Layers3 },
   { id: 'experience', label: 'Journey', hint: 'Version history of my career', icon: History },
   { id: 'achievements', label: 'Achievements', hint: 'Badges I’ve earned', icon: Trophy },
-  { id: 'services', label: 'Services', hint: 'How I can help', icon: Rocket },
+  { id: 'services', label: 'Services', hint: 'In-app purchases — what you can hire me for', icon: Rocket },
   { id: 'contact', label: 'Contact', hint: 'Send me a message', icon: MessageCircle },
 ]
 
@@ -321,11 +321,14 @@ const achievements = [
   },
 ]
 
+// Shown as App Store "In-App Purchases". Set `price` (e.g. 'From $499') to show it on the button instead of "Get".
 type Service = {
   title: string
   description: string
   icon: LucideIcon
+  color: string
   deliverables: string[]
+  price?: string
 }
 
 const services: Service[] = [
@@ -334,6 +337,7 @@ const services: Service[] = [
     description:
       'One codebase for iOS and Android — from Figma designs to a store-ready app, or a fast MVP that can grow into the full product.',
     icon: Smartphone,
+    color: '#0284c7',
     deliverables: ['iOS & Android from one codebase', 'Clean Architecture + BLoC/Cubit', 'MVP to full product'],
   },
   {
@@ -341,6 +345,7 @@ const services: Service[] = [
     description:
       'Kotlin and Jetpack Compose apps with MVVM — or native modules when a Flutter app needs platform-specific features.',
     icon: Cpu,
+    color: '#16a34a',
     deliverables: ['Kotlin & Jetpack Compose', 'Native modules for Flutter apps', 'Retrofit, Room & FCM'],
   },
   {
@@ -348,6 +353,7 @@ const services: Service[] = [
     description:
       'Dashboards and back-office tools with React and Next.js: billing, stock, reports, and role-based access for your team.',
     icon: Globe,
+    color: '#0d9488',
     deliverables: ['Next.js / React', 'Role-based access & audit logs', 'Reports, billing & exports'],
   },
   {
@@ -355,6 +361,7 @@ const services: Service[] = [
     description:
       'Connect your app to REST or GraphQL APIs, Supabase or Firebase — with login, real-time updates and push notifications.',
     icon: Server,
+    color: '#ea580c',
     deliverables: ['REST & GraphQL APIs', 'Supabase / Firebase / Node.js', 'Auth, real-time & push (FCM)'],
   },
   {
@@ -362,6 +369,7 @@ const services: Service[] = [
     description:
       'A review of your existing app: structure, state management and performance — with a clear plan to fix what slows your team down.',
     icon: ShieldCheck,
+    color: '#7c3aed',
     deliverables: ['Codebase & architecture audit', 'State management refactor', 'Performance fixes'],
   },
   {
@@ -369,6 +377,7 @@ const services: Service[] = [
     description:
       'Get your app published and keep releases smooth: store listings, versioning, staged rollouts and automated CI/CD builds.',
     icon: Rocket,
+    color: '#db2777',
     deliverables: ['Store submission & review', 'Staged rollouts & versioning', 'CI/CD (GitHub Actions, Codemagic)'],
   },
 ]
@@ -1516,6 +1525,8 @@ export default function PortfolioHome({
   const [shownBubbles, setShownBubbles] = useState(chatBubbles.length)
   const [typing, setTyping] = useState(false)
   const [sentMessage, setSentMessage] = useState<string | null>(null)
+  const [requestedService, setRequestedService] = useState<string | null>(null)
+  const messageRef = useRef<HTMLTextAreaElement>(null)
   const [activeTab, setActiveTab] = useState('home')
   const [copiedEmail, setCopiedEmail] = useState(false)
   const [submitting, setSubmitting] = useState(false)
@@ -1658,6 +1669,25 @@ export default function PortfolioHome({
   const jumpTo = (id: string) => {
     document.getElementById(id)?.scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth', block: 'start' })
     window.history.replaceState(null, '', `#${id}`)
+  }
+
+  const servicePrefix = 'Hi Raj, I’m interested in '
+
+  // "Get" on an in-app purchase: pre-fill the contact message with that service and jump to the form.
+  const requestService = (service: Service) => {
+    setRequestedService(service.title)
+    setFormData((current) => ({
+      ...current,
+      // Never overwrite a message the visitor wrote themselves.
+      message:
+        !current.message.trim() || current.message.startsWith(servicePrefix)
+          ? `${servicePrefix}${service.title.toLowerCase()}. Here’s a bit about my project:\n\n`
+          : current.message,
+    }))
+    setFormErrors((current) => ({ ...current, message: undefined }))
+    trackEvent('service_get_click', { service: service.title })
+    jumpTo('contact')
+    window.setTimeout(() => messageRef.current?.focus({ preventScroll: true }), reduceMotion ? 0 : 600)
   }
 
   const openExternal = (href: string) => window.open(href, '_blank', 'noopener,noreferrer')
@@ -2233,35 +2263,76 @@ export default function PortfolioHome({
             <Reveal>
               <SectionHeader
                 label="Work with me"
-                title="How I can help."
-                description="From a first MVP to store release — mobile apps, web platforms, and everything that connects them."
+                title="In-App Purchases."
+                description="Everything you can get from me — from a first MVP to store release. Tap Get and I’ll reply with a plan and a quote within a day."
               />
             </Reveal>
 
-            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-              {services.map((service, index) => {
-                const Icon = service.icon
-                return (
-                  <Reveal key={service.title} delay={0.04 + index * 0.04}>
-                    <div className="surface-card h-full p-5 sm:p-7">
-                      <span className="flex h-10 w-10 items-center justify-center rounded-[0.7rem] bg-accent/10 text-accent">
-                        <Icon size={19} />
-                      </span>
-                      <h3 className="mt-4 text-xl font-bold tracking-[-0.01em] text-foreground">{service.title}</h3>
-                      <p className="mt-2 text-[0.975rem] leading-7 text-muted-foreground">{service.description}</p>
-                      <ul className="mt-4 space-y-1.5">
-                        {service.deliverables.map((d) => (
-                          <li key={d} className="flex items-center gap-2 text-[0.95rem] text-foreground/85">
-                            <Check size={15} className="text-online" />
-                            {d}
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                  </Reveal>
-                )
-              })}
-            </div>
+            <Reveal delay={0.05}>
+              <div className="surface-card-strong overflow-hidden">
+                {/* Store header */}
+                <div className="flex flex-wrap items-center gap-4 p-5 sm:p-7">
+                  <span className="flex h-14 w-14 shrink-0 items-center justify-center rounded-[1rem] bg-foreground text-lg font-bold text-background sm:h-16 sm:w-16 sm:rounded-[1.15rem]">
+                    RJ
+                  </span>
+                  <div className="min-w-0 flex-1">
+                    <p className="text-lg font-bold tracking-[-0.01em] text-foreground sm:text-xl">Raj Javiya</p>
+                    <p className="text-sm text-muted-foreground">Mobile & web development</p>
+                  </div>
+                  <p className="rounded-full bg-secondary px-3 py-1 text-xs font-semibold text-muted-foreground">
+                    Offers In-App Purchases
+                  </p>
+                </div>
+
+                <ul className="grid px-5 sm:px-7 lg:grid-cols-2 lg:gap-x-12">
+                  {services.map((service) => {
+                    const Icon = service.icon
+                    const requested = requestedService === service.title
+                    return (
+                      <li key={service.title} className="flex gap-4 border-t border-border py-5">
+                        <span
+                          className="flex h-12 w-12 shrink-0 items-center justify-center rounded-[0.8rem] text-white"
+                          style={{
+                            background: `linear-gradient(145deg, ${service.color}, ${service.color}cc)`,
+                            boxShadow: `0 8px 18px -8px ${service.color}99`,
+                          }}
+                        >
+                          <Icon size={22} />
+                        </span>
+                        <div className="min-w-0 flex-1">
+                          <div className="flex items-start justify-between gap-3">
+                            <h3 className="pt-0.5 text-[1.05rem] font-bold leading-snug tracking-[-0.01em] text-foreground">
+                              {service.title}
+                            </h3>
+                            <button
+                              type="button"
+                              onClick={() => requestService(service)}
+                              aria-label={`Get ${service.title} — opens the contact form`}
+                              className={`inline-flex h-8 shrink-0 items-center gap-1 rounded-full px-4 text-[0.8rem] font-bold uppercase tracking-[0.02em] transition ${
+                                requested ? 'bg-online/10 text-online' : 'bg-secondary text-accent hover:bg-accent/10'
+                              }`}
+                            >
+                              {requested ? (
+                                <>
+                                  <Check size={14} strokeWidth={3} />
+                                  Added
+                                </>
+                              ) : (
+                                (service.price ?? 'Get')
+                              )}
+                            </button>
+                          </div>
+                          <p className="mt-1 text-[0.925rem] leading-6 text-muted-foreground">{service.description}</p>
+                          <p className="mt-2 text-[0.8rem] font-medium leading-5 text-foreground/70">
+                            {service.deliverables.join(' · ')}
+                          </p>
+                        </div>
+                      </li>
+                    )
+                  })}
+                </ul>
+              </div>
+            </Reveal>
 
             <Reveal delay={0.1}>
               <div className="flex flex-col gap-6 rounded-[1.75rem] bg-foreground p-6 text-background sm:p-10 lg:flex-row lg:items-center lg:justify-between">
@@ -2434,6 +2505,7 @@ export default function PortfolioHome({
                   <label className="mt-4 grid flex-1 gap-1.5 text-sm font-semibold text-foreground">
                     Message
                     <textarea
+                      ref={messageRef}
                       name="message"
                       value={formData.message}
                       onChange={handleInputChange}
