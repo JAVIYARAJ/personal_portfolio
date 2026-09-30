@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation'
 import type { GitHubStats, Repo } from '@/lib/github'
 import { hasCaseStudy } from '@/lib/case-studies'
 import { projects, type Project } from '@/lib/projects'
+import { siteHost, siteUrl } from '@/lib/site'
 import type { ChangeEvent, FormEvent, KeyboardEvent as ReactKeyboardEvent, PointerEvent, ReactNode } from 'react'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
@@ -51,6 +52,7 @@ import {
   Send,
   Server,
   Settings as SettingsIcon,
+  Share2,
   ShieldCheck,
   SignalHigh,
   Smartphone,
@@ -58,6 +60,8 @@ import {
   Star,
   Trophy,
   Twitter,
+  UserPlus,
+  Wallet,
   Wifi,
   Workflow,
   X,
@@ -66,6 +70,8 @@ import {
 
 const emailAddress = 'javiyaraj4@gmail.com'
 const resumeUrl = '/resume.pdf'
+// vCard served by app/raj-javiya.vcf/route.ts — opens in Contacts on phones.
+const vcardUrl = '/raj-javiya.vcf'
 
 // Free scheduling link (Cal.com).
 const bookingUrl = 'https://cal.com/raj-javiya-qkewzq/30min'
@@ -935,6 +941,145 @@ function PhoneMessages({ origin, onClose }: { origin: string; onClose: () => voi
   )
 }
 
+// The Wallet app: a business card pass with "Add to Contacts" (vCard), share and copy-email.
+function PhoneWallet({ origin, onClose }: { origin: string; onClose: () => void }) {
+  const reduce = useReducedMotion()
+  const closeRef = usePhoneAppFocus(onClose)
+  const [copied, setCopied] = useState<'email' | 'link' | null>(null)
+
+  const flash = (what: 'email' | 'link') => {
+    setCopied(what)
+    window.setTimeout(() => setCopied(null), 1800)
+  }
+
+  const copyEmail = async () => {
+    try {
+      await navigator.clipboard.writeText(emailAddress)
+      flash('email')
+    } catch {
+      // Clipboard blocked: nothing to do.
+    }
+  }
+
+  // Native share sheet where available (phones), otherwise copy the site link.
+  const share = async () => {
+    trackEvent('wallet_share')
+    if (navigator.share) {
+      try {
+        await navigator.share({ title: 'Raj Javiya — Mobile Developer', text: 'Flutter, Native Android & web developer', url: siteUrl })
+      } catch {
+        // Share sheet dismissed.
+      }
+      return
+    }
+    try {
+      await navigator.clipboard.writeText(siteUrl)
+      flash('link')
+    } catch {
+      // Clipboard blocked: nothing to do.
+    }
+  }
+
+  const stats = [
+    { label: 'Experience', value: '4+ yrs' },
+    { label: 'Apps', value: '15+' },
+    { label: 'Status', value: 'Available' },
+  ]
+
+  return (
+    <motion.div
+      role="dialog"
+      aria-label="Wallet — business card"
+      {...appZoom(origin, reduce)}
+      className="absolute inset-0 z-10 flex flex-col overflow-hidden bg-black text-white"
+    >
+      <div className="flex items-end justify-between px-4 pb-2 pt-11">
+        <p className="text-[1.35rem] font-bold leading-none tracking-[-0.02em]">Wallet</p>
+        <button
+          ref={closeRef}
+          type="button"
+          onClick={onClose}
+          className="rounded-full px-1 text-[0.78rem] font-semibold text-[#0a84ff] transition hover:text-[#4aa3ff]"
+        >
+          Done
+        </button>
+      </div>
+
+      <div className="no-scrollbar flex flex-1 flex-col gap-3 overflow-y-auto px-3 pb-7 pt-1">
+        {/* The pass */}
+        <motion.div
+          initial={reduce ? { opacity: 1 } : { opacity: 0, y: 40 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={reduce ? { duration: 0 } : { delay: 0.2, type: 'spring', stiffness: 260, damping: 26 }}
+          className="grad-accent-bg relative overflow-hidden rounded-[1rem] p-3.5 shadow-[0_18px_40px_-16px_rgba(47,91,255,0.7)]"
+        >
+          <div aria-hidden className="absolute -right-10 -top-12 h-32 w-32 rounded-full bg-white/10" />
+          <div aria-hidden className="absolute -bottom-16 -left-8 h-32 w-32 rounded-full bg-white/[0.07]" />
+
+          <div className="relative flex items-center justify-between">
+            <span className="flex h-7 w-7 items-center justify-center rounded-[0.5rem] bg-white text-[0.6rem] font-bold text-[#101114]">
+              RJ
+            </span>
+            <span className="text-[0.5rem] font-semibold uppercase tracking-[0.14em] text-white/75">Business card</span>
+          </div>
+
+          <p className="relative mt-4 text-[1.05rem] font-bold leading-tight tracking-[-0.01em]">Raj Javiya</p>
+          <p className="relative text-[0.65rem] text-white/80">Senior Mobile Developer · Flutter, Android & Web</p>
+
+          <div className="relative mt-3.5">
+            <p className="text-[0.48rem] font-semibold uppercase tracking-[0.12em] text-white/60">Email</p>
+            <p className="truncate text-[0.72rem] font-semibold">{emailAddress}</p>
+          </div>
+          <dl className="relative mt-2.5 grid grid-cols-3 gap-2">
+            {stats.map((stat) => (
+              <div key={stat.label} className="min-w-0">
+                <dt className="text-[0.48rem] font-semibold uppercase tracking-[0.12em] text-white/60">{stat.label}</dt>
+                <dd className="flex items-center gap-1 truncate text-[0.72rem] font-semibold">
+                  {stat.label === 'Status' ? <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-[#4ade80]" /> : null}
+                  {stat.value}
+                </dd>
+              </div>
+            ))}
+          </dl>
+
+          <p className="relative mt-3.5 border-t border-white/20 pt-2 text-[0.58rem] font-medium text-white/75">{siteHost}</p>
+        </motion.div>
+
+        {/* Actions */}
+        <a
+          href={vcardUrl}
+          onClick={() => trackEvent('vcard_download', { location: 'hero_wallet' })}
+          className="mt-1 inline-flex items-center justify-center gap-1.5 rounded-xl bg-white py-2.5 text-[0.75rem] font-semibold text-[#101114] transition hover:bg-white/90"
+        >
+          <UserPlus size={14} />
+          Add to Contacts
+        </a>
+        <div className="grid grid-cols-2 gap-2">
+          <button
+            type="button"
+            onClick={share}
+            className="inline-flex items-center justify-center gap-1.5 rounded-xl bg-white/10 py-2.5 text-[0.72rem] font-semibold transition hover:bg-white/15"
+          >
+            {copied === 'link' ? <Check size={13} className="text-[#4ade80]" /> : <Share2 size={13} />}
+            {copied === 'link' ? 'Link copied' : 'Share'}
+          </button>
+          <button
+            type="button"
+            onClick={copyEmail}
+            className="inline-flex items-center justify-center gap-1.5 rounded-xl bg-white/10 py-2.5 text-[0.72rem] font-semibold transition hover:bg-white/15"
+          >
+            {copied === 'email' ? <Check size={13} className="text-[#4ade80]" /> : <Copy size={13} />}
+            {copied === 'email' ? 'Copied' : 'Copy email'}
+          </button>
+        </div>
+        <p className="text-center text-[0.58rem] leading-4 text-white/50">
+          “Add to Contacts” saves my details straight to your phone.
+        </p>
+      </div>
+    </motion.div>
+  )
+}
+
 // Live status-bar clock in Raj's time zone, shown iOS-style without AM/PM. "9:41" until mounted.
 function useIstClock() {
   const [time, setTime] = useState('9:41')
@@ -998,11 +1143,14 @@ function useIslandMessage() {
   return message
 }
 
+// Anything the hero phone can open: a project preview or one of the built-in apps.
+type PhoneApp = Project | 'settings' | 'messages' | 'wallet'
+
 // The hero: a phone home screen where every app icon is a real project.
 function HeroPhone() {
   const reduce = useReducedMotion()
   const screenRef = useRef<HTMLDivElement>(null)
-  const [launched, setLaunched] = useState<{ app: Project | 'settings' | 'messages'; origin: string } | null>(null)
+  const [launched, setLaunched] = useState<{ app: PhoneApp; origin: string } | null>(null)
   // Built-in apps have light screens, so the status bar switches to dark text over them.
   const lightApp = launched?.app === 'settings' || launched?.app === 'messages'
   const clock = useIstClock()
@@ -1061,7 +1209,7 @@ function HeroPhone() {
     .filter((project): project is Project => Boolean(project))
 
   // Zoom the preview out of the tapped icon's position on the screen.
-  const launchApp = (app: Project | 'settings' | 'messages', icon: HTMLElement) => {
+  const launchApp = (app: PhoneApp, icon: HTMLElement) => {
     const screen = screenRef.current?.getBoundingClientRect()
     const rect = icon.getBoundingClientRect()
     const origin = screen
@@ -1277,6 +1425,28 @@ function HeroPhone() {
                     Messages
                   </span>
                 </motion.button>
+                <motion.button
+                  type="button"
+                  aria-label="Open Wallet — business card"
+                  aria-haspopup="dialog"
+                  onClick={(e) => {
+                    if (!jiggle) launchApp('wallet', e.currentTarget)
+                  }}
+                  {...pop(projects.length + 4)}
+                  layout
+                  whileTap={reduce || jiggle ? undefined : { scale: 0.88 }}
+                  className="group flex flex-col items-center gap-1"
+                >
+                  <span
+                    className={`relative flex h-[3.1rem] w-[3.1rem] items-center justify-center overflow-hidden rounded-[0.9rem] bg-gradient-to-b from-[#2a2b30] to-[#0b0c0f] text-white shadow-[0_4px_10px_rgba(0,0,0,0.18)] transition group-hover:-translate-y-0.5 ${jiggle ? 'jiggle' : ''}`}
+                    style={jiggle ? { animationDelay: '-0.2s' } : undefined}
+                  >
+                    <Wallet size={23} strokeWidth={1.75} />
+                  </span>
+                  <span className="text-[0.6rem] font-medium text-white [text-shadow:0_1px_2px_rgba(0,0,0,0.35)]">
+                    Wallet
+                  </span>
+                </motion.button>
               </div>
 
               {/* Dock */}
@@ -1305,6 +1475,8 @@ function HeroPhone() {
                   <PhoneSettings key="settings" origin={launched.origin} onClose={closeApp} />
                 ) : launched?.app === 'messages' ? (
                   <PhoneMessages key="messages" origin={launched.origin} onClose={closeApp} />
+                ) : launched?.app === 'wallet' ? (
+                  <PhoneWallet key="wallet" origin={launched.origin} onClose={closeApp} />
                 ) : launched ? (
                   <PhoneAppPreview
                     key={launched.app.slug}
@@ -2174,6 +2346,17 @@ export default function PortfolioHome({
       run: () => {
         trackEvent('book_call_click', { location: 'spotlight' })
         openExternal(bookingUrl)
+      },
+    },
+    {
+      id: 'action-vcard',
+      group: 'Actions',
+      label: 'Save my contact',
+      hint: 'Add Raj to your Contacts (vCard)',
+      icon: UserPlus,
+      run: () => {
+        trackEvent('vcard_download', { location: 'spotlight' })
+        window.location.href = vcardUrl
       },
     },
     {
