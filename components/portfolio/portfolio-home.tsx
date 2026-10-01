@@ -3,7 +3,7 @@
 import Link from 'next/link'
 import NextImage from 'next/image'
 import { useRouter } from 'next/navigation'
-import type { GitHubStats, Repo } from '@/lib/github'
+import type { GitHubActivity, GitHubStats, Repo } from '@/lib/github'
 import { hasCaseStudy } from '@/lib/case-studies'
 import { projects, type Project } from '@/lib/projects'
 import { siteHost, siteUrl } from '@/lib/site'
@@ -1096,15 +1096,46 @@ function useIstClock() {
 
 type IslandMessage = { key: string; icon: ReactNode; text: string }
 
+// "now", "5m ago", "3h ago", "2d ago".
+function timeAgo(iso: string) {
+  const minutes = Math.floor((Date.now() - Date.parse(iso)) / 60000)
+  if (minutes < 1) return 'now'
+  if (minutes < 60) return `${minutes}m ago`
+  const hours = Math.floor(minutes / 60)
+  return hours < 24 ? `${hours}h ago` : `${Math.floor(hours / 24)}d ago`
+}
+
+// Repos are named like "split_ease"; projects have slugs like "splitease".
+const normalizeName = (name: string) => name.toLowerCase().replace(/[^a-z0-9]/g, '')
+
+function activityProject(item: GitHubActivity) {
+  return projects.find((project) => normalizeName(project.slug) === normalizeName(item.repo))
+}
+
 // Dynamic Island: every few seconds it expands with a short live status, then shrinks back.
 // Messages are built after mount (the IST clock would otherwise mismatch the server render).
-function useIslandMessage() {
+// Real GitHub activity is mixed in as live notifications, e.g. "Pushed to SplitEase · 2h ago".
+function useIslandMessage(activity: GitHubActivity[]) {
   const [message, setMessage] = useState<IslandMessage | null>(null)
 
   useEffect(() => {
     const building = projects.find((project) => project.inProgress)
 
+    const activityMessages = activity.map((item) => () => {
+      const project = activityProject(item)
+      return {
+        key: `github-${item.id}`,
+        icon: project ? (
+          <AppIcon project={project} className="h-4 w-4 shrink-0 rounded-[0.3rem]" />
+        ) : (
+          <Github size={11} className="shrink-0" />
+        ),
+        text: `${item.action} ${project?.name ?? item.repo} · ${timeAgo(item.createdAt)}`,
+      }
+    })
+
     const messages: (() => IslandMessage)[] = [
+      ...activityMessages,
       ...(building
         ? [
             () => ({
@@ -1138,16 +1169,142 @@ function useIslandMessage() {
     }
     timer = window.setTimeout(show, 2000)
     return () => window.clearTimeout(timer)
-  }, [])
+  }, [activity])
 
   return message
+}
+
+// Pull down from the top of the hero phone (or tap the Dynamic Island): Raj's real GitHub
+// activity as iOS-style notifications. Swipe up, press Escape or tap × to close.
+function NotificationCenter({
+  activity,
+  onClose,
+  onOpenMessages,
+}: {
+  activity: GitHubActivity[]
+  onClose: () => void
+  onOpenMessages: (from: HTMLElement) => void
+}) {
+  const reduce = useReducedMotion()
+  const closeRef = usePhoneAppFocus(onClose)
+  // Only ever rendered after a tap, so reading the clock here can't cause a hydration mismatch.
+  const time = formatIstTime().replace(/\s*[AP]M$/i, '')
+  const date = new Intl.DateTimeFormat('en-US', {
+    timeZone: 'Asia/Kolkata',
+    weekday: 'long',
+    month: 'long',
+    day: 'numeric',
+  }).format(new Date())
+
+  const card =
+    'flex w-full items-start gap-2.5 rounded-[1.1rem] bg-white/85 p-2.5 text-left text-[#101114] shadow-[0_4px_14px_rgba(0,0,0,0.12)] backdrop-blur-md transition hover:bg-white'
+  const appear = (i: number) => ({
+    initial: reduce ? { opacity: 1 } : { opacity: 0, y: -12 },
+    animate: { opacity: 1, y: 0 },
+    transition: reduce ? { duration: 0 } : { delay: 0.12 + i * 0.06, type: 'spring' as const, stiffness: 380, damping: 28 },
+  })
+
+  return (
+    <motion.div
+      role="dialog"
+      aria-label="Notification Center"
+      initial={reduce ? { opacity: 0 } : { y: '-100%' }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={reduce ? { opacity: 0 } : { y: '-100%' }}
+      transition={reduce ? { duration: 0 } : { type: 'spring', stiffness: 320, damping: 34 }}
+      drag={reduce ? false : 'y'}
+      dragConstraints={{ top: 0, bottom: 0 }}
+      dragElastic={{ top: 0.6, bottom: 0.05 }}
+      onDragEnd={(_, info) => {
+        if (info.offset.y < -50 || info.velocity.y < -400) onClose()
+      }}
+      className="absolute inset-0 z-[25] flex flex-col bg-[#0b0c0f]/55 text-white backdrop-blur-2xl"
+    >
+      <div className="pt-12 text-center">
+        <p className="text-[0.75rem] font-medium text-white/80">{date}</p>
+        <p className="mt-0.5 text-[3.4rem] font-semibold leading-none tracking-[-0.03em] tabular-nums">{time}</p>
+      </div>
+
+      <div className="mt-5 flex items-center justify-between px-4">
+        <p className="text-[0.95rem] font-bold tracking-[-0.01em]">Notifications</p>
+        <button
+          ref={closeRef}
+          type="button"
+          onClick={onClose}
+          aria-label="Close Notification Center"
+          className="flex h-6 w-6 items-center justify-center rounded-full bg-white/20 text-white transition hover:bg-white/30"
+        >
+          <X size={12} strokeWidth={2.75} />
+        </button>
+      </div>
+
+      <ul className="no-scrollbar mt-2.5 flex-1 space-y-2 overflow-y-auto px-3 pb-10">
+        <motion.li {...appear(0)}>
+          <button type="button" onClick={(e) => onOpenMessages(e.currentTarget)} className={card}>
+            <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-[0.55rem] bg-gradient-to-b from-[#6ee27f] to-[#27b847] text-white">
+              <MessageCircle size={17} fill="currentColor" strokeWidth={1.5} />
+            </span>
+            <span className="min-w-0 flex-1">
+              <span className="flex items-center justify-between gap-2 text-[0.58rem] font-medium uppercase tracking-[0.06em] text-black/45">
+                Messages<span className="normal-case tracking-normal">now</span>
+              </span>
+              <span className="block text-[0.72rem] font-semibold">Raj Javiya</span>
+              <span className="block text-[0.66rem] leading-snug text-black/65">
+                Have an app idea? Tap to reply — I usually answer within a day.
+              </span>
+            </span>
+          </button>
+        </motion.li>
+
+        {activity.map((item, i) => {
+          const project = activityProject(item)
+          return (
+            <motion.li key={item.id} {...appear(i + 1)}>
+              <a
+                href={item.url}
+                target="_blank"
+                rel="noreferrer"
+                onClick={() => trackEvent('hero_notification_open', { repo: item.repo })}
+                className={card}
+              >
+                {project ? (
+                  <AppIcon project={project} className="h-8 w-8 shrink-0 rounded-[0.55rem]" />
+                ) : (
+                  <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-[0.55rem] bg-[#101114] text-white">
+                    <Github size={16} />
+                  </span>
+                )}
+                <span className="min-w-0 flex-1">
+                  <span className="flex items-center justify-between gap-2 text-[0.58rem] font-medium uppercase tracking-[0.06em] text-black/45">
+                    GitHub<span className="normal-case tracking-normal">{timeAgo(item.createdAt)}</span>
+                  </span>
+                  <span className="block truncate text-[0.72rem] font-semibold">
+                    {item.action} {project?.name ?? item.repo}
+                  </span>
+                  <span className="line-clamp-2 block text-[0.66rem] leading-snug text-black/65">{item.detail}</span>
+                </span>
+              </a>
+            </motion.li>
+          )
+        })}
+
+        {activity.length === 0 ? (
+          <motion.li {...appear(1)} className="pt-3 text-center text-[0.68rem] text-white/60">
+            No older notifications
+          </motion.li>
+        ) : null}
+      </ul>
+
+      <div aria-hidden className="absolute bottom-1.5 left-1/2 h-1 w-24 -translate-x-1/2 rounded-full bg-white/80" />
+    </motion.div>
+  )
 }
 
 // Anything the hero phone can open: a project preview or one of the built-in apps.
 type PhoneApp = Project | 'settings' | 'messages' | 'wallet'
 
 // The hero: a phone home screen where every app icon is a real project.
-function HeroPhone() {
+function HeroPhone({ activity }: { activity: GitHubActivity[] }) {
   const reduce = useReducedMotion()
   const screenRef = useRef<HTMLDivElement>(null)
   const [launched, setLaunched] = useState<{ app: PhoneApp; origin: string } | null>(null)
@@ -1155,7 +1312,14 @@ function HeroPhone() {
   const lightApp = launched?.app === 'settings' || launched?.app === 'messages'
   const clock = useIstClock()
   const closeApp = useCallback(() => setLaunched(null), [])
-  const island = useIslandMessage()
+  const island = useIslandMessage(activity)
+  const [notificationsOpen, setNotificationsOpen] = useState(false)
+  const closeNotifications = useCallback(() => setNotificationsOpen(false), [])
+  const openNotifications = () => {
+    if (notificationsOpen) return
+    setNotificationsOpen(true)
+    trackEvent('hero_notifications_open')
+  }
 
   // Jiggle mode: press and hold an icon, then drag icons onto each other to rearrange them.
   const [jiggle, setJiggle] = useState(false)
@@ -1275,6 +1439,21 @@ function HeroPhone() {
                   ) : null}
                 </AnimatePresence>
               </motion.div>
+
+              {/* Pull down from the top edge (or tap the island) to open the Notification Center */}
+              {jiggle || notificationsOpen ? null : (
+                <motion.button
+                  type="button"
+                  aria-label="Open Notification Center"
+                  aria-haspopup="dialog"
+                  onClick={openNotifications}
+                  onPanEnd={(_, info) => {
+                    if (info.offset.y > 16) openNotifications()
+                  }}
+                  style={{ touchAction: 'none' }}
+                  className="absolute inset-x-0 top-0 z-40 h-9 cursor-pointer"
+                />
+              )}
 
               {jiggle ? (
                 <button
@@ -1487,6 +1666,19 @@ function HeroPhone() {
                 ) : null}
               </AnimatePresence>
 
+              <AnimatePresence>
+                {notificationsOpen ? (
+                  <NotificationCenter
+                    activity={activity}
+                    onClose={closeNotifications}
+                    onOpenMessages={(from) => {
+                      setNotificationsOpen(false)
+                      launchApp('messages', from)
+                    }}
+                  />
+                ) : null}
+              </AnimatePresence>
+
               <div
                 aria-hidden
                 className={`absolute bottom-1.5 left-1/2 z-20 h-1 w-24 -translate-x-1/2 rounded-full transition-colors ${launched ? 'bg-foreground/70' : 'bg-white/80'}`}
@@ -1497,7 +1689,7 @@ function HeroPhone() {
       </div>
 
       <p className="mt-5 text-center text-xs text-muted-foreground">
-        {jiggle ? 'Drag icons to rearrange · tap Done when finished' : 'Tap an app to open it · press and hold to rearrange'}
+        {jiggle ? 'Drag icons to rearrange · tap Done when finished' : 'Tap an app · pull down from the top for notifications · hold to rearrange'}
       </p>
     </div>
   )
@@ -2106,9 +2298,11 @@ function SkillCard({ group, variant }: { group: SkillGroup; variant: SkillCardVa
 export default function PortfolioHome({
   repos = [],
   githubStats = { repoCount: 0 },
+  activity = [],
 }: {
   repos: Repo[]
   githubStats: GitHubStats
+  activity?: GitHubActivity[]
 }) {
   const reduceMotion = useReducedMotion()
   const router = useRouter()
@@ -2526,7 +2720,7 @@ export default function PortfolioHome({
             </Reveal>
 
             <Reveal delay={0.1}>
-              <HeroPhone />
+              <HeroPhone activity={activity} />
             </Reveal>
           </div>
 
